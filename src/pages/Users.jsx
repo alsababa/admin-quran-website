@@ -32,18 +32,18 @@ const UsersPage = () => {
     );
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6" dir="rtl">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h3 className="text-2xl font-bold">Users Management</h3>
-                    <p className="text-gray-400 text-sm">Monitor and manage application users.</p>
+                <div className="text-right">
+                    <h3 className="text-2xl font-bold">إدارة المستخدمين</h3>
+                    <p className="text-gray-400 text-sm">مراقبة وإدارة مستخدمي التطبيق.</p>
                 </div>
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                     <input
                         type="text"
-                        placeholder="Search by name or email..."
-                        className="pl-10 pr-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm w-full md:w-80 focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="البحث بالاسم أو البريد الإلكتروني..."
+                        className="pr-10 pl-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm w-full md:w-80 focus:ring-2 focus:ring-blue-500 outline-none text-right"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -51,20 +51,20 @@ const UsersPage = () => {
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-right text-sm">
                     <thead className="bg-gray-800 bg-opacity-50 border-b border-gray-800 text-gray-400">
                         <tr>
-                            <th className="px-6 py-4 font-semibold">User Info</th>
-                            <th className="px-6 py-4 font-semibold">Tier</th>
-                            <th className="px-6 py-4 font-semibold">Status</th>
-                            <th className="px-6 py-4 font-semibold">Actions</th>
+                            <th className="px-6 py-4 font-semibold">بيانات المستخدم</th>
+                            <th className="px-6 py-4 font-semibold">الفئة</th>
+                            <th className="px-6 py-4 font-semibold">الحالة</th>
+                            <th className="px-6 py-4 font-semibold">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800">
                         {loading ? (
-                            <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500">Loading users...</td></tr>
+                            <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500">جاري تحميل المستخدمين...</td></tr>
                         ) : filteredUsers.length === 0 ? (
-                            <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500">No users found.</td></tr>
+                            <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500">لم يتم العثور على مستخدمين.</td></tr>
                         ) : (
                             filteredUsers.map(user => (
                                 <tr key={user.id} className="hover:bg-gray-800 hover:bg-opacity-30 transition-colors">
@@ -73,8 +73,8 @@ const UsersPage = () => {
                                             <div className="h-10 w-10 rounded-full bg-blue-500 bg-opacity-10 text-blue-500 flex items-center justify-center font-bold">
                                                 {user.fullName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                                             </div>
-                                            <div>
-                                                <p className="font-medium">{user.fullName || 'No Name'}</p>
+                                            <div className="text-right">
+                                                <p className="font-medium">{user.fullName || 'بدون اسم'}</p>
                                                 <p className="text-xs text-gray-500">{user.email}</p>
                                             </div>
                                         </div>
@@ -82,19 +82,19 @@ const UsersPage = () => {
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider ${user.subscriptionTier === 'premium' ? 'bg-amber-500 bg-opacity-10 text-amber-500 border border-amber-500 border-opacity-20' : 'bg-gray-700 text-gray-400'
                                             }`}>
-                                            {user.subscriptionTier || 'free'}
+                                            {user.subscriptionTier === 'premium' ? 'مميز' : 'مجاني'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`flex items-center gap-1.5 text-xs ${user.subscriptionStatus === 'active' ? 'text-green-500' : 'text-gray-500'
                                             }`}>
                                             <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                                            {user.subscriptionStatus || 'free'}
+                                            {user.subscriptionStatus === 'active' ? 'نشط' : 'غير نشط'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <button className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-colors" title="Manage User">
+                                            <button className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-colors" title="إدارة المستخدم">
                                                 <UserCog size={18} />
                                             </button>
                                         </div>

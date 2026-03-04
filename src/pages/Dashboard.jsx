@@ -17,20 +17,20 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-950 text-gray-100 flex overflow-hidden">
+        <div className="min-h-screen bg-gray-950 text-gray-100 flex overflow-hidden" dir="rtl">
             {/* Sidebar */}
-            <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col shrink-0">
-                <div className="p-6">
-                    <h1 className="text-xl font-bold flex items-center gap-2">
+            <div className="w-64 bg-gray-900 border-l border-gray-800 flex flex-col shrink-0">
+                <div className="p-6 text-right">
+                    <h1 className="text-xl font-bold flex items-center justify-start gap-2">
                         <BookOpen className="text-blue-500" />
-                        <span>Quran SL Admin</span>
+                        <span>أدمن قرآن لغة الإشارة</span>
                     </h1>
                 </div>
 
                 <nav className="mt-6 flex-1 px-4 space-y-2 overflow-y-auto">
-                    <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Overview" />
-                    <SidebarLink to="/dashboard/users" icon={<Users size={20} />} label="Users" />
-                    <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard size={20} />} label="Subscriptions" />
+                    <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="نظرة عامة" />
+                    <SidebarLink to="/dashboard/users" icon={<Users size={20} />} label="المستخدمين" />
+                    <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard size={20} />} label="الاشتراكات" />
                 </nav>
 
                 <div className="p-4 border-t border-gray-800">
@@ -38,9 +38,9 @@ const Dashboard = () => {
                         <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold shrink-0">
                             {user?.email?.charAt(0).toUpperCase() || 'A'}
                         </div>
-                        <div className="overflow-hidden">
+                        <div className="overflow-hidden text-right">
                             <p className="text-sm font-medium truncate">{user?.email}</p>
-                            <p className="text-xs text-gray-500">Administrator</p>
+                            <p className="text-xs text-gray-500">مسؤول</p>
                         </div>
                     </div>
                     <button
@@ -48,7 +48,7 @@ const Dashboard = () => {
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
                     >
                         <LogOut size={16} />
-                        <span>Logout</span>
+                        <span>تسجيل الخروج</span>
                     </button>
                 </div>
             </div>
@@ -56,16 +56,16 @@ const Dashboard = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 <header className="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-8 shrink-0">
-                    <h2 className="font-semibold text-lg">Dashboard</h2>
+                    <h2 className="font-semibold text-lg">لوحة التحكم</h2>
                     <div className="flex items-center gap-4">
                         <span className="text-xs px-2 py-1 bg-green-500 bg-opacity-10 text-green-500 rounded border border-green-500 border-opacity-20 flex items-center gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                            System Online
+                            النظام متصل
                         </span>
                     </div>
                 </header>
 
-                <main className="p-8 flex-1 overflow-y-auto w-full">
+                <main className="p-8 flex-1 overflow-y-auto w-full text-right">
                     <Routes>
                         <Route path="/" element={<Overview />} />
                         <Route path="/users" element={<UsersPage />} />
@@ -117,20 +117,20 @@ const Overview = () => {
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard title="Total Users" value={loading ? '...' : stats.totalUsers} subtitle="Registered accounts" />
-                <StatCard title="Active Subscriptions" value={loading ? '...' : stats.activeSubs} subtitle="Premium access" />
-                <StatCard title="Revenue (estimate)" value={loading ? '...' : `${stats.revenue} SAR`} subtitle="Per month" />
+                <StatCard title="إجمالي المستخدمين" value={loading ? '...' : stats.totalUsers} subtitle="الحسابات المسجلة" />
+                <StatCard title="الاشتراكات النشطة" value={loading ? '...' : stats.activeSubs} subtitle="الوصول المميز" />
+                <StatCard title="الإيرادات (تقديري)" value={loading ? '...' : `${stats.revenue} ريال`} subtitle="شهرياً" />
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
-                <h4 className="font-semibold text-lg">Quick Actions</h4>
+                <h4 className="font-semibold text-lg">إجراءات سريعة</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <QuickAction to="/dashboard/users" label="View Users" description="Account details & history" />
-                    <QuickAction to="/dashboard/subscriptions" label="Update Plans" description="Manual premium granting" />
-                    <QuickAction to="/dashboard/users" label="Support" description="Helping user issues" />
+                    <QuickAction to="/dashboard/users" label="عرض المستخدمين" description="تفاصيل الحساب والسجل" />
+                    <QuickAction to="/dashboard/subscriptions" label="تحديث الخطط" description="منح التميز يدوياً" />
+                    <QuickAction to="/dashboard/users" label="الدعم الفني" description="مساعدة المستخدمين" />
                     <div className="p-4 bg-gray-800 bg-opacity-40 rounded-lg border border-gray-700 flex flex-col justify-center opacity-50 cursor-not-allowed">
-                        <span className="font-medium text-sm">Reports</span>
-                        <span className="text-xs text-gray-500">Coming soon...</span>
+                        <span className="font-medium text-sm text-right">التقارير</span>
+                        <span className="text-xs text-gray-500 text-right">قريباً...</span>
                     </div>
                 </div>
             </div>
@@ -139,7 +139,7 @@ const Overview = () => {
 };
 
 const StatCard = ({ title, value, subtitle }) => (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-sm text-right">
         <p className="text-sm text-gray-400 font-medium">{title}</p>
         <h3 className="text-3xl font-bold mt-2">{value}</h3>
         <p className="text-xs text-blue-500 mt-1">{subtitle}</p>
@@ -149,7 +149,7 @@ const StatCard = ({ title, value, subtitle }) => (
 const QuickAction = ({ to, label, description }) => (
     <Link
         to={to}
-        className="p-4 bg-gray-800 bg-opacity-40 rounded-lg border border-gray-700 hover:border-blue-500 transition-all group"
+        className="p-4 bg-gray-800 bg-opacity-40 rounded-lg border border-gray-700 hover:border-blue-500 transition-all group text-right"
     >
         <span className="font-medium text-sm group-hover:text-blue-500 transition-colors">{label}</span>
         <p className="text-xs text-gray-500 mt-1">{description}</p>
