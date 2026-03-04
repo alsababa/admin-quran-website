@@ -4,98 +4,65 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Video,
     Plus,
-    Trash2,
-    ExternalLink,
+    Search,
     Play,
+    Trash2,
+    Edit,
+    MoreVertical,
+    CheckCircle2,
     X,
-    Filter,
-    Layers,
-    Clock,
-    Check
+    Upload,
+    Link as LinkIcon,
+    Film
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { collection, query, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
 
-const VideoCard = ({ video, onDelete, index }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.1 }}
-        className="bg-slate-900/40 backdrop-blur-md border border-slate-800/50 rounded-[2rem] overflow-hidden group hover:border-blue-500/30 transition-all duration-500"
-    >
-        <div className="aspect-video bg-slate-800/50 flex items-center justify-center relative overflow-hidden">
-            <Video size={48} className="text-slate-700 transition-transform duration-500 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-sm">
-                <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-xl shadow-blue-500/40 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                >
-                    <Play fill="currentColor" size={24} className="mr-1" />
-                </motion.div>
-            </div>
-            <div className="absolute top-4 right-4 px-3 py-1 bg-slate-950/60 backdrop-blur-md rounded-full border border-slate-800/50 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                {video.category || 'عام'}
-            </div>
-        </div>
-
-        <div className="p-6">
-            <div className="flex justify-between items-start gap-4">
-                <div className="text-right">
-                    <h4 className="font-bold text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-1">{video.title}</h4>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                            <Clock size={12} />
-                            {video.createdAt ? new Date(video.createdAt).toLocaleDateString('ar-SA') : 'تاريخ غير معروف'}
-                        </span>
-                        <span className="flex items-center gap-1">
-                            <Layers size={12} />
-                            {video.category}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="mt-6 flex items-center gap-2">
-                <a
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-slate-800/50 hover:bg-blue-500/10 hover:text-blue-400 rounded-xl border border-slate-700/50 hover:border-blue-500/30 transition-all text-xs font-bold text-slate-400"
-                >
-                    <ExternalLink size={14} />
-                    <span>فتح الرابط</span>
-                </a>
-                <button
-                    onClick={() => onDelete(video.id)}
-                    className="p-2.5 bg-red-500/5 hover:bg-red-500/20 text-red-500 border border-red-500/10 rounded-xl transition-all active:scale-90"
-                >
-                    <Trash2 size={18} />
-                </button>
-            </div>
-        </div>
-    </motion.div>
-);
-
-export default function Videos() {
+export default function VideosPage() {
     const [videos, setVideos] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newVideo, setNewVideo] = useState({ title: '', url: '', category: 'Quran' });
+    const [loading, setLoading] = useState(true);
+    const [newVideo, setNewVideo] = useState({ title: '', url: '', category: 'قرآن' });
 
     useEffect(() => {
         fetchVideos();
     }, []);
 
     const fetchVideos = async () => {
-        setLoading(true);
         try {
-            const q = query(collection(db, "videos"));
-            const querySnapshot = await getDocs(q);
-            const videosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setVideos(videosData);
-        } catch (error) {
-            console.error("Error fetching videos:", error);
+            // Fetch from Firebase
+            const fbSnapshot = await getDocs(collection(db, "videos"));
+            const fbVideos = fbSnapshot.docs.map(doc => ({
+                id: `fb-${doc.id}`,
+                ...doc.data(),
+                source: 'firebase'
+            }));
+
+            // Fetch from Supabase
+            let sbVideos = [];
+            try {
+                const { data, error } = await supabase
+                    .from('videos')
+                    .select('*');
+
+                if (data) {
+                    sbVideos = data.map(video => ({
+                        id: `sb-${video.id}`,
+                        title: video.title,
+                        url: video.url,
+                        category: video.category || 'عام',
+                        createdAt: video.created_at ? { seconds: Math.floor(new Date(video.created_at).getTime() / 1000) } : null,
+                        source: 'supabase'
+                    }));
+                }
+            } catch (sbErr) {
+                console.warn("Supabase fetch error:", sbErr);
+            }
+
+            setVideos([...fbVideos, ...sbVideos]);
+        } catch (err) {
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -106,80 +73,113 @@ export default function Videos() {
         try {
             await addDoc(collection(db, "videos"), {
                 ...newVideo,
-                createdAt: new Date().toISOString()
+                createdAt: serverTimestamp()
             });
-            setNewVideo({ title: '', url: '', category: 'Quran' });
             setIsModalOpen(false);
+            setNewVideo({ title: '', url: '', category: 'قرآن' });
             fetchVideos();
-        } catch (error) {
-            console.error("Error adding video:", error);
+        } catch (err) {
+            console.error(err);
         }
     };
 
-    const handleDeleteVideo = async (id) => {
-        if (!window.confirm("هل أنت متأكد من حذف هذا الفيديو؟")) return;
-        try {
-            await deleteDoc(doc(db, "videos", id));
-            fetchVideos();
-        } catch (error) {
-            console.error("Error deleting video:", error);
+    const handleDelete = async (id) => {
+        if (confirm('هل أنت متأكد من حذف هذا الفيديو؟')) {
+            try {
+                await deleteDoc(doc(db, "videos", id));
+                fetchVideos();
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 
     return (
-        <div className="space-y-10 pb-20">
-            {/* Header Content */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-slate-900/40 backdrop-blur-md border border-slate-800/50 p-8 rounded-[2.5rem]">
+        <div className="space-y-12 pb-20">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div className="text-right">
-                    <h3 className="text-3xl font-black tracking-tight text-white mb-2">إدارة المحتوى</h3>
-                    <p className="text-slate-500 text-sm font-medium">رفع وتصنيف فيديوهات لغة الإشارة للقرآن الكريم.</p>
+                    <h3 className="text-4xl font-black text-white tracking-tighter text-right">مكتبة الفيديو</h3>
+                    <p className="text-[#8FB394]/40 font-bold text-sm mt-2 text-right">إدارة محتوى فيديوهات لغة الإشارة والدروس التعليمية.</p>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-80 group">
+                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#8FB394]/30" size={18} />
+                        <input
+                            type="text"
+                            placeholder="ابحث في المكتبة..."
+                            className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-white placeholder:text-[#8FB394]/20 focus:border-[#8FB394]/40 transition-all"
+                        />
+                    </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-[1.5rem] font-black transition-all shadow-xl shadow-blue-500/20 active:scale-95 text-sm"
+                        className="h-14 px-8 bg-[#8FB394] hover:bg-[#4A6351] text-[#0D1510] font-black rounded-2xl shadow-xl shadow-[#8FB394]/20 active:scale-95 transition-all flex items-center gap-3 shrink-0"
                     >
-                        <Plus size={20} />
-                        <span>إضافة فيديو جديد</span>
-                    </button>
-                    <button className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-slate-400 hover:text-blue-400 transition-all">
-                        <Filter size={20} />
+                        <Plus size={20} strokeWidth={3} />
+                        <span className="text-xs">إضافة فيديو</span>
                     </button>
                 </div>
             </div>
 
-            {/* Grid Content */}
-            <AnimatePresence mode="wait">
-                {loading ? (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="py-32 text-center"
-                    >
-                        <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-                        <p className="text-slate-500 font-bold">جاري تحميل المكتبة...</p>
-                    </motion.div>
-                ) : videos.length === 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                        className="py-32 flex flex-col items-center opacity-30 grayscale"
-                    >
-                        <div className="w-24 h-24 bg-slate-800 rounded-[2.5rem] flex items-center justify-center mb-6 border border-slate-700">
-                            <Video size={48} />
-                        </div>
-                        <h4 className="text-2xl font-black">المكتبة فارغة حالياً</h4>
-                        <p className="mt-2 font-medium">ابدأ بإضافة أول فيديو لعرضه هنا.</p>
-                    </motion.div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {videos.map((video, idx) => (
-                            <VideoCard key={video.id} video={video} index={idx} onDelete={handleDeleteVideo} />
-                        ))}
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Video Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <AnimatePresence>
+                    {loading ? (
+                        [1, 2, 3, 4].map(i => (
+                            <div key={i} className="aspect-video glass-panel rounded-3xl animate-pulse bg-[#8FB394]/5" />
+                        ))
+                    ) : videos.map((video, idx) => (
+                        <motion.div
+                            key={video.id}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="group glass-card rounded-[2.5rem] overflow-hidden border-[#8FB394]/10 hover:border-[#8FB394]/40 relative flex flex-col h-full shadow-2xl"
+                        >
+                            {/* Thumbnail Placeholder with Sage Gradient */}
+                            <div className="aspect-video bg-gradient-to-br from-[#4A6351]/40 to-[#0D1510] relative overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Film size={48} className="text-[#8FB394]/20 group-hover:scale-110 transition-transform duration-700" />
+                                </div>
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                                    <button className="h-16 w-16 bg-[#8FB394] text-[#0D1510] rounded-full flex items-center justify-center shadow-2xl scale-75 group-hover:scale-100 transition-all duration-500">
+                                        <Play size={28} fill="currentColor" className="mr-1" />
+                                    </button>
+                                </div>
+                                <div className="absolute top-4 right-4 bg-[#0D1510]/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-[#8FB394]/20 text-[10px] font-black text-[#8FB394] uppercase tracking-widest">
+                                    {video.category || 'عام'}
+                                </div>
+                            </div>
 
-            {/* Premium Modal */}
+                            <div className="p-7 flex flex-col flex-1">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h4 className="font-extrabold text-[#F5F2ED] text-base leading-snug line-clamp-2 text-right">{video.title}</h4>
+                                    <button className="text-[#8FB394]/40 hover:text-[#8FB394] p-1 transition-colors">
+                                        <MoreVertical size={18} />
+                                    </button>
+                                </div>
+
+                                <div className="mt-auto pt-6 border-t border-[#8FB394]/5 flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-[#8FB394]/40">
+                                        <CheckCircle2 size={14} className="text-[#8FB394]" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">مفعل</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDelete(video.id)}
+                                        className="text-[10px] font-bold text-rose-500/50 hover:text-rose-500 flex items-center gap-1.5 transition-all"
+                                    >
+                                        <Trash2 size={14} />
+                                        حذف
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+
+            {/* Add Video Modal */}
             <AnimatePresence>
                 {isModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
@@ -188,83 +188,85 @@ export default function Videos() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsModalOpen(false)}
-                            className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl"
+                            className="absolute inset-0 bg-[#0D1510]/95 backdrop-blur-xl"
                         />
+
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                            className="bg-slate-900 border border-slate-800/60 rounded-[3rem] p-10 w-full max-w-xl shadow-2xl relative z-10"
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="glass-panel w-full max-w-xl rounded-[3rem] p-12 relative overflow-hidden shadow-[0_0_100px_rgba(143,179,148,0.1)]"
                         >
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="absolute top-8 left-8 p-3 hover:bg-slate-800 rounded-2xl text-slate-500 transition-colors"
+                                className="absolute top-10 left-10 text-[#8FB394]/40 hover:text-white transition-colors"
                             >
-                                <X size={20} />
+                                <X size={24} />
                             </button>
 
-                            <div className="mb-10 text-right">
-                                <h3 className="text-3xl font-black text-white mb-2">إضافة محتوى جديد</h3>
-                                <p className="text-slate-500 text-sm">أدخل تفاصيل الفيديو للتخزين السحابي.</p>
+                            <div className="text-center mb-10 text-right">
+                                <h4 className="text-3xl font-black text-white text-right">إضافة فيديو جديد</h4>
+                                <p className="text-[#8FB394]/40 font-bold text-sm mt-2 text-right">أدخل تفاصيل الفيديو ليتم عرضه في التطبيق.</p>
                             </div>
 
-                            <form onSubmit={handleAddVideo} className="space-y-6 text-right">
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-3 pr-2">عنوان الفيديو</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-600"
-                                        placeholder="مثال: سورة الواقعة - لغة الإشارة"
-                                        value={newVideo.title}
-                                        onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-3 pr-2">رابط الفيديو (URL)</label>
-                                    <input
-                                        type="url"
-                                        required
-                                        className="w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl px-6 py-4 text-white text-left focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-600"
-                                        placeholder="https://youtube.com/..."
-                                        value={newVideo.url}
-                                        onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-3 pr-2">التصنيف</label>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {['Quran', 'Meaning', 'Lesson'].map(cat => (
-                                            <button
-                                                key={cat}
-                                                type="button"
-                                                onClick={() => setNewVideo({ ...newVideo, category: cat })}
-                                                className={`py-3 rounded-2xl border transition-all text-xs font-bold ${newVideo.category === cat
-                                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
-                                                        : 'bg-slate-800/40 border-slate-700/50 text-slate-400 hover:border-slate-500'
-                                                    }`}
-                                            >
-                                                {cat === 'Quran' ? 'قرآن' : cat === 'Meaning' ? 'معاني' : 'دروس'}
-                                                {newVideo.category === cat && <Check size={14} className="inline mr-1" />}
-                                            </button>
-                                        ))}
+                            <form onSubmit={handleAddVideo} className="space-y-8">
+                                <div className="space-y-3 text-right">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-[#8FB394]/60 mr-4">عنوان الفيديو</label>
+                                    <div className="relative">
+                                        <Film className="absolute right-5 top-1/2 -translate-y-1/2 text-[#8FB394]/20" size={20} />
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="سورة الفاتحة - لغة الإشارة"
+                                            className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-white placeholder:text-[#8FB394]/20"
+                                            value={newVideo.title}
+                                            onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
+                                        />
                                     </div>
                                 </div>
-                                <div className="pt-6 flex gap-4">
-                                    <button
-                                        type="submit"
-                                        className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-[1.5rem] shadow-xl shadow-blue-500/20 transition-all active:scale-95"
-                                    >
-                                        تأكيد الإضافة
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModalOpen(false)}
-                                        className="px-8 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-5 rounded-[1.5rem] transition-all"
-                                    >
-                                        إلغاء
-                                    </button>
+
+                                <div className="space-y-3 text-right">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-[#8FB394]/60 mr-4">رابط الفيديو (URL)</label>
+                                    <div className="relative">
+                                        <LinkIcon className="absolute right-5 top-1/2 -translate-y-1/2 text-[#8FB394]/20" size={20} />
+                                        <input
+                                            type="url"
+                                            required
+                                            placeholder="https://youtube.com/..."
+                                            className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-white placeholder:text-[#8FB394]/20"
+                                            value={newVideo.url}
+                                            onChange={(e) => setNewVideo({ ...newVideo, url: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
+
+                                <div className="grid grid-cols-2 gap-4 text-right">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-[#8FB394]/60 mr-4">التصنيف</label>
+                                        <select
+                                            className="w-full h-14 glass-input rounded-2xl px-6 text-sm font-medium text-white appearance-none"
+                                            value={newVideo.category}
+                                            onChange={(e) => setNewVideo({ ...newVideo, category: e.target.value })}
+                                        >
+                                            <option value="قرآن" className="bg-[#0D1510]">قرآن كريم</option>
+                                            <option value="تعليم" className="bg-[#0D1510]">تعليم</option>
+                                            <option value="أخرى" className="bg-[#0D1510]">أخرى</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex items-end justify-center pb-1">
+                                        <div className="p-4 bg-[#8FB394]/5 border border-[#8FB394]/10 rounded-2xl flex items-center justify-center gap-3 w-full">
+                                            <Upload size={18} className="text-[#8FB394]" />
+                                            <span className="text-[10px] font-black text-[#8FB394] uppercase tracking-widest">جاهز للرفع</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full h-16 bg-[#8FB394] text-[#0D1510] font-black rounded-2xl shadow-2xl shadow-[#8FB394]/20 hover:bg-white transition-all active:scale-95 text-sm mt-4"
+                                >
+                                    تأكيد الإضافة ونشر الفيديو
+                                </button>
                             </form>
                         </motion.div>
                     </div>

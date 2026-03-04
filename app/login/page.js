@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Mail, Lock, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -28,74 +28,88 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden font-sans" dir="rtl">
-            {/* Background Aesthetics */}
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/20 blur-[150px] rounded-full animate-pulse" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-indigo-600/20 blur-[150px] rounded-full" />
+        <div className="min-h-screen bg-[#0D1510] flex items-center justify-center p-4 relative overflow-hidden text-[#F5F2ED] font-sans" dir="rtl">
+            {/* Animated Botanical Ambient Background */}
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#8FB394]/10 blur-[130px] rounded-full animate-glow-sage" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#4A6351]/10 blur-[130px] rounded-full animate-glow-sage" style={{ animationDelay: '-5s' }} />
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="w-full max-w-lg z-10"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-md z-10"
             >
-                {/* Logo Section */}
-                <div className="text-center mb-10">
+                {/* Branding Section */}
+                <div className="text-center mb-10 overflow-hidden">
                     <motion.div
-                        initial={{ rotate: -10, scale: 0.8 }}
-                        animate={{ rotate: 0, scale: 1 }}
-                        transition={{ delay: 0.3, type: "spring" }}
-                        className="inline-flex p-5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] shadow-2xl shadow-blue-500/20 mb-6 text-white"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
+                        className="inline-flex p-5 rounded-3xl bg-gradient-to-br from-[#8FB394] to-[#4A6351] shadow-2xl shadow-[#8FB394]/20 mb-6 text-[#F5F2ED]"
                     >
-                        <BookOpen size={40} />
+                        <BookOpen size={44} strokeWidth={2.5} />
                     </motion.div>
-                    <h1 className="text-4xl font-black text-white tracking-tight mb-3">قرآن لغة الإشارة</h1>
-                    <p className="text-slate-400 font-medium">لوحة التحكم الإدارية للمحتوى والبيانات</p>
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-4xl font-extrabold tracking-tight mb-3 text-[#F5F2ED]"
+                    >
+                        قرآن الإشارة
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="text-[#8FB394]/70 font-medium text-sm"
+                    >
+                        لوحة التحكم الإدارية للمحتوى والبيانات
+                    </motion.p>
                 </div>
 
-                {/* Login Card */}
-                <div className="bg-slate-900/40 backdrop-blur-2xl border border-slate-800/60 rounded-[3rem] p-10 shadow-3xl overflow-hidden relative group">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                {/* Login Container */}
+                <div className="glass-panel rounded-[2.5rem] p-10 shadow-3xl relative group">
+                    <div className="absolute top-0 left-10 right-10 h-[1px] bg-gradient-to-r from-transparent via-[#8FB394]/40 to-transparent" />
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <AnimatePresence>
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <AnimatePresence mode="wait">
                             {error && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-sm font-bold"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-400 text-xs font-bold"
                                 >
-                                    <AlertCircle size={18} />
+                                    <AlertCircle size={18} className="shrink-0" />
                                     <span>{error}</span>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        <div className="space-y-2 text-right">
-                            <label className="text-[11px] font-black uppercase tracking-widest text-slate-500 pr-2">البريد الإلكتروني</label>
-                            <div className="relative group">
-                                <Mail className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+                        <div className="space-y-3 text-right">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8FB394]/60 pr-5">البريد الإلكتروني</label>
+                            <div className="relative group/input">
+                                <Mail className="absolute right-5 top-1/2 -translate-y-1/2 text-[#8FB394]/40 group-focus-within/input:text-[#8FB394] transition-colors" size={20} strokeWidth={1.5} />
                                 <input
                                     type="email"
                                     required
                                     placeholder="admin@example.com"
-                                    className="w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl pr-14 pl-6 py-4 text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none transition-all placeholder:text-slate-700"
+                                    className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-[#F5F2ED] placeholder:text-[#8FB394]/20 focus:border-[#8FB394]/40 focus:ring-4 focus:ring-[#8FB394]/5 transition-all outline-none"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2 text-right">
-                            <label className="text-[11px] font-black uppercase tracking-widest text-slate-500 pr-2">كلمة المرور</label>
-                            <div className="relative group">
-                                <Lock className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+                        <div className="space-y-3 text-right">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8FB394]/60 pr-5">كلمة المرور</label>
+                            <div className="relative group/input">
+                                <Lock className="absolute right-5 top-1/2 -translate-y-1/2 text-[#8FB394]/40 group-focus-within/input:text-[#8FB394] transition-colors" size={20} strokeWidth={1.5} />
                                 <input
                                     type="password"
                                     required
                                     placeholder="••••••••"
-                                    className="w-full bg-slate-800/40 border border-slate-700/50 rounded-2xl pr-14 pl-6 py-4 text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 outline-none transition-all placeholder:text-slate-700"
+                                    className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-[#F5F2ED] placeholder:text-[#8FB394]/20 focus:border-[#8FB394]/40 focus:ring-4 focus:ring-[#8FB394]/5 transition-all outline-none"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
@@ -105,24 +119,29 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-[1.5rem] shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group relative overflow-hidden"
+                            className="w-full h-16 bg-gradient-to-r from-[#8FB394] to-[#4A6351] hover:brightness-110 text-[#F5F2ED] font-extrabold rounded-2xl shadow-xl shadow-[#4A6351]/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4 group relative overflow-hidden"
                         >
-                            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                            <div className="absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                             {loading ? (
-                                <Loader2 className="animate-spin" size={22} />
+                                <Loader2 className="animate-spin" size={24} />
                             ) : (
                                 <>
-                                    <span>تسجيل الدخول</span>
-                                    <ArrowRight className="transform rotate-180 group-hover:-translate-x-1 transition-transform" size={22} />
+                                    <span>دخول للمنصة</span>
+                                    <ArrowRight size={22} strokeWidth={2.5} className="transform rotate-180 group-hover:-translate-x-1.5 transition-transform" />
                                 </>
                             )}
                         </button>
                     </form>
                 </div>
 
-                <p className="text-center text-slate-600 text-xs mt-8">
-                    © 2026 قرآن لغة الإشارة - جميع الحقوق محفوظة
-                </p>
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1 }}
+                    className="text-center text-[#8FB394]/40 text-[10px] mt-12 font-bold tracking-widest uppercase"
+                >
+                    © 2026 قرآن لغة الإشارة — الهوية البصرية الرسمية
+                </motion.p>
             </motion.div>
         </div>
     );

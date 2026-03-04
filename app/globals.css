@@ -1,14 +1,98 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-sage: #8FB394;
+  --color-brand-cream: #F5F2ED;
+  --color-brand-forest: #0D1510;
+  --color-brand-moss: #4A6351;
+}
 
 :root {
-  --background: #030712;
-  --foreground: #f9fafb;
+  --background: #0D1510;
+  /* Deep Forest Dark Mode */
+  --foreground: #F5F2ED;
+  /* Cream Foreground */
+  --accent-primary: #8FB394;
+  /* Sage Green */
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Premium Glassmorphism Utilities (Sage Tinted) */
+@utility glass-panel {
+  background-color: rgba(13, 21, 16, 0.4);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(143, 179, 148, 0.15);
+  /* Tinted with Sage */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+@utility glass-card {
+  background-color: rgba(74, 99, 81, 0.1);
+  /* Moss background */
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(143, 179, 148, 0.2);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility glass-card-hover {
+  border-color: rgba(143, 179, 148, 0.5);
+  background-color: rgba(143, 179, 148, 0.1);
+  box-shadow: 0 0 30px rgba(143, 179, 148, 0.1);
+}
+
+@utility glass-input {
+  background-color: rgba(13, 21, 16, 0.6);
+  border: 1px solid rgba(143, 179, 148, 0.2);
+  transition: all 0.3s;
+  outline: none;
+}
+
+@utility glass-input-focus {
+  border-color: rgba(143, 179, 148, 0.6);
+  box-shadow: 0 0 0 4px rgba(143, 179, 148, 0.1);
+}
+
+/* Custom Scrollbar (Sage) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4A6351;
+  /* Moss Green */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8FB394;
+  /* Sage Green */
+}
+
+/* Animations (Botanical Glow) */
+@keyframes pulse-glow-sage {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    filter: blur(100px);
+  }
+
+  50% {
+    opacity: 0.6;
+    filter: blur(140px);
+  }
+}
+
+@utility animate-glow-sage {
+  animation: pulse-glow-sage 10s ease-in-out infinite;
 }
