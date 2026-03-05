@@ -15,79 +15,28 @@ import {
     Link as LinkIcon,
     Film
 } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { collection, query, getDocs, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { supabase } from '@/lib/supabase';
+import { useVideos } from '@/hooks/useVideos';
 
 export default function VideosPage() {
-    const [videos, setVideos] = useState([]);
+    const { videos, loading, handleAddVideo, handleDelete } = useVideos();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [newVideo, setNewVideo] = useState({ title: '', url: '', category: 'قرآن' });
 
-    useEffect(() => {
-        fetchVideos();
-    }, []);
-
-    const fetchVideos = async () => {
-        try {
-            // Fetch from Firebase
-            const fbSnapshot = await getDocs(collection(db, "videos"));
-            const fbVideos = fbSnapshot.docs.map(doc => ({
-                id: `fb-${doc.id}`,
-                ...doc.data(),
-                source: 'firebase'
-            }));
-
-            // Fetch from Supabase
-            let sbVideos = [];
-            try {
-                const { data, error } = await supabase
-                    .from('videos')
-                    .select('*');
-
-                if (data) {
-                    sbVideos = data.map(video => ({
-                        id: `sb-${video.id}`,
-                        title: video.title,
-                        url: video.url,
-                        category: video.category || 'عام',
-                        createdAt: video.created_at ? { seconds: Math.floor(new Date(video.created_at).getTime() / 1000) } : null,
-                        source: 'supabase'
-                    }));
-                }
-            } catch (sbErr) {
-                console.warn("Supabase fetch error:", sbErr);
-            }
-
-            setVideos([...fbVideos, ...sbVideos]);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleAddVideo = async (e) => {
+    const onSubmitNewVideo = async (e) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, "videos"), {
-                ...newVideo,
-                createdAt: serverTimestamp()
-            });
+            await handleAddVideo(newVideo);
             setIsModalOpen(false);
             setNewVideo({ title: '', url: '', category: 'قرآن' });
-            fetchVideos();
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleDelete = async (id) => {
+    const onDeleteVideo = async (id, source) => {
         if (confirm('هل أنت متأكد من حذف هذا الفيديو؟')) {
             try {
-                await deleteDoc(doc(db, "videos", id));
-                fetchVideos();
+                await handleDelete(id, source);
             } catch (err) {
                 console.error(err);
             }
@@ -166,7 +115,7 @@ export default function VideosPage() {
                                         <span className="text-[10px] font-black uppercase tracking-widest">مفعل</span>
                                     </div>
                                     <button
-                                        onClick={() => handleDelete(video.id)}
+                                        onClick={() => onDeleteVideo(video.id, video.source)}
                                         className="text-[10px] font-bold text-rose-500/50 hover:text-rose-500 flex items-center gap-1.5 transition-all"
                                     >
                                         <Trash2 size={14} />
@@ -209,7 +158,7 @@ export default function VideosPage() {
                                 <p className="text-[#8FB394]/40 font-bold text-sm mt-2 text-right">أدخل تفاصيل الفيديو ليتم عرضه في التطبيق.</p>
                             </div>
 
-                            <form onSubmit={handleAddVideo} className="space-y-8">
+                            <form onSubmit={onSubmitNewVideo} className="space-y-8">
                                 <div className="space-y-3 text-right">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-[#8FB394]/60 mr-4">عنوان الفيديو</label>
                                     <div className="relative">

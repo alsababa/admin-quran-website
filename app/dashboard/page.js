@@ -17,6 +17,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, getDocs, where } from 'firebase/firestore';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 const StatCard = ({ title, value, icon, subtitle, colorClass, delay }) => (
     <motion.div
@@ -67,55 +68,9 @@ const QuickActionCard = ({ to, label, description, icon, delay }) => (
     </Link>
 );
 
+
 export default function Overview() {
-    const [stats, setStats] = useState({ totalUsers: 0, activeSubs: 0, revenue: 0 });
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                // Firebase Stats
-                const usersSnap = await getDocs(collection(db, "users"));
-                const fbTotal = usersSnap.size;
-
-                const subsSnap = await getDocs(query(collection(db, "users"), where("subscriptionStatus", "==", "active")));
-                const fbActive = subsSnap.size;
-
-                // Supabase Stats (Catch errors gracefully if tables don't exist yet)
-                let sbTotal = 0;
-                let sbActive = 0;
-
-                try {
-                    const { count: sbTotalCount } = await supabase
-                        .from('users')
-                        .select('*', { count: 'exact', head: true });
-                    sbTotal = sbTotalCount || 0;
-
-                    const { count: sbActiveCount } = await supabase
-                        .from('users')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('subscription_status', 'active'); // Assuming snake_case in Supabase
-                    sbActive = sbActiveCount || 0;
-                } catch (sbErr) {
-                    console.warn("Supabase fetch error:", sbErr);
-                }
-
-                const total = fbTotal + sbTotal;
-                const active = fbActive + sbActive;
-
-                setStats({
-                    totalUsers: total,
-                    activeSubs: active,
-                    revenue: active * 10
-                });
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchStats();
-    }, []);
+    const { stats, loading } = useDashboardStats();
 
     return (
         <div className="space-y-12 pb-20">

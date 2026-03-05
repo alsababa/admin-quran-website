@@ -15,6 +15,7 @@ import {
 import { db } from '@/lib/firebase';
 import { collection, query, getDocs, where } from 'firebase/firestore';
 import { supabase } from '@/lib/supabase';
+import { usePremiumUsers } from '@/hooks/usePremiumUsers';
 
 const MetricCard = ({ title, value, subtitle, icon, delay }) => (
     <motion.div
@@ -34,53 +35,9 @@ const MetricCard = ({ title, value, subtitle, icon, delay }) => (
     </motion.div>
 );
 
+
 export default function SubscriptionsPage() {
-    const [premiumUsers, setPremiumUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchPremiumUsers = async () => {
-            try {
-                // Fetch from Firebase
-                const fbQuery = query(collection(db, "users"), where("subscriptionStatus", "==", "active"));
-                const fbSnapshot = await getDocs(fbQuery);
-                const fbData = fbSnapshot.docs.map(doc => ({
-                    id: `fb-${doc.id}`,
-                    ...doc.data(),
-                    source: 'firebase'
-                }));
-
-                // Fetch from Supabase
-                let sbData = [];
-                try {
-                    const { data, error } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('subscription_status', 'active');
-
-                    if (data) {
-                        sbData = data.map(user => ({
-                            id: `sb-${user.id}`,
-                            displayName: user.full_name || user.display_name || user.email?.split('@')[0],
-                            email: user.email,
-                            subscriptionStatus: 'active',
-                            createdAt: user.created_at ? { seconds: Math.floor(new Date(user.created_at).getTime() / 1000) } : null,
-                            source: 'supabase'
-                        }));
-                    }
-                } catch (sbErr) {
-                    console.warn("Supabase fetch error:", sbErr);
-                }
-
-                setPremiumUsers([...fbData, ...sbData]);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPremiumUsers();
-    }, []);
+    const { premiumUsers, loading } = usePremiumUsers();
 
     return (
         <div className="space-y-12 pb-20">

@@ -14,57 +14,11 @@ import {
     CheckCircle2,
     XCircle
 } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import { supabase } from '@/lib/supabase';
+import { useUsers } from '@/hooks/useUsers';
 
 export default function UsersPage() {
-    const [users, setUsers] = useState([]);
+    const { users, loading, error } = useUsers();
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                // Fetch from Firebase
-                const fbSnapshot = await getDocs(collection(db, "users"));
-                const fbUsers = fbSnapshot.docs.map(doc => ({
-                    id: `fb-${doc.id}`,
-                    ...doc.data(),
-                    source: 'firebase'
-                }));
-
-                // Fetch from Supabase
-                let sbUsers = [];
-                try {
-                    const { data, error } = await supabase
-                        .from('users')
-                        .select('*');
-
-                    if (data) {
-                        sbUsers = data.map(user => ({
-                            id: `sb-${user.id}`,
-                            displayName: user.full_name || user.display_name || user.email?.split('@')[0],
-                            email: user.email,
-                            subscriptionStatus: user.subscription_status || 'inactive',
-                            createdAt: user.created_at ? { seconds: Math.floor(new Date(user.created_at).getTime() / 1000) } : null,
-                            source: 'supabase',
-                            raw: user
-                        }));
-                    }
-                } catch (sbErr) {
-                    console.warn("Supabase fetch error:", sbErr);
-                }
-
-                setUsers([...fbUsers, ...sbUsers]);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchUsers();
-    }, []);
 
     const filteredUsers = users.filter(user =>
         user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
