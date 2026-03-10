@@ -44,7 +44,7 @@ const StatCard = ({ title, value, icon, subtitle, colorClass, delay }) => (
             <h3 className="text-3xl font-black text-white tracking-tighter">{value}</h3>
         </div>
         <p className="mt-4 text-[10px] font-bold text-[#8FB394]/30 flex items-center gap-1.5 opacity-60">
-            <div className={`w-1.5 h-1.5 rounded-full bg-[#8FB394]`} />
+            <span className={`w-1.5 h-1.5 rounded-full bg-[#8FB394]`} />
             {subtitle}
         </p>
     </motion.div>
