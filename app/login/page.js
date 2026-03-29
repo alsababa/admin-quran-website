@@ -51,7 +51,7 @@ export default function LoginPage() {
                         transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
                         className="inline-flex p-3 rounded-3xl bg-gradient-to-br from-[#14B8A6]/20 to-[#0D9488]/20 shadow-2xl shadow-[#14B8A6]/15 border border-[#14B8A6]/20 mb-5 text-[#0A0D1A]"
                     >
-                        <img src="/logo/logo.png" alt="Logo" className="w-16 h-16 object-contain drop-shadow-xl" />
+                        <img src="/logo/logo.png" alt="مصحف أنامل للصم" className="w-16 h-16 object-contain drop-shadow-xl" />
                     </motion.div>
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
@@ -59,7 +59,7 @@ export default function LoginPage() {
                         transition={{ delay: 0.4 }}
                         className="text-4xl font-extrabold tracking-tight text-[#F5F0E8]"
                     >
-                        قرآن الإشارة
+                        مصحف أنامل
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -67,7 +67,7 @@ export default function LoginPage() {
                         transition={{ delay: 0.5 }}
                         className="text-[#14B8A6]/60 font-bold text-xs mt-2 uppercase tracking-widest"
                     >
-                        لوحة التحكم الإدارية
+                        إدارة محتوى الصم
                     </motion.p>
                 </div>
 

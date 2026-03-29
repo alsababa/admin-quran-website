@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Trash2, Shield, Mail, Calendar,
     ChevronDown, Filter, Edit3, X, Loader2,
-    CheckCircle2, AlertTriangle, User
+    CheckCircle2, AlertTriangle, User, Smartphone, Globe, Building2, Apple
 } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
 
@@ -188,9 +188,12 @@ export default function UsersPage() {
     };
 
     const handleUpgrade = async (user) => {
+        // Simple prompt for account type for now, can be improved to a modal later
+        const type = window.confirm(`هل تريد ترقية ${user.displayName || user.email} كـ "جهة" (Entity)؟\nنعم = جهة، إلغاء = فرد`) ? 'entity' : 'individual';
+        
         try {
-            await upgradeUser(user);
-            showToast(`تمت ترقية ${user.displayName || user.email} للباقة المميزة ✨`);
+            await upgradeUser(user, type);
+            showToast(`تمت ترقية ${user.displayName || user.email} كـ ${type === 'entity' ? 'جهة' : 'فرد'} للباقة المميزة ✨`);
         } catch {
             showToast('فشل تنفيذ الترقية. تحقق من الصلاحيات.', 'error');
         }
@@ -230,7 +233,9 @@ export default function UsersPage() {
                         <thead>
                             <tr className="border-b border-[#14B8A6]/8 bg-[#14B8A6]/5">
                                 <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">المستخدم</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">نوع الحساب</th>
                                 <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">الحالة</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">المنصة</th>
                                 <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">تاريخ التسجيل</th>
                                 <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-left">الإجراءات</th>
                             </tr>
@@ -270,12 +275,33 @@ export default function UsersPage() {
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="flex justify-center">
+                                                <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-[10px] font-bold
+                                                    ${user.accountType === 'entity' 
+                                                        ? 'bg-[#14B8A6]/20 border-[#14B8A6]/30 text-[#14B8A6]' 
+                                                        : 'bg-white/5 border-white/10 text-white/60'}`}>
+                                                    {user.accountType === 'entity' ? <Building2 size={12} /> : <User size={12} />}
+                                                    {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex justify-center">
                                                 <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest
                                                     ${user.subscriptionStatus === 'active'
                                                         ? 'bg-[#14B8A6]/10 border-[#14B8A6]/20 text-[#14B8A6]'
                                                         : 'bg-[#1E2448]/80 border-white/10 text-[#F5F0E8]/35'}`}>
                                                     <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-[#14B8A6]' : 'bg-white/20'}`} />
                                                     {user.subscriptionStatus === 'active' ? 'مميز' : 'مجاني'}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex justify-center">
+                                                <div className="flex items-center gap-2 text-[#14B8A6]/60">
+                                                    {user.platform === 'ios' && <Apple size={14} />}
+                                                    {user.platform === 'android' && <Smartphone size={14} />}
+                                                    {user.platform === 'manual' && <Globe size={14} />}
+                                                    <span className="text-[10px] font-bold uppercase">{user.platform || 'غير محدد'}</span>
                                                 </div>
                                             </div>
                                         </td>

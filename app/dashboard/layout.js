@@ -119,8 +119,8 @@ export default function DashboardLayout({ children }) {
                                     <img src="/logo/logo.png" alt="Logo" className="w-8 h-8 object-contain drop-shadow-md" />
                                 </div>
                                 <div>
-                                    <span className="text-base font-black tracking-tight bg-gradient-to-l from-[#F5F0E8] to-[#14B8A6] bg-clip-text text-transparent">قرآن الإشارة</span>
-                                    <p className="text-[9px] font-bold text-[#14B8A6]/40 uppercase tracking-widest mt-0.5">Admin Panel</p>
+                                    <span className="text-base font-black tracking-tight bg-gradient-to-l from-[#F5F0E8] to-[#14B8A6] bg-clip-text text-transparent">مصحف أنامل</span>
+                                    <p className="text-[9px] font-bold text-[#14B8A6]/40 uppercase tracking-widest mt-0.5">Admin Dashboard</p>
                                 </div>
                             </motion.div>
                         ) : (
@@ -141,6 +141,7 @@ export default function DashboardLayout({ children }) {
                     <SidebarLink to="/dashboard" icon={<LayoutDashboard />} label="الرئيسية" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/users" icon={<Users />} label="المستخدمون" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/videos" icon={<Video />} label="الفيديوهات" isOpen={isSidebarOpen} />
+                    <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard />} label="تقارير الاشتراكات" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/support" icon={<MessageSquare />} label="الدعم الفني" isOpen={isSidebarOpen} />
                 </nav>
 

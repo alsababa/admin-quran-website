@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import {
     CreditCard, TrendingUp, Calendar, User,
-    Search, Star, CheckCircle2
+    Search, Star, CheckCircle2, Apple, Smartphone, Globe, Building2, BarChart3
 } from 'lucide-react';
 import { usePremiumUsers } from '@/hooks/usePremiumUsers';
 
@@ -33,19 +33,47 @@ export default function SubscriptionsPage() {
             {/* Header */}
             <div className="flex justify-between items-end">
                 <div className="text-right">
-                    <h3 className="text-4xl font-black text-white tracking-tighter">نظام الاشتراكات</h3>
-                    <p className="text-[#14B8A6]/40 font-bold text-sm mt-2">تتبع العوائد والمشتركين المميزين في منصة قرآن الإشارة.</p>
+                    <h3 className="text-4xl font-black text-white tracking-tighter">تقارير الاشتراكات</h3>
+                    <p className="text-[#14B8A6]/40 font-bold text-sm mt-2">تحليل أداء الاشتراكات القادمة من تطبيقات الهواتف الذكية.</p>
                 </div>
-                <button className="h-11 px-5 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-xl text-[#14B8A6] font-black text-xs hover:bg-[#14B8A6]/20 transition-all">
-                    تحميل الفواتير
-                </button>
+                <div className="flex gap-3">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
+                        <div className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse" />
+                        <span className="text-[10px] font-bold text-[#14B8A6] uppercase tracking-wider">تحديث حي</span>
+                    </div>
+                </div>
             </div>
 
             {/* Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <MetricCard title="إجمالي المشتركين" value={loading ? '...' : premiumUsers.length} subtitle="معدل نمو +5٪ شهرياً" icon={<User />} delay={0.1} />
-                <MetricCard title="صافي العوائد" value={loading ? '...' : `${premiumUsers.length * 10} ر.س`} subtitle="الشهر الحالي" icon={<TrendingUp />} delay={0.2} />
-                <MetricCard title="اشتراكات جديدة" value="12" subtitle="آخر 7 أيام" icon={<Star />} delay={0.3} />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <MetricCard 
+                    title="إجمالي المميزين" 
+                    value={loading ? '...' : premiumUsers.length} 
+                    subtitle="كافة المنصات" 
+                    icon={<Star />} 
+                    delay={0.1} 
+                />
+                <MetricCard 
+                    title="حسابات الجهات" 
+                    value={loading ? '...' : premiumUsers.filter(u => u.accountType === 'entity').length} 
+                    subtitle="منظمات مسجلة" 
+                    icon={<Building2 />} 
+                    delay={0.2} 
+                />
+                <MetricCard 
+                    title="نمو أندرويد" 
+                    value={loading ? '...' : premiumUsers.filter(u => u.platform === 'android').length} 
+                    subtitle="Google Play" 
+                    icon={<Smartphone />} 
+                    delay={0.3} 
+                />
+                <MetricCard 
+                    title="نمو أيفون" 
+                    value={loading ? '...' : premiumUsers.filter(u => u.platform === 'ios').length} 
+                    subtitle="App Store" 
+                    icon={<Apple />} 
+                    delay={0.4} 
+                />
             </div>
 
             {/* Table */}
@@ -58,8 +86,8 @@ export default function SubscriptionsPage() {
                         </div>
                     </div>
                     <h4 className="font-extrabold text-white text-base flex items-center gap-3">
-                        <CreditCard size={18} className="text-[#14B8A6]" />
-                        سجل المشتركين المميزين
+                        <BarChart3 size={18} className="text-[#14B8A6]" />
+                        توزيع المشتركين حسب النوع والمنصة
                     </h4>
                 </div>
 
@@ -68,9 +96,9 @@ export default function SubscriptionsPage() {
                         <thead>
                             <tr className="border-b border-[#14B8A6]/8">
                                 <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40">المشترك</th>
-                                <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 text-center">الخطة</th>
-                                <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 text-center">تاريخ التجديد</th>
-                                <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 text-left">الحالة</th>
+                                <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 text-center">نوع الحساب</th>
+                                <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 text-center">المنصة</th>
+                                <th className="px-9 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 text-left">التاريخ</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#14B8A6]/5">
@@ -103,24 +131,25 @@ export default function SubscriptionsPage() {
                                         </div>
                                     </td>
                                     <td className="px-9 py-5 text-center">
-                                        <span className="text-[10px] font-black text-[#14B8A6] bg-[#14B8A6]/10 px-3 py-1 rounded-lg border border-[#14B8A6]/20">
-                                            {user.plan || 'باقة احترافية'}
+                                        <span className={`text-[10px] font-black px-3 py-1 rounded-lg border
+                                            ${user.accountType === 'entity' ? 'bg-[#14B8A6]/20 border-[#14B8A6]/30 text-[#14B8A6]' : 'bg-white/5 border-white/10 text-white/50'}`}>
+                                            {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
                                         </span>
                                     </td>
                                     <td className="px-9 py-5 text-center">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <Calendar size={11} className="text-[#14B8A6]/30" />
-                                            <span className="text-xs font-bold text-[#F5F0E8]/50">
-                                                {user.renewalDate ? new Date(user.renewalDate?.seconds ? user.renewalDate.seconds * 1000 : user.renewalDate).toLocaleDateString('ar-SA') : 'غير متوفر'}
-                                            </span>
+                                        <div className="flex items-center justify-center gap-2 text-[#14B8A6]/60 font-bold uppercase text-[10px]">
+                                            {user.platform === 'ios' && <Apple size={12} />}
+                                            {user.platform === 'android' && <Smartphone size={12} />}
+                                            {user.platform === 'manual' && <Globe size={12} />}
+                                            {user.platform || 'غير محدد'}
                                         </div>
                                     </td>
                                     <td className="px-9 py-5">
-                                        <div className="flex justify-end">
-                                            <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#14B8A6]/10 border border-[#14B8A6]/20 text-[#14B8A6] text-[9px] font-black uppercase tracking-widest">
-                                                <CheckCircle2 size={11} />
-                                                نشط
-                                            </div>
+                                        <div className="flex justify-end gap-2 items-center text-[#F5F0E8]/40">
+                                            <span className="text-xs font-bold">
+                                                {user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ar-SA') : 'غير متوفر'}
+                                            </span>
+                                            <Calendar size={12} />
                                         </div>
                                     </td>
                                 </motion.tr>

@@ -23,6 +23,8 @@ export function useUsers() {
                 id: `fb-${doc.id}`,
                 rawId: doc.id,
                 ...doc.data(),
+                accountType: doc.data().accountType || 'individual',
+                platform: doc.data().platform || 'manual',
                 source: 'firebase'
             }));
             setFbUsers(usersList);
@@ -53,6 +55,8 @@ export function useUsers() {
                     email: user.email,
                     subscriptionStatus: user.subscription_status || 'inactive',
                     subscriptionTier: user.subscription_tier || 'free',
+                    accountType: user.account_type || 'individual',
+                    platform: user.platform || 'manual',
                     createdAt: user.created_at ? { seconds: Math.floor(new Date(user.created_at).getTime() / 1000) } : null,
                     source: 'supabase'
                 }));
@@ -82,18 +86,24 @@ export function useUsers() {
         }
     }, [fetchSupabaseUsers]);
 
-    const upgradeUser = useCallback(async (user) => {
+    const upgradeUser = useCallback(async (user, accountType = 'individual') => {
         if (user.source === 'firebase') {
             await updateDoc(doc(db, "users", user.rawId), {
                 subscriptionStatus: 'active',
-                subscriptionTier: 'premium'
+                subscriptionTier: 'premium',
+                accountType: accountType,
+                platform: 'manual'
             });
         } else {
-            const { error } = await supabase
+            await supabase
                 .from('users')
-                .update({ subscription_status: 'active', subscription_tier: 'premium' })
+                .update({ 
+                    subscription_status: 'active', 
+                    subscription_tier: 'premium',
+                    account_type: accountType,
+                    platform: 'manual'
+                })
                 .eq('id', user.rawId);
-            if (error) throw error;
             await fetchSupabaseUsers();
         }
     }, [fetchSupabaseUsers]);

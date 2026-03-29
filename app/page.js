@@ -45,10 +45,10 @@ export default function LandingPage() {
                         <div className="relative group">
                             <div className="absolute -inset-1.5 bg-[#14B8A6]/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
                             <div className="relative p-1.5 bg-white border border-gray-100 shadow-sm rounded-xl">
-                                <img src="/logo/logo.png" alt="شعار قرآن الإشارة" className="w-10 h-10 object-contain" />
+                                <img src="/logo/logo.png" alt="مصحف أنامل للصم" className="w-10 h-10 object-contain" />
                             </div>
                         </div>
-                        <span className="text-xl font-black text-gray-900 tracking-tight hidden sm:block">قرآن الإشارة</span>
+                        <span className="text-xl font-black text-gray-900 tracking-tight hidden sm:block">مصحف أنامل للصم</span>
                     </div>
                     
                     <div className="hidden md:flex items-center gap-8 text-sm font-bold text-gray-500">
@@ -104,11 +104,11 @@ export default function LandingPage() {
 
                     <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tight text-gray-900 leading-[1.1] mb-6">
                         تلاوة وفهم القرآن <br className="hidden md:block"/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#14B8A6] to-[#0D9488]">بلغة الإشارة</span> بيسر.
+                        <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#14B8A6] to-[#0D9488]">بأنامل الصم</span> بيسر.
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-500 font-medium mb-12 max-w-2xl mx-auto leading-relaxed">
-                        منصة قرآن الإشارة هي نافذتك الشاملة لتعلم وتلاوة كتاب الله، مع مكتبة تفاعلية متكاملة مصممة خصيصاً للصم وضعاف السمع بجودة فائقة وواجهة استثنائية.
+                        منصة مصحف أنامل هي نافذتك الشاملة لتعلم وتلاوة كتاب الله، مع مكتبة تفاعلية متكاملة مصممة خصيصاً للصم وضعاف السمع بجودة فائقة وواجهة استثنائية.
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-24">
