@@ -126,6 +126,7 @@ export default function LandingPage() {
                     <div className="flex w-full overflow-hidden group">
                         {[1, 2, 3].map((set) => (
                             <div key={set} className="flex min-w-max animate-infinite-scroll group-hover:[animation-play-state:paused] gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-300 font-extrabold text-xl md:text-2xl text-gray-400 px-6 md:px-12" aria-hidden={set !== 1}>
+                                <span className="hover:text-[#14B8A6] transition-colors">شركة السبابة الرقمية</span>
                                 <span className="hover:text-gray-900 transition-colors">مصحف تبيان</span>
                                 <span className="hover:text-gray-900 transition-colors">جمعية لأجلهم</span>
                                 <span className="hover:text-[#14B8A6] transition-colors">لغة الإشارة SAL</span>
@@ -210,6 +211,46 @@ export default function LandingPage() {
                             <img src="/logo/app_assets_images_indexpart.png" className="w-full h-auto object-contain rounded-2xl border border-gray-100" />
                             <div className="absolute top-0 inset-x-0 h-6 flex justify-center">
                                 <div className="w-1/3 h-5 bg-gray-900 rounded-b-xl" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── About The Initiative (Vision & Mission) ── */}
+            <section className="py-24 max-w-7xl mx-auto px-6 relative">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#14B8A6]/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="bg-gray-900 text-white rounded-[3rem] p-12 md:p-20 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#14B8A6] blur-[150px] opacity-30 rounded-full" />
+                    
+                    <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                        <div>
+                            <span className="text-sm font-extrabold text-[#14B8A6] tracking-widest uppercase mb-4 block">عن المبادرة</span>
+                            <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">رؤيتنا لا تعرف حدوداً والصم في قلب الاهتمام</h2>
+                            <p className="text-gray-400 font-medium leading-relaxed mb-8 text-lg">
+                                بجهود دؤوبة، وتحت مظلة <strong className="text-white">"شركة السبابة الرقمية"</strong>، نسعى لبناء مجتمع رقمي شامل يعزز من قدرة الصم وضعاف السمع على الوصول إلى القرآن الكريم وفهمه بيسر وسهولة، معتمدين على أحدث تقنيات العرض المرئي وفريق متخصص لضمان دقة لغة الإشارة المعتمدة.
+                            </p>
+                            <div className="flex items-center gap-4 border-t border-gray-800 pt-8 mt-8">
+                                <div className="w-14 h-14 bg-[#14B8A6]/20 rounded-2xl flex items-center justify-center text-[#14B8A6]">
+                                    <Shield size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-white text-lg">محتوى موثوق ومراجع</h4>
+                                    <p className="text-gray-400 text-sm">من قبل نخبة من علماء الشريعة وخبراء الإشارة.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-6 relative">
+                            {/* Decorative blocks to replace images, maintaining the SaaS aesthetic */}
+                            <div className="bg-gray-800 rounded-3xl p-8 transform translate-y-8 flex flex-col justify-center items-center text-center shadow-lg border border-gray-700 hover:-translate-y-2 transition-transform duration-500">
+                                <Users size={40} className="text-[#14B8A6] mb-4" />
+                                <h3 className="text-2xl font-black text-white mb-2">مجتمع مترابط</h3>
+                                <p className="text-gray-400 text-sm">شراكات ممتدة لخدمة المستفيدين</p>
+                            </div>
+                            <div className="bg-gray-800 rounded-3xl p-8 flex flex-col justify-center items-center text-center shadow-lg border border-gray-700 hover:-translate-y-2 transition-transform duration-500">
+                                <Globe size={40} className="text-[#14B8A6] mb-4" />
+                                <h3 className="text-2xl font-black text-white mb-2">معايير عالمية</h3>
+                                <p className="text-gray-400 text-sm">أداء يفوق التطلعات وشمولية رقمية</p>
                             </div>
                         </div>
                     </div>
@@ -391,10 +432,13 @@ export default function LandingPage() {
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
                         <img src="/logo/logo.png" className="w-10 h-10 object-contain" />
-                        <span className="text-lg font-extrabold text-gray-900">قرآن الإشارة</span>
+                        <div className="flex flex-col">
+                            <span className="text-lg font-extrabold text-gray-900">قرآن الإشارة</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">إحدى مبادرات شركة السبابة الرقمية</span>
+                        </div>
                     </div>
                     <p className="text-sm font-medium text-gray-500 text-center">
-                        © 2026 قرآن الإشارة. جميع الحقوق محفوظة لخدمة الصم وضعاف السمع.
+                        © 2026 قرآن الإشارة التابع لشركة السبابة الرقمية. جميع الحقوق محفوظة لخدمة الصم وضعاف السمع.
                     </p>
                     <Link href="/login" className="text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-2 group bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-full">
                         بوابة إدارة المنصة <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
