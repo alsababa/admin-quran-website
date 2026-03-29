@@ -5,8 +5,8 @@ import { AuthProvider } from "@/context/AuthContext";
 const inter = Inter({ subsets: ["latin", "arabic"] });
 
 export const metadata = {
-    title: "أدمن قرآن لغة الإشارة",
-    description: "لوحة تحكم إدارة محتوى قرآن لغة الإشارة",
+    title: 'قرآن الإشارة — تعلم القرآن بلغة الإشارة',
+    description: 'المنصة الرسمية الأولى لتمكين الصم وضعاف السمع من تلاوة وتعلم القرآن الكريم عبر لغة الإشارة العربية.',
 };
 
 export default function RootLayout({ children }) {

@@ -1,10 +1,8 @@
+"use client";
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { HandMetal, Smartphone, Accessibility, Star, Users, Video, ChevronLeft, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote } from 'lucide-react';
 
-export const metadata = {
-    title: 'قرآن الإشارة — تعلم القرآن بلغة الإشارة',
-    description: 'المنصة الرسمية الأولى لتمكين الصم وضعاف السمع من تلاوة وتعلم القرآن الكريم عبر لغة الإشارة العربية.',
-};
 
 const FeatureCard = ({ icon, title, desc }) => (
     <div className="bg-white border border-gray-100 shadow-sm rounded-3xl p-8 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
@@ -52,7 +50,6 @@ export default function LandingPage() {
                         <a href="#features" className="hover:text-gray-900 transition-colors">المميزات</a>
                         <a href="#interface" className="hover:text-gray-900 transition-colors">واجهة التطبيق</a>
                         <a href="#process" className="hover:text-gray-900 transition-colors">كيف يعمل؟</a>
-                        <a href="#pricing" className="hover:text-gray-900 transition-colors">الباقات</a>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -67,10 +64,31 @@ export default function LandingPage() {
             </nav>
 
             {/* ── Hero Center Layout ── */}
-            <section className="relative pt-40 pb-20 px-6 mx-auto overflow-hidden">
+            <motion.section 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="relative pt-40 pb-20 px-6 mx-auto overflow-hidden"
+            >
                 {/* Advanced Beautiful Mesh Gradient Background */}
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#14B8A6]/10 blur-[120px] rounded-full pointer-events-none" />
-                <div className="absolute right-[-10%] top-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+                <motion.div 
+                    animate={{ 
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, 0],
+                        x: [0, 20, 0]
+                    }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#14B8A6]/10 blur-[120px] rounded-full pointer-events-none" 
+                />
+                <motion.div 
+                    animate={{ 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, -10, 0],
+                        x: [0, -30, 0]
+                    }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute right-[-10%] top-[20%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" 
+                />
                 
                 <div className="relative z-10 max-w-7xl mx-auto text-center">
                     {/* Badge */}
@@ -117,7 +135,7 @@ export default function LandingPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* ── Logos/Trusted By ── */}
             <section className="bg-white py-12 border-y border-gray-100">
@@ -150,36 +168,60 @@ export default function LandingPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-min">
                     {/* Bento Box 1: Azkar */}
-                    <div className="col-span-1 md:col-span-2 bg-[#F1F5F9] rounded-[2.5rem] p-10 flex flex-col items-center text-center group hover:bg-[#E2E8F0] transition-colors duration-500 overflow-hidden">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="col-span-1 md:col-span-2 bg-[#F1F5F9] rounded-[2.5rem] p-10 flex flex-col items-center text-center group hover:bg-[#E2E8F0] transition-colors duration-500 overflow-hidden"
+                    >
                         <h3 className="text-3xl font-black text-gray-900 mb-3 block">ترجمة الأذكار</h3>
                         <p className="text-gray-600 font-medium text-base mb-8 max-w-lg">أذكار الصباح والمساء وأذكار الصلاة مسجلة بدقة عالية بلغة الإشارة ليسهل حفظها وترديدها يومياً.</p>
                         <div className="w-full flex justify-center">
-                            <img src="/logo/app_assets_images_azkartranslate.png" className="w-auto h-[320px] object-contain drop-shadow-2xl group-hover:-translate-y-2 transition-transform duration-700 rounded-3xl" />
+                            <img src="/logo/app_assets_images_azkartranslate.png" className="w-auto h-[320px] object-contain drop-shadow-[0_20px_50px_rgba(20,184,166,0.15)] group-hover:-translate-y-2 transition-transform duration-700 rounded-3xl" />
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Bento Box 2: Location/Prayer */}
-                    <div className="col-span-1 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-10 flex flex-col items-center text-center group overflow-hidden">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="col-span-1 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-10 flex flex-col items-center text-center group overflow-hidden"
+                    >
                         <Compass className="text-[#14B8A6] mb-4 mx-auto" size={36} />
                         <h3 className="text-2xl font-black text-gray-900 mb-2">القبلة والصلاة</h3>
                         <p className="text-gray-500 font-medium text-sm mb-8">مواقيت وتحديد اتجاه مرئي.</p>
                         <div className="w-full flex justify-center mt-auto">
                             <img src="/logo/app_assets_images_indexitemlocationmecca.png" className="w-auto h-[180px] object-contain drop-shadow-xl group-hover:-translate-y-2 transition-transform duration-700 rounded-2xl" />
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Bento Box 3: Surahs List - Primary color box */}
-                    <div className="col-span-1 bg-[#14B8A6] rounded-[2.5rem] p-10 flex flex-col items-center text-center text-white group shadow-[0_20px_40px_rgba(20,184,166,0.2)] hover:bg-[#0D9488] transition-colors duration-500 overflow-hidden">
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="col-span-1 bg-[#14B8A6] rounded-[2.5rem] p-10 flex flex-col items-center text-center text-white group shadow-[0_20px_40px_rgba(20,184,166,0.2)] hover:bg-[#0D9488] transition-colors duration-500 overflow-hidden"
+                    >
                         <BookOpen className="text-white mb-4 mx-auto" size={36} />
                         <h3 className="text-2xl font-black mb-2">القرآن كاملاً</h3>
                         <p className="text-teal-50 font-medium text-sm mb-8">30 جزءاً مسجلاً وحاضراً للتصفح المُيسر.</p>
                         <div className="w-full flex justify-center mt-auto">
                             <img src="/logo/app_assets_images_indexpart.png" className="w-auto h-[280px] object-contain drop-shadow-2xl group-hover:-translate-y-2 transition-transform duration-700 rounded-3xl" />
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Bento Box 4: Acceptance/Success Flow */}
-                    <div className="col-span-1 md:col-span-2 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center justify-between text-center md:text-right group gap-10 overflow-hidden">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                        className="col-span-1 md:col-span-2 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center justify-between text-center md:text-right group gap-10 overflow-hidden"
+                    >
                         <div className="w-full md:w-1/2">
                             <h3 className="text-3xl font-black text-gray-900 mb-3">سهولة المتابعة</h3>
                             <p className="text-gray-500 font-medium text-base">تتبع تقدمك في الحفظ والتلاوة مع واجهات ذكية ومريحة للرؤية تشجعك على الاستمرارية (شاشات إنجاز سلسة واضحة).</p>
@@ -188,7 +230,7 @@ export default function LandingPage() {
                             <img src="/logo/app_assets_images_accept.png" className="w-auto h-[220px] object-contain drop-shadow-xl rounded-2xl group-hover:-translate-y-2 transition-transform duration-700" />
                             <img src="/logo/app_assets_images_bottombar_prayer.png" className="w-auto h-[220px] object-contain drop-shadow-xl rounded-2xl group-hover:-translate-y-2 transition-transform duration-700" />
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -304,7 +346,7 @@ export default function LandingPage() {
                             <div className="w-10 h-10 bg-[#14B8A6]/10 rounded-full flex items-center justify-center font-bold text-[#14B8A6]">ف</div>
                             <div>
                                 <h4 className="font-extrabold text-gray-900 text-sm">فاطمة علي</h4>
-                                <p className="text-xs text-gray-500">مشتركة باقة احترافية</p>
+                                <p className="text-xs text-gray-500">مشرفة تعليمية</p>
                             </div>
                         </div>
                     </div>
@@ -329,50 +371,6 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── Pricing ── */}
-            <section id="pricing" className="py-28 max-w-7xl mx-auto px-6">
-                 <div className="text-center mb-20">
-                    <span className="text-sm font-extrabold text-[#14B8A6] bg-[#14B8A6]/10 px-4 py-1.5 rounded-full inline-block mb-4">الاشتراكات</span>
-                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">باقات بسيطة ومرنة</h2>
-                    <p className="text-gray-500 font-medium max-w-2xl mx-auto text-lg">اختر الخطة التي تناسب احتياجاتك لتبدأ رحلتك مع كتاب الله.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    {/* Free Plan */}
-                    <div className="bg-white border border-gray-200 rounded-[2.5rem] p-10 shadow-sm flex flex-col items-start transition-shadow hover:shadow-md">
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">الأساسية</p>
-                        <h3 className="text-6xl font-black text-gray-900 mb-2">مجانًا</h3>
-                        <p className="text-gray-500 font-medium mb-10 border-b border-gray-100 pb-8 w-full">استخدام أساسي دائم لبعض السور.</p>
-                        <ul className="space-y-5 text-sm font-bold text-gray-600 mb-10 flex-grow">
-                            {['تصفح السور الأساسية والأجزاء القصيرة', 'جودة عادية للفيديوهات', 'معرفة القبلة وأوقات الصلاة'].map((f, i) => (
-                                <li key={i} className="flex items-center gap-3"><Check size={20} className="text-gray-400" />{f}</li>
-                            ))}
-                        </ul>
-                        <button className="w-full h-14 bg-[#F1F5F9] hover:bg-gray-200 text-gray-900 font-bold rounded-2xl transition-colors mt-auto">
-                            الاستمرار مجاناً
-                        </button>
-                    </div>
-
-                    {/* Pro Plan */}
-                    <div className="bg-gray-900 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden flex flex-col items-start transform md:-translate-y-4">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#14B8A6] rounded-full blur-[100px] opacity-20 pointer-events-none" />
-                        <div className="w-full flex justify-between items-center mb-4">
-                            <p className="text-sm font-bold text-[#14B8A6] uppercase tracking-widest">احترافي</p>
-                            <span className="text-[10px] bg-[#14B8A6]/20 text-[#14B8A6] px-3 py-1 text-center font-bold rounded-full">الأشهر</span>
-                        </div>
-                        <h3 className="text-5xl lg:text-6xl font-black text-white mb-2 flex items-baseline gap-2">10<span className="text-lg text-gray-400 font-bold ml-1">ر.س/شهر</span></h3>
-                        <p className="text-gray-400 font-medium mb-10 border-b border-gray-800 pb-8 w-full relative z-10">وصول غير محدود لكل المحتوى.</p>
-                        <ul className="space-y-5 text-sm font-bold text-gray-300 mb-10 flex-grow relative z-10">
-                            {['القرآن كاملاً مترجم للغة الإشارة', 'جودة فيديوهات فائقة الدقة HD', 'ترجمة الأذكار اليومية بالكامل', 'التحميل للاستخدام بدون إنترنت'].map((f, i) => (
-                                <li key={i} className="flex items-center gap-3 text-white"><Check size={20} className="text-[#14B8A6]" />{f}</li>
-                            ))}
-                        </ul>
-                        <button className="w-full h-14 bg-[#14B8A6] hover:bg-[#0D9488] text-white font-bold rounded-2xl transition-colors relative z-10 shadow-[0_10px_30px_rgba(20,184,166,0.3)] mt-auto">
-                            اشترك الآن
-                        </button>
-                    </div>
-                </div>
-            </section>
 
             {/* ── Stats ── */}
             <section className="bg-white border-y border-gray-100 py-20">
@@ -393,15 +391,36 @@ export default function LandingPage() {
                 
                 <div className="space-y-4">
                     {/* FAQ Item 1 */}
-                    <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">هل التطبيق موجه فقط للصم وضعاف السمع؟</h3>
-                        <p className="text-gray-500 font-medium">نعم، تم تصميمه خصيصاً ليناسب احتياجات لغة الإشارة الخاصة بالصم وضعاف السمع، ولكن يمكن لأي شخص راغب في تعلم لغة الإشارة للقرآن استخدامه.</p>
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex gap-4 items-start"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-[#14B8A6]/10 flex items-center justify-center text-[#14B8A6] shrink-0">
+                            <Users size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">هل التطبيق موجه فقط للصم وضعاف السمع؟</h3>
+                            <p className="text-gray-500 font-medium leading-relaxed">نعم، تم تصميمه خصيصاً ليناسب احتياجات لغة الإشارة الخاصة بالصم وضعاف السمع، ولكن يمكن لأي شخص راغب في تعلم لغة الإشارة للقرآن استخدامه.</p>
+                        </div>
+                    </motion.div>
                      {/* FAQ Item 2 */}
-                     <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">هل أحتاج إلى الاتصال بالإنترنت دائماً؟</h3>
-                        <p className="text-gray-500 font-medium">في البداية نعم لتحميل الفيديوهات والسور، ولكن بإمكانك حفظها في جهازك (للمشتركين في الباقة الاحترافية) ومشاهدتها في أي وقت وأي مكان دون إنترنت.</p>
-                    </div>
+                     <motion.div 
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex gap-4 items-start"
+                     >
+                        <div className="w-10 h-10 rounded-xl bg-[#14B8A6]/10 flex items-center justify-center text-[#14B8A6] shrink-0">
+                            <Globe size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">هل أحتاج إلى الاتصال بالإنترنت دائماً؟</h3>
+                            <p className="text-gray-500 font-medium leading-relaxed">في البداية نعم لتحميل الفيديوهات والسور، ولكن بإمكانك حفظها في جهازك ومشاهدتها في أي وقت وأي مكان دون إنترنت.</p>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 

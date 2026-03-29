@@ -13,11 +13,8 @@ import {
     ChevronRight,
     Bell,
     Search,
-<<<<<<< Updated upstream
-    Loader2
-=======
+    Loader2,
     MessageSquare
->>>>>>> Stashed changes
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -86,13 +83,8 @@ export default function DashboardLayout({ children }) {
     const getPageTitle = () => {
         if (pathname === '/dashboard') return 'لوحة التحكم';
         if (pathname === '/dashboard/users') return 'إدارة المستخدمين';
-        if (pathname === '/dashboard/subscriptions') return 'الاشتراكات والفوترة';
-<<<<<<< Updated upstream
-        if (pathname === '/dashboard/videos') return 'إدارة المحتوى';
-=======
         if (pathname === '/dashboard/videos') return 'إدارة المحتوى والميديا';
         if (pathname === '/dashboard/support') return 'الدعم الفني والتذاكر';
->>>>>>> Stashed changes
         return 'لوحة التحكم';
     };
 
@@ -148,7 +140,6 @@ export default function DashboardLayout({ children }) {
                 <nav className="flex-1 py-8 px-4 space-y-2 overflow-y-auto custom-scrollbar">
                     <SidebarLink to="/dashboard" icon={<LayoutDashboard />} label="الرئيسية" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/users" icon={<Users />} label="المستخدمون" isOpen={isSidebarOpen} />
-                    <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard />} label="الاشتراكات" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/videos" icon={<Video />} label="الفيديوهات" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/support" icon={<MessageSquare />} label="الدعم الفني" isOpen={isSidebarOpen} />
                 </nav>

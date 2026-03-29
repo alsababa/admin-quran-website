@@ -102,28 +102,17 @@ export default function SubscriptionsPage() {
                                             </div>
                                         </div>
                                     </td>
-<<<<<<< Updated upstream
                                     <td className="px-9 py-5 text-center">
                                         <span className="text-[10px] font-black text-[#14B8A6] bg-[#14B8A6]/10 px-3 py-1 rounded-lg border border-[#14B8A6]/20">
-                                            باقة احترافية
-=======
-                                    <td className="px-10 py-6 text-center">
-                                        <span className="text-xs font-black text-[#8FB394] bg-[#8FB394]/10 px-3 py-1 rounded-lg border border-[#8FB394]/20">
                                             {user.plan || 'باقة احترافية'}
->>>>>>> Stashed changes
                                         </span>
                                     </td>
                                     <td className="px-9 py-5 text-center">
                                         <div className="flex items-center justify-center gap-2">
-<<<<<<< Updated upstream
                                             <Calendar size={11} className="text-[#14B8A6]/30" />
-                                            <span className="text-xs font-bold text-[#F5F0E8]/50">2025/05/12</span>
-=======
-                                            <Calendar size={12} className="text-[#8FB394]/30" />
-                                            <span className="text-xs font-bold text-[#F5F2ED]/60">
+                                            <span className="text-xs font-bold text-[#F5F0E8]/50">
                                                 {user.renewalDate ? new Date(user.renewalDate?.seconds ? user.renewalDate.seconds * 1000 : user.renewalDate).toLocaleDateString('ar-SA') : 'غير متوفر'}
                                             </span>
->>>>>>> Stashed changes
                                         </div>
                                     </td>
                                     <td className="px-9 py-5">

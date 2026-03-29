@@ -21,6 +21,12 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: rgba(20, 184, 166, 0.2);
+  color: #14B8A6;
 }
 
 /* Premium Glassmorphism Utilities (Gold/Indigo Tinted) */
@@ -74,8 +80,8 @@ body {
   background: #14B8A6;
 }
 
-/* Animations (Gold Glow) */
-@keyframes pulse-glow-gold {
+/* Animations (Teal Glow) */
+@keyframes pulse-glow-teal {
   0%, 100% {
     opacity: 0.25;
     filter: blur(100px);
@@ -87,7 +93,7 @@ body {
 }
 
 @utility animate-glow-teal {
-  animation: pulse-glow-gold 10s ease-in-out infinite;
+  animation: pulse-glow-teal 10s ease-in-out infinite;
 }
 
 @keyframes infinite-scroll {
