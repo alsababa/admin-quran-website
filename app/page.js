@@ -41,9 +41,14 @@ export default function LandingPage() {
             {/* ── Navbar ── */}
             <nav className="fixed inset-x-0 top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <img src="/logo/logo.png" alt="شعار قرآن الإشارة" className="w-10 h-10 object-contain drop-shadow-sm" />
-                        <span className="text-lg font-extrabold text-gray-900 tracking-tight hidden sm:block">قرآن الإشارة</span>
+                    <div className="flex items-center gap-4">
+                        <div className="relative group">
+                            <div className="absolute -inset-1.5 bg-[#14B8A6]/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                            <div className="relative p-1.5 bg-white border border-gray-100 shadow-sm rounded-xl">
+                                <img src="/logo/logo.png" alt="شعار قرآن الإشارة" className="w-10 h-10 object-contain" />
+                            </div>
+                        </div>
+                        <span className="text-xl font-black text-gray-900 tracking-tight hidden sm:block">قرآن الإشارة</span>
                     </div>
                     
                     <div className="hidden md:flex items-center gap-8 text-sm font-bold text-gray-500">

@@ -7,6 +7,10 @@ const inter = Inter({ subsets: ["latin", "arabic"] });
 export const metadata = {
     title: 'قرآن الإشارة — تعلم القرآن بلغة الإشارة',
     description: 'المنصة الرسمية الأولى لتمكين الصم وضعاف السمع من تلاوة وتعلم القرآن الكريم عبر لغة الإشارة العربية.',
+    icons: {
+        icon: '/logo/logo.png',
+        apple: '/logo/logo.png',
+    }
 };
 
 export default function RootLayout({ children }) {
