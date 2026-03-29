@@ -48,39 +48,39 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(201,168,76,0.1)]"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#C9A84C]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-[#14B8A6]/40 hover:text-white transition-colors">
                     <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-8 text-right">
-                    <div className="h-14 w-14 rounded-2xl bg-[#C9A84C]/10 border border-[#C9A84C]/20 flex items-center justify-center font-black text-[#C9A84C] text-xl">
+                    <div className="h-14 w-14 rounded-2xl bg-[#14B8A6]/10 border border-[#14B8A6]/20 flex items-center justify-center font-black text-[#14B8A6] text-xl">
                         {name?.charAt(0) || <User size={22} />}
                     </div>
                     <div>
                         <h4 className="text-2xl font-black text-white">تعديل المستخدم</h4>
-                        <p className="text-[#C9A84C]/40 text-xs font-bold mt-0.5">تحديث معلومات الحساب</p>
+                        <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">تحديث معلومات الحساب</p>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="space-y-2 text-right">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-[#C9A84C]/50">الاسم الكامل</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-[#14B8A6]/50">الاسم الكامل</label>
                         <input
                             type="text"
-                            className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#C9A84C]/20"
+                            className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="اسم المستخدم"
                         />
                     </div>
                     <div className="space-y-2 text-right">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-[#C9A84C]/50">البريد الإلكتروني</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-[#14B8A6]/50">البريد الإلكتروني</label>
                         <div className="relative">
-                            <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C9A84C]/25" />
+                            <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#14B8A6]/25" />
                             <input
                                 type="email"
-                                className="w-full h-13 glass-input rounded-xl pr-11 pl-5 py-3.5 text-sm font-medium text-white placeholder:text-[#C9A84C]/20"
+                                className="w-full h-13 glass-input rounded-xl pr-11 pl-5 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="user@example.com"
@@ -90,7 +90,7 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
                     <button
                         type="submit"
                         disabled={saving}
-                        className="w-full h-13 bg-[#C9A84C] text-[#0A0D1A] font-black rounded-xl hover:bg-[#E8C97A] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                        className="w-full h-13 bg-[#14B8A6] text-[#0A0D1A] font-black rounded-xl hover:bg-[#E8C97A] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
                     >
                         {saving ? <Loader2 size={18} className="animate-spin" /> : 'حفظ التغييرات'}
                     </button>
@@ -125,7 +125,7 @@ const DeleteModal = ({ user, onConfirm, onClose, deleting }) => (
             <div className="flex gap-3">
                 <button
                     onClick={onClose}
-                    className="flex-1 h-12 glass-card border-[#C9A84C]/10 rounded-xl text-[#F5F0E8]/50 font-bold text-sm hover:text-white transition-all"
+                    className="flex-1 h-12 glass-card border-[#14B8A6]/10 rounded-xl text-[#F5F0E8]/50 font-bold text-sm hover:text-white transition-all"
                 >
                     إلغاء
                 </button>
@@ -202,20 +202,20 @@ export default function UsersPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div className="text-right">
                     <h3 className="text-4xl font-black text-white tracking-tighter">قائمة المستخدمين</h3>
-                    <p className="text-[#C9A84C]/40 font-bold text-sm mt-2">إدارة والتحكم في حسابات المستخدمين المسجلين.</p>
+                    <p className="text-[#14B8A6]/40 font-bold text-sm mt-2">إدارة والتحكم في حسابات المستخدمين المسجلين.</p>
                 </div>
                 <div className="flex flex-wrap gap-4 w-full md:w-auto">
                     <div className="relative flex-1 md:w-80 group">
-                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#C9A84C]/30 group-focus-within:text-[#C9A84C] transition-colors" size={17} />
+                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#14B8A6]/30 group-focus-within:text-[#14B8A6] transition-colors" size={17} />
                         <input
                             type="text"
                             placeholder="ابحث عن مستخدم..."
-                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#C9A84C]/20 focus:border-[#C9A84C]/40 transition-all"
+                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20 focus:border-[#14B8A6]/40 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="h-13 px-5 py-3.5 glass-panel border-[#C9A84C]/10 rounded-2xl text-[#C9A84C]/50 hover:text-[#C9A84C] flex items-center gap-2.5 transition-all">
+                    <button className="h-13 px-5 py-3.5 glass-panel border-[#14B8A6]/10 rounded-2xl text-[#14B8A6]/50 hover:text-[#14B8A6] flex items-center gap-2.5 transition-all">
                         <Filter size={16} />
                         <span className="text-[10px] font-black uppercase tracking-widest">تصفية</span>
                         <ChevronDown size={13} />
@@ -224,18 +224,18 @@ export default function UsersPage() {
             </div>
 
             {/* Table */}
-            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#C9A84C]/10 shadow-2xl">
+            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#14B8A6]/10 shadow-2xl">
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-right">
                         <thead>
-                            <tr className="border-b border-[#C9A84C]/8 bg-[#C9A84C]/5">
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#C9A84C]/50">المستخدم</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#C9A84C]/50 text-center">الحالة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#C9A84C]/50">تاريخ التسجيل</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#C9A84C]/50 text-left">الإجراءات</th>
+                            <tr className="border-b border-[#14B8A6]/8 bg-[#14B8A6]/5">
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">المستخدم</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">الحالة</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">تاريخ التسجيل</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-left">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#C9A84C]/5">
+                        <tbody className="divide-y divide-[#14B8A6]/5">
                             <AnimatePresence>
                                 {loading ? (
                                     [1, 2, 3, 4].map(i => (
@@ -252,18 +252,18 @@ export default function UsersPage() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: idx * 0.04 }}
-                                        className="group hover:bg-[#C9A84C]/3 transition-colors"
+                                        className="group hover:bg-[#14B8A6]/3 transition-colors"
                                     >
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#C9A84C]/20 to-[#8B6F2E]/15 border border-[#C9A84C]/20 flex items-center justify-center font-black text-[#C9A84C] text-sm shrink-0">
+                                                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#14B8A6]/20 to-[#0D9488]/15 border border-[#14B8A6]/20 flex items-center justify-center font-black text-[#14B8A6] text-sm shrink-0">
                                                     {user.displayName?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || '?'}
                                                 </div>
                                                 <div className="overflow-hidden">
                                                     <p className="font-extrabold text-white text-sm truncate">{user.displayName || 'مستخدم جديد'}</p>
                                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                                        <Mail size={11} className="text-[#C9A84C]/30" />
-                                                        <p className="text-[10px] font-bold text-[#C9A84C]/40 truncate max-w-[180px]">{user.email}</p>
+                                                        <Mail size={11} className="text-[#14B8A6]/30" />
+                                                        <p className="text-[10px] font-bold text-[#14B8A6]/40 truncate max-w-[180px]">{user.email}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -272,9 +272,9 @@ export default function UsersPage() {
                                             <div className="flex justify-center">
                                                 <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest
                                                     ${user.subscriptionStatus === 'active'
-                                                        ? 'bg-[#C9A84C]/10 border-[#C9A84C]/20 text-[#C9A84C]'
+                                                        ? 'bg-[#14B8A6]/10 border-[#14B8A6]/20 text-[#14B8A6]'
                                                         : 'bg-[#1E2448]/80 border-white/10 text-[#F5F0E8]/35'}`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-[#C9A84C]' : 'bg-white/20'}`} />
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-[#14B8A6]' : 'bg-white/20'}`} />
                                                     {user.subscriptionStatus === 'active' ? 'مميز' : 'مجاني'}
                                                 </div>
                                             </div>
@@ -284,7 +284,7 @@ export default function UsersPage() {
                                                 <p className="text-xs font-bold text-[#F5F0E8]/45">
                                                     {user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ar-SA') : 'غير متوفر'}
                                                 </p>
-                                                <Calendar size={13} className="text-[#C9A84C]/20" />
+                                                <Calendar size={13} className="text-[#14B8A6]/20" />
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
@@ -292,7 +292,7 @@ export default function UsersPage() {
                                                 {/* Edit */}
                                                 <button
                                                     onClick={() => setEditingUser(user)}
-                                                    className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-[#F5F0E8]/40 hover:text-white hover:bg-[#C9A84C]/15 hover:border-[#C9A84C]/25 transition-all"
+                                                    className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-[#F5F0E8]/40 hover:text-white hover:bg-[#14B8A6]/15 hover:border-[#14B8A6]/25 transition-all"
                                                     title="تعديل"
                                                 >
                                                     <Edit3 size={15} />
@@ -309,7 +309,7 @@ export default function UsersPage() {
                                                 {user.subscriptionStatus !== 'active' && (
                                                     <button
                                                         onClick={() => handleUpgrade(user)}
-                                                        className="h-10 px-4 bg-[#C9A84C]/10 border border-[#C9A84C]/20 rounded-xl text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#0A0D1A] font-black text-[9px] transition-all flex items-center gap-1.5"
+                                                        className="h-10 px-4 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-xl text-[#14B8A6] hover:bg-[#14B8A6] hover:text-[#0A0D1A] font-black text-[9px] transition-all flex items-center gap-1.5"
                                                         title="ترقية لمميز"
                                                     >
                                                         <Shield size={13} strokeWidth={2.5} />
@@ -326,14 +326,14 @@ export default function UsersPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-10 py-6 bg-[#C9A84C]/3 border-t border-[#C9A84C]/5 flex justify-between items-center">
-                    <p className="text-[9px] font-black text-[#C9A84C]/40 uppercase tracking-widest">
+                <div className="px-10 py-6 bg-[#14B8A6]/3 border-t border-[#14B8A6]/5 flex justify-between items-center">
+                    <p className="text-[9px] font-black text-[#14B8A6]/40 uppercase tracking-widest">
                         عرض {filteredUsers.length} من أصل {users.length} مستخدم
                     </p>
                     <div className="flex gap-2">
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-all rotate-180"><ChevronDown size={13} /></button>
-                        <button className="px-4 py-2 bg-[#C9A84C]/10 border border-[#C9A84C]/20 rounded-lg text-[#C9A84C] text-[9px] font-black">1</button>
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#C9A84C] transition-all"><ChevronDown size={13} /></button>
+                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#14B8A6] transition-all rotate-180"><ChevronDown size={13} /></button>
+                        <button className="px-4 py-2 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-lg text-[#14B8A6] text-[9px] font-black">1</button>
+                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#14B8A6] transition-all"><ChevronDown size={13} /></button>
                     </div>
                 </div>
             </div>

@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gold:    #C9A84C;
+  --color-gold:    #14B8A6;
   --color-gold-light: #E8C97A;
-  --color-gold-dark:  #8B6F2E;
+  --color-gold-dark:  #0D9488;
   --color-navy:    #0A0D1A;
   --color-indigo:  #141830;
   --color-indigo2: #1E2448;
@@ -13,7 +13,7 @@
 :root {
   --background: #0A0D1A;
   --foreground: #F5F0E8;
-  --accent-primary: #C9A84C;
+  --accent-primary: #14B8A6;
 }
 
 body {
@@ -71,7 +71,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C9A84C;
+  background: #14B8A6;
 }
 
 /* Animations (Gold Glow) */
@@ -86,12 +86,21 @@ body {
   }
 }
 
-@utility animate-glow-gold {
+@utility animate-glow-teal {
   animation: pulse-glow-gold 10s ease-in-out infinite;
+}
+
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+@utility animate-infinite-scroll {
+  animation: infinite-scroll 25s linear infinite;
 }
 
 /* Arabic geometric pattern overlay */
 @utility arabic-pattern {
-  background-image: radial-gradient(circle at 1px 1px, rgba(201,168,76,0.06) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(20,184,166,0.06) 1px, transparent 0);
   background-size: 32px 32px;
 }

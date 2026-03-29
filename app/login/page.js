@@ -49,9 +49,9 @@ export default function LoginPage() {
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
-                        className="inline-flex p-5 rounded-3xl bg-gradient-to-br from-[#C9A84C] to-[#8B6F2E] shadow-2xl shadow-[#C9A84C]/25 mb-5 text-[#0A0D1A]"
+                        className="inline-flex p-3 rounded-3xl bg-gradient-to-br from-[#C9A84C]/20 to-[#8B6F2E]/20 shadow-2xl shadow-[#C9A84C]/15 border border-[#C9A84C]/20 mb-5 text-[#0A0D1A]"
                     >
-                        <BookOpen size={42} strokeWidth={2.5} />
+                        <img src="/logo/logo.png" alt="Logo" className="w-16 h-16 object-contain drop-shadow-xl" />
                     </motion.div>
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
