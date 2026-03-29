@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Redirect all paths that do not have an extension to their corresponding HTML file
+# This handles the trailingSlash: true configuration
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ $1.html [L]
+
+# Optional: Handle 404s by redirecting to the main entry if file doesn't exist
+ErrorDocument 404 /404/index.html
