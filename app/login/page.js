@@ -144,7 +144,7 @@ export default function LoginPage() {
                     transition={{ delay: 1 }}
                     className="text-center text-[#14B8A6]/30 text-[9px] mt-10 font-bold tracking-widest uppercase"
                 >
-                    © 2026 قرآن لغة الإشارة — نظام الإدارة
+                    © 2026 مصحف أنامل للصم — نظام الإدارة
                 </motion.p>
             </motion.div>
         </div>

@@ -124,6 +124,21 @@ export function useUsers() {
         }
     }, [fetchSupabaseUsers]);
 
-    return { users, loading, error, deleteUser, upgradeUser, updateUser };
+    const changeAccountType = useCallback(async (user, accountType) => {
+        if (user.source === 'firebase') {
+            await updateDoc(doc(db, "users", user.rawId), {
+                accountType: accountType,
+            });
+        } else {
+            const { error } = await supabase
+                .from('users')
+                .update({ account_type: accountType })
+                .eq('id', user.rawId);
+            if (error) throw error;
+            await fetchSupabaseUsers();
+        }
+    }, [fetchSupabaseUsers]);
+
+    return { users, loading, error, deleteUser, upgradeUser, updateUser, changeAccountType };
 }
 

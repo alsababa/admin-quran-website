@@ -212,16 +212,103 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
     );
 };
 
+// ── Change Account Type Modal ────────────────────────────
+const ChangeTypeModal = ({ user, onConfirm, onClose, saving }) => {
+    const [type, setType] = useState(user.accountType || 'individual');
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 text-right" dir="rtl">
+            <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
+            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(20,184,166,0.15)]"
+            >
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-[#14B8A6]/40 hover:text-white transition-colors">
+                    <X size={20} />
+                </button>
+
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="h-14 w-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                        <Building2 size={28} />
+                    </div>
+                    <div>
+                        <h4 className="text-2xl font-black text-white">تغيير نوع الحساب</h4>
+                        <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">تحديد طبيعة الحساب 🏢</p>
+                    </div>
+                </div>
+
+                <p className="text-sm font-bold text-white/60 mb-8 leading-relaxed">
+                    اختر نوع الحساب لـ <span className="text-[#14B8A6]">{user.displayName || user.email}</span>.
+                    <br/><span className="text-[10px] text-white/30">لن يتأثر اشتراك المستخدم الحالي.</span>
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                    <button
+                        onClick={() => setType('individual')}
+                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3
+                            ${type === 'individual'
+                                ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-white'
+                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                    >
+                        <User size={24} className={type === 'individual' ? 'text-[#14B8A6]' : 'text-white/20'} />
+                        <span className="text-sm font-black">حساب فردي</span>
+                        <span className="text-[10px] text-white/30">مستخدم واحد</span>
+                    </button>
+                    <button
+                        onClick={() => setType('entity')}
+                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3
+                            ${type === 'entity'
+                                ? 'bg-blue-500/10 border-blue-500/40 text-white'
+                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                    >
+                        <Building2 size={24} className={type === 'entity' ? 'text-blue-400' : 'text-white/20'} />
+                        <span className="text-sm font-black">جهة / منظمة</span>
+                        <span className="text-[10px] text-white/30">مؤسسة أو شركة</span>
+                    </button>
+                </div>
+
+                {/* Current Status Indicator */}
+                <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-white/3 rounded-2xl border border-white/5">
+                    <div className="w-2 h-2 rounded-full bg-[#14B8A6]" />
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                        النوع الحالي: {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
+                    </p>
+                </div>
+
+                <button
+                    onClick={() => onConfirm(user, type)}
+                    disabled={saving || type === user.accountType}
+                    className="w-full h-14 bg-blue-500 text-white font-black rounded-2xl hover:bg-blue-400 transition-all active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                    {saving ? <Loader2 size={20} className="animate-spin" /> : 'تغيير نوع الحساب'}
+                </button>
+                {type === user.accountType && (
+                    <p className="text-center text-[10px] text-white/20 mt-3">لا يوجد تغيير — اختر نوعاً مختلفاً</p>
+                )}
+            </motion.div>
+        </div>
+    );
+};
+
 // ── Main Page ─────────────────────────────────────────────
 export default function UsersPage() {
-    const { users, loading, deleteUser, upgradeUser, updateUser } = useUsers();
+    const { users, loading, deleteUser, upgradeUser, updateUser, changeAccountType } = useUsers();
     const [searchTerm, setSearchTerm] = useState('');
     const [editingUser, setEditingUser] = useState(null);
     const [deletingUser, setDeletingUser] = useState(null);
     const [upgradingUser, setUpgradingUser] = useState(null);
+    const [changingTypeUser, setChangingTypeUser] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpgrading, setIsUpgrading] = useState(false);
+    const [isChangingType, setIsChangingType] = useState(false);
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type = 'success') => {
@@ -275,6 +362,19 @@ export default function UsersPage() {
 
     const handleUpgradeClick = (user) => {
         setUpgradingUser(user);
+    };
+
+    const handleConfirmChangeType = async (user, type) => {
+        setIsChangingType(true);
+        try {
+            await changeAccountType(user, type);
+            setChangingTypeUser(null);
+            showToast(`تم تغيير نوع حساب ${user.displayName || user.email} إلى ${type === 'entity' ? 'جهة / منظمة' : 'حساب فردي'} 🏢`);
+        } catch {
+            showToast('فشل تغيير نوع الحساب. حاول مجدداً.', 'error');
+        } finally {
+            setIsChangingType(false);
+        }
     };
 
     return (
@@ -409,6 +509,17 @@ export default function UsersPage() {
                                                 >
                                                     <Trash2 size={15} />
                                                 </button>
+                                                {/* Change Account Type */}
+                                                <button
+                                                    onClick={() => setChangingTypeUser(user)}
+                                                    className={`p-2.5 border rounded-xl transition-all
+                                                        ${user.accountType === 'entity'
+                                                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white'
+                                                            : 'bg-white/4 border-white/5 text-[#F5F0E8]/40 hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/20'}`}
+                                                    title="تغيير نوع الحساب (فردي / جهة)"
+                                                >
+                                                    <Building2 size={15} />
+                                                </button>
                                                 {/* Upgrade */}
                                                 {user.subscriptionStatus !== 'active' && (
                                                     <button
@@ -474,6 +585,18 @@ export default function UsersPage() {
                         onConfirm={handleConfirmUpgrade}
                         onClose={() => setUpgradingUser(null)}
                         upgrading={isUpgrading}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Change Account Type Modal */}
+            <AnimatePresence>
+                {changingTypeUser && (
+                    <ChangeTypeModal
+                        user={changingTypeUser}
+                        onConfirm={handleConfirmChangeType}
+                        onClose={() => setChangingTypeUser(null)}
+                        saving={isChangingType}
                     />
                 )}
             </AnimatePresence>

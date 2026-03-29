@@ -495,12 +495,12 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                     <img src="/logo/logo.png" className="w-10 h-10 object-contain" />
                     <div className="flex flex-col">
-                        <span className="text-lg font-extrabold text-gray-900">قرآن الإشارة</span>
+                        <span className="text-lg font-extrabold text-gray-900">مصحف أنامل للصم</span>
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">إحدى مبادرات شركة السبابة الرقمية</span>
                     </div>
                 </div>
                 <p className="text-sm font-medium text-gray-500 text-center">
-                    © 2026 قرآن الإشارة التابع لشركة السبابة الرقمية. جميع الحقوق محفوظة لخدمة الصم وضعاف السمع.
+                    © 2026 مصحف أنامل للصم — التابع لشركة السبابة الرقمية. جميع الحقوق محفوظة لخدمة الصم وضعاف السمع.
                 </p>
                 <Link href="/login" className="text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-2 group bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-full">
                     بوابة إدارة المنصة <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
