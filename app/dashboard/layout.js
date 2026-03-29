@@ -14,7 +14,8 @@ import {
     Bell,
     Search,
     Loader2,
-    MessageSquare
+    MessageSquare,
+    Ticket
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -84,6 +85,7 @@ export default function DashboardLayout({ children }) {
         if (pathname === '/dashboard') return 'لوحة التحكم';
         if (pathname === '/dashboard/users') return 'إدارة المستخدمين';
         if (pathname === '/dashboard/videos') return 'إدارة المحتوى والميديا';
+        if (pathname === '/dashboard/codes') return 'أكواد التفعيل وإدارة المجموعات';
         if (pathname === '/dashboard/support') return 'الدعم الفني والتذاكر';
         return 'لوحة التحكم';
     };
@@ -142,6 +144,7 @@ export default function DashboardLayout({ children }) {
                     <SidebarLink to="/dashboard/users" icon={<Users />} label="المستخدمون" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/videos" icon={<Video />} label="الفيديوهات" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard />} label="تقارير الاشتراكات" isOpen={isSidebarOpen} />
+                    <SidebarLink to="/dashboard/codes" icon={<Ticket />} label="أكواد التفعيل" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/support" icon={<MessageSquare />} label="الدعم الفني" isOpen={isSidebarOpen} />
                 </nav>
 
