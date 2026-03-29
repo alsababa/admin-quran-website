@@ -141,14 +141,87 @@ const DeleteModal = ({ user, onConfirm, onClose, deleting }) => (
     </div>
 );
 
+// ── Upgrade User Modal ──────────────────────────────────────
+const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
+    const [type, setType] = useState('individual');
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 text-right" dir="rtl">
+            <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
+            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(20,184,166,0.15)]"
+            >
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-[#14B8A6]/40 hover:text-white transition-colors">
+                    <X size={20} />
+                </button>
+
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="h-14 w-14 rounded-2xl bg-[#14B8A6]/10 border border-[#14B8A6]/20 flex items-center justify-center text-[#14B8A6]">
+                        <Shield size={28} />
+                    </div>
+                    <div>
+                        <h4 className="text-2xl font-black text-white">ترقية الحساب</h4>
+                        <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">منح العضوية المميزة ✨</p>
+                    </div>
+                </div>
+
+                <p className="text-sm font-bold text-white/60 mb-8 leading-relaxed">
+                    اختر نوع الحساب المميز لـ <span className="text-[#14B8A6]">{user.displayName || user.email}</span>.
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                    <button
+                        onClick={() => setType('individual')}
+                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
+                            ${type === 'individual' 
+                                ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-white' 
+                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                    >
+                        <User size={24} className={type === 'individual' ? 'text-[#14B8A6]' : 'text-white/20'} />
+                        <span className="text-sm font-black">حساب فردي</span>
+                    </button>
+                    <button
+                        onClick={() => setType('entity')}
+                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
+                            ${type === 'entity' 
+                                ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-white' 
+                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                    >
+                        <Building2 size={24} className={type === 'entity' ? 'text-[#14B8A6]' : 'text-white/20'} />
+                        <span className="text-sm font-black">جهة / منظمة</span>
+                    </button>
+                </div>
+
+                <button
+                    onClick={() => onConfirm(user, type)}
+                    disabled={upgrading}
+                    className="w-full h-14 bg-[#14B8A6] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#0D9488] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                    {upgrading ? <Loader2 size={20} className="animate-spin" /> : 'تأكيد الترقية الآن'}
+                </button>
+            </motion.div>
+        </div>
+    );
+};
+
 // ── Main Page ─────────────────────────────────────────────
 export default function UsersPage() {
     const { users, loading, deleteUser, upgradeUser, updateUser } = useUsers();
     const [searchTerm, setSearchTerm] = useState('');
     const [editingUser, setEditingUser] = useState(null);
     const [deletingUser, setDeletingUser] = useState(null);
+    const [upgradingUser, setUpgradingUser] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isUpgrading, setIsUpgrading] = useState(false);
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type = 'success') => {
@@ -187,16 +260,21 @@ export default function UsersPage() {
         }
     };
 
-    const handleUpgrade = async (user) => {
-        // Simple prompt for account type for now, can be improved to a modal later
-        const type = window.confirm(`هل تريد ترقية ${user.displayName || user.email} كـ "جهة" (Entity)؟\nنعم = جهة، إلغاء = فرد`) ? 'entity' : 'individual';
-        
+    const handleConfirmUpgrade = async (user, type) => {
+        setIsUpgrading(true);
         try {
             await upgradeUser(user, type);
+            setUpgradingUser(null);
             showToast(`تمت ترقية ${user.displayName || user.email} كـ ${type === 'entity' ? 'جهة' : 'فرد'} للباقة المميزة ✨`);
         } catch {
             showToast('فشل تنفيذ الترقية. تحقق من الصلاحيات.', 'error');
+        } finally {
+            setIsUpgrading(false);
         }
+    };
+
+    const handleUpgradeClick = (user) => {
+        setUpgradingUser(user);
     };
 
     return (
@@ -334,7 +412,7 @@ export default function UsersPage() {
                                                 {/* Upgrade */}
                                                 {user.subscriptionStatus !== 'active' && (
                                                     <button
-                                                        onClick={() => handleUpgrade(user)}
+                                                        onClick={() => handleUpgradeClick(user)}
                                                         className="h-10 px-4 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-xl text-[#14B8A6] hover:bg-[#14B8A6] hover:text-[#0A0D1A] font-black text-[9px] transition-all flex items-center gap-1.5"
                                                         title="ترقية لمميز"
                                                     >
@@ -384,6 +462,18 @@ export default function UsersPage() {
                         onConfirm={handleDelete}
                         onClose={() => setDeletingUser(null)}
                         deleting={isDeleting}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Upgrade Modal */}
+            <AnimatePresence>
+                {upgradingUser && (
+                    <UpgradeModal
+                        user={upgradingUser}
+                        onConfirm={handleConfirmUpgrade}
+                        onClose={() => setUpgradingUser(null)}
+                        upgrading={isUpgrading}
                     />
                 )}
             </AnimatePresence>
