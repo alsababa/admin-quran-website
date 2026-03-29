@@ -13,13 +13,8 @@ import {
     ChevronRight,
     Bell,
     Search,
-<<<<<<< Updated upstream
     Loader2,
     MessageSquare
-=======
-    Loader2
-
->>>>>>> Stashed changes
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -88,11 +83,6 @@ export default function DashboardLayout({ children }) {
     const getPageTitle = () => {
         if (pathname === '/dashboard') return 'لوحة التحكم';
         if (pathname === '/dashboard/users') return 'إدارة المستخدمين';
-<<<<<<< Updated upstream
-=======
-        if (pathname === '/dashboard/subscriptions') return 'الاشتراكات والفوترة';
-        if (pathname === '/dashboard/videos') return 'إدارة المحتوى';
->>>>>>> Stashed changes
         if (pathname === '/dashboard/videos') return 'إدارة المحتوى والميديا';
         if (pathname === '/dashboard/support') return 'الدعم الفني والتذاكر';
         return 'لوحة التحكم';
