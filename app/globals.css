@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-sage: #8FB394;
-  --color-brand-cream: #F5F2ED;
-  --color-brand-forest: #0D1510;
-  --color-brand-moss: #4A6351;
+  --color-gold:    #C9A84C;
+  --color-gold-light: #E8C97A;
+  --color-gold-dark:  #8B6F2E;
+  --color-navy:    #0A0D1A;
+  --color-indigo:  #141830;
+  --color-indigo2: #1E2448;
+  --color-cream:   #F5F0E8;
 }
 
 :root {
-  --background: #0D1510;
-  /* Deep Forest Dark Mode */
-  --foreground: #F5F2ED;
-  /* Cream Foreground */
-  --accent-primary: #8FB394;
-  /* Sage Green */
+  --background: #0A0D1A;
+  --foreground: #F5F0E8;
+  --accent-primary: #C9A84C;
 }
 
 body {
@@ -23,44 +23,42 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Premium Glassmorphism Utilities (Sage Tinted) */
+/* Premium Glassmorphism Utilities (Gold/Indigo Tinted) */
 @utility glass-panel {
-  background-color: rgba(13, 21, 16, 0.4);
+  background-color: rgba(10, 13, 26, 0.5);
   backdrop-filter: blur(28px);
-  border: 1px solid rgba(143, 179, 148, 0.15);
-  /* Tinted with Sage */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 @utility glass-card {
-  background-color: rgba(74, 99, 81, 0.1);
-  /* Moss background */
+  background-color: rgba(30, 36, 72, 0.25);
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(143, 179, 148, 0.2);
+  border: 1px solid rgba(201, 168, 76, 0.18);
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility glass-card-hover {
-  border-color: rgba(143, 179, 148, 0.5);
-  background-color: rgba(143, 179, 148, 0.1);
-  box-shadow: 0 0 30px rgba(143, 179, 148, 0.1);
+  border-color: rgba(201, 168, 76, 0.5);
+  background-color: rgba(201, 168, 76, 0.08);
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.12);
 }
 
 @utility glass-input {
-  background-color: rgba(13, 21, 16, 0.6);
-  border: 1px solid rgba(143, 179, 148, 0.2);
+  background-color: rgba(10, 13, 26, 0.7);
+  border: 1px solid rgba(201, 168, 76, 0.2);
   transition: all 0.3s;
   outline: none;
 }
 
 @utility glass-input-focus {
-  border-color: rgba(143, 179, 148, 0.6);
-  box-shadow: 0 0 0 4px rgba(143, 179, 148, 0.1);
+  border-color: rgba(201, 168, 76, 0.6);
+  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.08);
 }
 
-/* Custom Scrollbar (Sage) */
+/* Custom Scrollbar (Gold) */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -68,31 +66,32 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4A6351;
-  /* Moss Green */
+  background: #2A3060;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8FB394;
-  /* Sage Green */
+  background: #C9A84C;
 }
 
-/* Animations (Botanical Glow) */
-@keyframes pulse-glow-sage {
-
-  0%,
-  100% {
-    opacity: 0.3;
+/* Animations (Gold Glow) */
+@keyframes pulse-glow-gold {
+  0%, 100% {
+    opacity: 0.25;
     filter: blur(100px);
   }
-
   50% {
-    opacity: 0.6;
+    opacity: 0.5;
     filter: blur(140px);
   }
 }
 
-@utility animate-glow-sage {
-  animation: pulse-glow-sage 10s ease-in-out infinite;
+@utility animate-glow-gold {
+  animation: pulse-glow-gold 10s ease-in-out infinite;
+}
+
+/* Arabic geometric pattern overlay */
+@utility arabic-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(201,168,76,0.06) 1px, transparent 0);
+  background-size: 32px 32px;
 }
