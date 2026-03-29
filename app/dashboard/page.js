@@ -113,10 +113,43 @@ export default function Overview() {
                         <div className="h-24 w-24 rounded-[2rem] bg-gradient-to-br from-[#14B8A6] to-[#0D9488] flex items-center justify-center shadow-2xl shadow-[#14B8A6]/30">
                             <BookOpen size={44} strokeWidth={2} className="text-[#0A0D1A]" />
                         </div>
+<<<<<<< Updated upstream
                         <div className="mt-3 flex justify-center gap-1.5">
                             {[...Array(3)].map((_, i) => (
                                 <div key={i} className={`rounded-full bg-[#14B8A6] ${i === 1 ? 'w-4 h-1.5' : 'w-1.5 h-1.5 opacity-40'}`} />
                             ))}
+=======
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <QuickActionCard
+                                to="/dashboard/videos"
+                                label="رفع فيديو"
+                                description="إضافة دروس لغة إشارة"
+                                icon={<Plus />}
+                                delay={0.4}
+                            />
+                            <QuickActionCard
+                                to="/dashboard/users"
+                                label="المستخدمين"
+                                description="تحكم كامل بالحسابات"
+                                icon={<Users />}
+                                delay={0.5}
+                            />
+                            <QuickActionCard
+                                to="/dashboard/subscriptions"
+                                label="الاشتراكات"
+                                description="إدارة الفوترة والخطط"
+                                icon={<FileText />}
+                                delay={0.6}
+                            />
+                            <QuickActionCard
+                                to="/dashboard/support"
+                                label="الدعم الفني"
+                                description="الرد على الطلبات"
+                                icon={<MessageSquare />}
+                                delay={0.7}
+                            />
+>>>>>>> Stashed changes
                         </div>
                     </div>
 
