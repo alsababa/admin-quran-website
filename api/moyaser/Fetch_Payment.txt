@@ -1,0 +1,35 @@
+const axios = require('axios');
+
+let config = {
+  method: 'get',
+  maxBodyLength: Infinity,
+  url: 'https://api.moyasar.com/v1/payments/:id',
+  headers: { 
+    'Accept': 'application/json'
+  }
+};
+
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+
+Request
+Collapse all
+Base URL
+https://api.moyasar.com/v1
+Auth
+Username
+Username
+Password
+Password
+Parameters
+id — pathrequired
+ID of the payment to fetch
+Send API Request
+Response
+Clear
+Click the Send API Request button above and see the response here!

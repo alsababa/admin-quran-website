@@ -1,0 +1,85 @@
+https://api.moyasar.com/v1/payments
+const axios = require('axios');
+let data = JSON.stringify({
+  "given_id": "a1168bd1-47a4-4b97-8a50-dd5caaccacf2",
+  "amount": 100,
+  "currency": "SAR",
+  "description": "Kindle Whitepaper",
+  "callback_url": "https://example.com/checkout/payer-return",
+  "source": {
+    "type": "creditcard",
+    "name": "John Doe",
+    "number": "4111111111111111",
+    "month": 0,
+    "year": 2030,
+    "cvc": 123,
+    "statement_descriptor": "Century Store",
+    "3ds": true,
+    "manual": false,
+    "save_card": false
+  },
+  "metadata": {
+    "cart_id": "72e470a5-cbc4-47b3-a52a-e89fda6adb19",
+    "customer_email": "johndoe@example.com",
+    "customer_id": "23432"
+  },
+  "apply_coupon": true
+});
+
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: 'https://api.moyasar.com/v1/payments',
+  headers: { 
+    'Content-Type': 'application/json', 
+    'Accept': 'application/json'
+  },
+  data : data
+};
+
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+
+
+Request
+Collapse all
+Base URL
+https://api.moyasar.com/v1
+Auth
+Username
+Username
+Password
+Password
+Body
+ required
+
+{
+  "given_id": "a1168bd1-47a4-4b97-8a50-dd5caaccacf2",
+  "amount": 100,
+  "currency": "SAR",
+  "description": "Kindle Whitepaper",
+  "callback_url": "https://example.com/checkout/payer-return",
+  "source": {
+    "type": "creditcard",
+    "name": "John Doe",
+    "number": "4111111111111111",
+    "month": 0,
+    "year": 2030,
+    "cvc": 123,
+    "statement_descriptor": "Century Store",
+    "3ds": true,
+    "manual": false,
+    "save_card": false
+  },
+  "metadata": {
+    "cart_id": "72e470a5-cbc4-47b3-a52a-e89fda6adb19",
+    "customer_email": "johndoe@example.com",
+    "customer_id": "23432"
+  },
+  "apply_coupon": true
+}
