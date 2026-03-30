@@ -5,7 +5,7 @@ import {
     deleteDoc, doc, updateDoc
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin as supabase } from '@/lib/supabase';
 
 export function useUsers() {
     const [users, setUsers] = useState([]);
@@ -125,17 +125,28 @@ export function useUsers() {
     }, [fetchSupabaseUsers]);
 
     const changeAccountType = useCallback(async (user, accountType) => {
-        if (user.source === 'firebase') {
-            await updateDoc(doc(db, "users", user.rawId), {
-                accountType: accountType,
-            });
-        } else {
-            const { error } = await supabase
-                .from('users')
-                .update({ account_type: accountType })
-                .eq('id', user.rawId);
-            if (error) throw error;
+        console.log(`Attempting to change account type for ${user.id} to ${accountType}`);
+        try {
+            if (user.source === 'firebase') {
+                await updateDoc(doc(db, "users", user.rawId), {
+                    accountType: accountType,
+                });
+            } else {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ account_type: accountType })
+                    .eq('id', user.rawId);
+                
+                if (error) {
+                    console.error("Supabase Error changing account type:", error);
+                    throw error;
+                }
+            }
             await fetchSupabaseUsers();
+            console.log("Account type updated successfully");
+        } catch (err) {
+            console.error("Failed to change account type:", err);
+            throw err;
         }
     }, [fetchSupabaseUsers]);
 
