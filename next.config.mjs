@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: 'export', // تم التعطيل لدعم Server Actions والأمان
+    output: 'export',
     images: {
         unoptimized: true,
     },

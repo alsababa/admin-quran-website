@@ -1,12 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { 
-    fetchCodesAction, 
-    generateCodesAction, 
-    deleteCodeAction, 
-    deleteBatchAction 
-} from '@/app/actions/codeActions';
 
 export function useActivationCodes() {
     const [codes, setCodes] = useState([]);
@@ -17,7 +11,15 @@ export function useActivationCodes() {
     const fetchCodes = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await fetchCodesAction();
+            // NOTE: auth.users is NOT accessible from the client anon key.
+            // We only fetch the codes. If you need organization details, 
+            // you must use a public profiles table.
+            const { data, error } = await supabase
+                .from('activation_codes')
+                .select('*') 
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
             setCodes(data || []);
         } catch (err) {
             console.error("Error fetching codes:", err);
@@ -34,11 +36,32 @@ export function useActivationCodes() {
     // ── Generate Bulk Codes ───────────────────────────────────
     const generateBulkCodes = async ({ count, orgId, prefix = 'ANML', expiresAt = null }) => {
         try {
-            const result = await generateCodesAction({ count, orgId, prefix, expiresAt });
+            const batchId = crypto.randomUUID();
+            const newCodes = [];
+
+            for (let i = 0; i < count; i++) {
+                const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase();
+                const codeString = `${prefix}-${randomPart}`;
+                
+                newCodes.push({
+                    code: codeString,
+                    batch_id: batchId,
+                    org_id: orgId,
+                    expires_at: expiresAt,
+                    status: 'available'
+                });
+            }
+
+            const { data, error } = await supabase
+                .from('activation_codes')
+                .insert(newCodes)
+                .select();
+
+            if (error) throw error;
             
             // Refresh list
             await fetchCodes();
-            return result;
+            return { success: true, batchId, codes: data };
         } catch (err) {
             console.error("Error generating codes:", err);
             return { success: false, error: err.message };
@@ -48,7 +71,12 @@ export function useActivationCodes() {
     // ── Delete Specific Code ──────────────────────────────────
     const deleteCode = async (id) => {
         try {
-            await deleteCodeAction(id);
+            const { error } = await supabase
+                .from('activation_codes')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
             setCodes(prev => prev.filter(c => c.id !== id));
             return { success: true };
         } catch (err) {
@@ -60,7 +88,12 @@ export function useActivationCodes() {
     // ── Delete Entire Batch ───────────────────────────────────
     const deleteBatch = async (batchId) => {
         try {
-            await deleteBatchAction(batchId);
+            const { error } = await supabase
+                .from('activation_codes')
+                .delete()
+                .eq('batch_id', batchId);
+
+            if (error) throw error;
             setCodes(prev => prev.filter(c => c.batch_id !== batchId));
             return { success: true };
         } catch (err) {

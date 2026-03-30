@@ -6,12 +6,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { supabase } from '@/lib/supabase';
-import { 
-    deleteUserAction, 
-    upgradeUserAction, 
-    updateUserAction, 
-    changeAccountTypeAction 
-} from '@/app/actions/adminActions';
 
 export function useUsers() {
     const [users, setUsers] = useState([]);
@@ -86,8 +80,9 @@ export function useUsers() {
         if (user.source === 'firebase') {
             await deleteDoc(doc(db, "users", user.rawId));
         } else {
-            // Using Server Action for Supabase (Admin Power)
-            await deleteUserAction(user.rawId);
+            // NOTE: Requires RLS policy for admins in Supabase
+            const { error } = await supabase.from('users').delete().eq('id', user.rawId);
+            if (error) throw error;
             await fetchSupabaseUsers();
         }
     }, [fetchSupabaseUsers]);
@@ -101,8 +96,17 @@ export function useUsers() {
                 platform: 'manual'
             });
         } else {
-            // Using Server Action for Supabase (Admin Power)
-            await upgradeUserAction(user.rawId, accountType);
+            // NOTE: Requires RLS policy for admins in Supabase
+            const { error } = await supabase
+                .from('users')
+                .update({ 
+                    subscription_status: 'active', 
+                    subscription_tier: 'premium',
+                    account_type: accountType,
+                    platform: 'manual'
+                })
+                .eq('id', user.rawId);
+            if (error) throw error;
             await fetchSupabaseUsers();
         }
     }, [fetchSupabaseUsers]);
@@ -114,8 +118,12 @@ export function useUsers() {
             if (updates.email !== undefined) fbUpdates.email = updates.email;
             await updateDoc(doc(db, "users", user.rawId), fbUpdates);
         } else {
-            // Using Server Action for Supabase (Admin Power)
-            await updateUserAction(user.rawId, updates);
+            // NOTE: Requires RLS policy for admins in Supabase
+            const sbUpdates = {};
+            if (updates.displayName !== undefined) sbUpdates.full_name = updates.displayName;
+            if (updates.email !== undefined) sbUpdates.email = updates.email;
+            const { error } = await supabase.from('users').update(sbUpdates).eq('id', user.rawId);
+            if (error) throw error;
             await fetchSupabaseUsers();
         }
     }, [fetchSupabaseUsers]);
@@ -128,8 +136,16 @@ export function useUsers() {
                     accountType: accountType,
                 });
             } else {
-                // Using Server Action for Supabase (Admin Power)
-                await changeAccountTypeAction(user.rawId, accountType);
+                // NOTE: Requires RLS policy for admins in Supabase
+                const { error } = await supabase
+                    .from('users')
+                    .update({ account_type: accountType })
+                    .eq('id', user.rawId);
+                
+                if (error) {
+                    console.error("Supabase Error changing account type:", error);
+                    throw error;
+                }
             }
             await fetchSupabaseUsers();
             console.log("Account type updated successfully");
