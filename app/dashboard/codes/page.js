@@ -143,7 +143,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
 
 // ── Main Page ─────────────────────────────────────────────
 export default function CodesPage() {
-    const { codes, loading, generateBulkCodes, deleteCode, refresh } = useActivationCodes();
+    const { codes, loading, generateBulkCodes, deleteCode } = useActivationCodes();
     const { users } = useUsers();
     
     const [searchTerm, setSearchTerm] = useState('');

@@ -17,7 +17,7 @@ import {
     MessageSquare,
     Ticket
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 const SidebarLink = ({ to, icon, label, isOpen }) => {
     const pathname = usePathname();

@@ -1,29 +1,25 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { useState, useEffect, useMemo } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { supabase } from '@/lib/supabase';
 
 export function useDashboardStats() {
-    const [stats, setStats] = useState({ totalUsers: 0, activeSubs: 0, revenue: 0 });
     const [loading, setLoading] = useState(true);
-
     const [fbCounts, setFbCounts] = useState({ total: 0, active: 0 });
     const [sbCounts, setSbCounts] = useState({ total: 0, active: 0 });
 
     // 1. Firebase Real-time Stats
     useEffect(() => {
-        // We can't use simple 'count' queries with onSnapshot easily for the whole collection 
-        // without downloading docs, unless we use a specialized counter doc.
-        // For small/medium apps, downloading the snapshot and checking size is common.
         const usersCol = collection(db, "users");
-
         const unsubscribe = onSnapshot(usersCol, (snapshot) => {
             const total = snapshot.size;
             const active = snapshot.docs.filter(doc => doc.data().subscriptionStatus === 'active').length;
             setFbCounts({ total, active });
+            setLoading(false);
         }, (err) => {
             console.error("Firebase Dashboard Stats Error:", err);
+            setLoading(false);
         });
 
         return () => unsubscribe();
@@ -50,19 +46,16 @@ export function useDashboardStats() {
         fetchSbStats();
     }, []);
 
-    // 3. Coordinate Loading and Merging
-    useEffect(() => {
+    // 3. Derived Stats (Using useMemo to avoid cascading renders)
+    const stats = useMemo(() => {
         const totalUsers = fbCounts.total + sbCounts.total;
         const activeSubs = fbCounts.active + sbCounts.active;
-
-        setStats({
+        
+        return {
             totalUsers,
             activeSubs,
             revenue: activeSubs * 10
-        });
-
-        // Assume loaded once we have some data or error
-        setLoading(false);
+        };
     }, [fbCounts, sbCounts]);
 
     return { stats, loading };

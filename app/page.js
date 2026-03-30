@@ -22,7 +22,7 @@ const StatBadge = ({ value, label }) => (
     </div>
 );
 
-const StepIndicator = ({ number, title, desc, delay }) => (
+const StepIndicator = ({ number, title, desc }) => (
     <div className="relative pl-0 md:pl-10 text-center md:text-right flex flex-col md:flex-row items-center md:items-start gap-6 group">
         <div className="flex-shrink-0 w-16 h-16 bg-white border-4 border-[#F8FAFC] shadow-xl rounded-full flex items-center justify-center text-xl font-black text-[#14B8A6] z-10 relative">
             {number}

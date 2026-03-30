@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Mail, Lock, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -20,7 +20,7 @@ export default function LoginPage() {
         try {
             await login(email, password);
             router.push('/dashboard');
-        } catch (err) {
+        } catch {
             setError('فشل تسجيل الدخول. يرجى التحقق من البيانات.');
         } finally {
             setLoading(false);

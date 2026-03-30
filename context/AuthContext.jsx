@@ -1,11 +1,13 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
-const AuthContext = createContext();
+/* eslint-disable react-refresh/only-export-components */
+export const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+// useAuth is now in @/hooks/useAuth
+// export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
