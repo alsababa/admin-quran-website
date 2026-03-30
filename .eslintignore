@@ -1,0 +1,13 @@
+# Build output
+out/
+.next/
+
+# Temporary files
+tmp/
+
+# Dependencies
+node_modules/
+
+# Config files
+*.config.js
+*.config.mjs
