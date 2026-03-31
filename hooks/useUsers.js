@@ -158,9 +158,15 @@ export function useUsers() {
             if (user.source === 'firebase') {
                 await updateDoc(doc(db, "users", user.rawId), {
                     accountType: accountType,
+                    subscriptionType: accountType === 'entity' ? 'organization' : 'individual',
+                    isOrgAdmin: accountType === 'entity',
                 });
             } else {
-                const result = await updateUserAdmin(user.rawId, { account_type: accountType });
+                const result = await updateUserAdmin(user.rawId, { 
+                    account_type: accountType,
+                    subscription_type: accountType === 'entity' ? 'organization' : 'individual',
+                    is_org_admin: accountType === 'entity',
+                });
                 if (!result.success) {
                     console.error("Supabase error changing account type:", result.error);
                     throw new Error(result.error);

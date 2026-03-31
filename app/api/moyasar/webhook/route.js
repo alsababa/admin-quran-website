@@ -27,7 +27,7 @@ export async function POST(req) {
     }
 
     // 2. Extract Metadata
-    const { userId, source } = payload.metadata || {};
+    const { userId, source, planId } = payload.metadata || {};
 
     if (!userId || !source) {
         throw new Error("Missing metadata (userId/source)");
@@ -37,12 +37,14 @@ export async function POST(req) {
     const adminApp = getAdminApp();
     const adminDb = adminApp.firestore();
 
-    const extensionDays = 365; // Yearly plan (1 Year)
+    // Determine extension days based on planId
+    let extensionDays = 365; // Default to Yearly
+    if (planId === 'premium_monthly') extensionDays = 30;
+    
     let newEndDate = new Date();
 
     // 4. Update Database based on Source
     if (source === 'firebase') {
-        // Use Firebase Admin SDK (adminDb) to bypass client-side security rules
         const userRef = adminDb.collection('users').doc(userId);
         const userSnap = await userRef.get();
 
@@ -53,7 +55,6 @@ export async function POST(req) {
         const userData = userSnap.data();
         let currentEnd = new Date();
         
-        // Handle existing endDate
         if (userData.endDate) {
             const dateVal = userData.endDate.toDate ? userData.endDate.toDate() : new Date(userData.endDate);
             if (dateVal > currentEnd) currentEnd = dateVal;
@@ -65,6 +66,9 @@ export async function POST(req) {
         await userRef.update({
             subscriptionStatus: 'active',
             subscriptionTier: 'premium',
+            subscriptionType: userData.subscriptionType || 'individual',
+            isOrgAdmin: userData.isOrgAdmin || false,
+            planId: planId || 'premium_yearly',
             endDate: newEndDate.toISOString(),
             lastPaymentId: payload.id,
             platform: 'moyasar',
@@ -95,6 +99,9 @@ export async function POST(req) {
             .update({
                 subscription_status: 'active',
                 subscription_tier: 'premium',
+                subscription_type: user.subscription_type || 'individual',
+                is_org_admin: user.is_org_admin || false,
+                plan_id: planId || 'premium_yearly',
                 end_date: newEndDate.toISOString(),
                 platform: 'moyasar'
             })
