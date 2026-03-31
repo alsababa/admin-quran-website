@@ -204,10 +204,22 @@ export default function CodesPage() {
 
     const enrichedCodes = useMemo(() => {
         return codes.map(code => {
-            const org = users.find(u => u.rawId === code.org_id);
+            // البحث عن المعرف في كافة الحقول المحتملة لضمان التوافق
+            const rawId = code.org_id || code.organization_id || code.organization;
+            const cleanOrgId = rawId?.toString().trim();
+            
+            const org = users.find(u => 
+                u.rawId?.toString() === cleanOrgId || 
+                u.id?.toString() === cleanOrgId ||
+                u.email === cleanOrgId
+            );
+            
             return {
                 ...code,
-                organization: org || { displayName: code.org_id } // Fallback to raw ID if not found
+                organization: org || { 
+                    displayName: cleanOrgId || 'غير معروف',
+                    email: 'لم يتم العثور على سجل' 
+                }
             };
         });
     }, [codes, users]);
@@ -223,7 +235,7 @@ export default function CodesPage() {
             {/* Header & Stats */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
                 <div className="text-right">
-                    <h3 className="text-4xl font-black text-white tracking-tighter">أكواد التفعيل</h3>
+                    <h3 className="text-4xl font-black text-white tracking-tighter">أكواد التفعيل (نسخة المطور - مُحدثة)</h3>
                     <p className="text-[#14B8A6]/40 font-bold text-sm mt-2">إدارة وتوليد مفاتيح الدخول المميزة للمنظمات.</p>
                 </div>
                 
@@ -334,9 +346,14 @@ export default function CodesPage() {
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-2.5">
                                                 <Building2 size={13} className="text-[#14B8A6]/30" />
-                                                <span className="text-xs font-bold text-white/60">
-                                                    {code.organization?.displayName || 'جهة غير محددة'}
-                                                </span>
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-bold text-white/60">
+                                                        {code.organization?.displayName || code.org_id || 'بيان مفقود'}
+                                                    </span>
+                                                    {code.organization?.email && (
+                                                        <span className="text-[8px] text-[#14B8A6]/40 uppercase font-black">{code.organization.email}</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
