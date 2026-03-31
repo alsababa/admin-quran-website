@@ -349,12 +349,14 @@ export default function UsersPage() {
 
     const handleConfirmUpgrade = async (user, type) => {
         setIsUpgrading(true);
+        console.log(`Upgrading user ${user.id} to ${type}...`);
         try {
             await upgradeUser(user, type);
             setUpgradingUser(null);
             showToast(`تمت ترقية ${user.displayName || user.email} كـ ${type === 'entity' ? 'جهة' : 'فرد'} للباقة المميزة ✨`);
-        } catch {
-            showToast('فشل تنفيذ الترقية. تحقق من الصلاحيات.', 'error');
+        } catch (err) {
+            console.error("Critical: Upgrade failed:", err);
+            showToast(`فشل تنفيذ الترقية: ${err.message || 'تحقق من الصلاحيات'}`, 'error');
         } finally {
             setIsUpgrading(false);
         }

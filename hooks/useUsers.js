@@ -6,6 +6,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { supabase } from '@/lib/supabase';
+import { updateUserAdmin, deleteUserAdmin } from '@/app/actions/userActions';
 
 export function useUsers() {
     const [users, setUsers] = useState([]);
@@ -77,54 +78,63 @@ export function useUsers() {
     // ── Mutations ────────────────────────────────────────────
 
     const deleteUser = useCallback(async (user) => {
-        if (user.source === 'firebase') {
-            await deleteDoc(doc(db, "users", user.rawId));
-        } else {
-            // NOTE: Requires RLS policy for admins in Supabase
-            const { error } = await supabase.from('users').delete().eq('id', user.rawId);
-            if (error) throw error;
-            await fetchSupabaseUsers();
+        try {
+            if (user.source === 'firebase') {
+                await deleteDoc(doc(db, "users", user.rawId));
+            } else {
+                const result = await deleteUserAdmin(user.rawId);
+                if (!result.success) throw new Error(result.error);
+                await fetchSupabaseUsers();
+            }
+        } catch (err) {
+            console.error("Delete user error:", err);
+            throw err;
         }
     }, [fetchSupabaseUsers]);
 
     const upgradeUser = useCallback(async (user, accountType = 'individual') => {
-        if (user.source === 'firebase') {
-            await updateDoc(doc(db, "users", user.rawId), {
-                subscriptionStatus: 'active',
-                subscriptionTier: 'premium',
-                accountType: accountType,
-                platform: 'manual'
-            });
-        } else {
-            // NOTE: Requires RLS policy for admins in Supabase
-            const { error } = await supabase
-                .from('users')
-                .update({ 
-                    subscription_status: 'active', 
+        try {
+            if (user.source === 'firebase') {
+                await updateDoc(doc(db, "users", user.rawId), {
+                    subscriptionStatus: 'active',
+                    subscriptionTier: 'premium',
+                    accountType: accountType,
+                    platform: 'manual'
+                });
+            } else {
+                const result = await updateUserAdmin(user.rawId, {
+                    subscription_status: 'active',
                     subscription_tier: 'premium',
                     account_type: accountType,
                     platform: 'manual'
-                })
-                .eq('id', user.rawId);
-            if (error) throw error;
-            await fetchSupabaseUsers();
+                });
+                if (!result.success) throw new Error(result.error);
+                await fetchSupabaseUsers();
+            }
+        } catch (err) {
+            console.error("Upgrade user error:", err);
+            throw err;
         }
     }, [fetchSupabaseUsers]);
 
     const updateUser = useCallback(async (user, updates) => {
-        if (user.source === 'firebase') {
-            const fbUpdates = {};
-            if (updates.displayName !== undefined) fbUpdates.displayName = updates.displayName;
-            if (updates.email !== undefined) fbUpdates.email = updates.email;
-            await updateDoc(doc(db, "users", user.rawId), fbUpdates);
-        } else {
-            // NOTE: Requires RLS policy for admins in Supabase
-            const sbUpdates = {};
-            if (updates.displayName !== undefined) sbUpdates.full_name = updates.displayName;
-            if (updates.email !== undefined) sbUpdates.email = updates.email;
-            const { error } = await supabase.from('users').update(sbUpdates).eq('id', user.rawId);
-            if (error) throw error;
+        try {
+            if (user.source === 'firebase') {
+                const fbUpdates = {};
+                if (updates.displayName !== undefined) fbUpdates.displayName = updates.displayName;
+                if (updates.email !== undefined) fbUpdates.email = updates.email;
+                await updateDoc(doc(db, "users", user.rawId), fbUpdates);
+            } else {
+                const sbUpdates = {};
+                if (updates.displayName !== undefined) sbUpdates.full_name = updates.displayName;
+                if (updates.email !== undefined) sbUpdates.email = updates.email;
+                const result = await updateUserAdmin(user.rawId, sbUpdates);
+                if (!result.success) throw new Error(result.error);
+            }
             await fetchSupabaseUsers();
+        } catch (err) {
+            console.error("Update user error:", err);
+            throw err;
         }
     }, [fetchSupabaseUsers]);
 
@@ -136,15 +146,10 @@ export function useUsers() {
                     accountType: accountType,
                 });
             } else {
-                // NOTE: Requires RLS policy for admins in Supabase
-                const { error } = await supabase
-                    .from('users')
-                    .update({ account_type: accountType })
-                    .eq('id', user.rawId);
-                
-                if (error) {
-                    console.error("Supabase Error changing account type:", error);
-                    throw error;
+                const result = await updateUserAdmin(user.rawId, { account_type: accountType });
+                if (!result.success) {
+                    console.error("Supabase error changing account type:", result.error);
+                    throw new Error(result.error);
                 }
             }
             await fetchSupabaseUsers();
@@ -155,6 +160,70 @@ export function useUsers() {
         }
     }, [fetchSupabaseUsers]);
 
-    return { users, loading, error, deleteUser, upgradeUser, updateUser, changeAccountType };
+    const cancelSubscription = useCallback(async (user) => {
+        try {
+            if (user.source === 'firebase') {
+                await updateDoc(doc(db, "users", user.rawId), {
+                    subscriptionTier: 'free',
+                    subscriptionStatus: 'inactive'
+                });
+            } else {
+                const result = await updateUserAdmin(user.rawId, { 
+                    subscription_tier: 'free',
+                    subscription_status: 'inactive'
+                });
+                if (!result.success) throw new Error(result.error);
+            }
+            await fetchSupabaseUsers();
+        } catch (err) {
+            console.error("Failed to cancel subscription:", err);
+            throw err;
+        }
+    }, [fetchSupabaseUsers]);
+
+    const extendSubscription = useCallback(async (user, days = 30) => {
+        try {
+            // Determine the base date to extend from
+            let currentEndDate = new Date();
+            if (user.endDate) {
+                // Handle different date formats (Firebase Timestamp or ISO string)
+                if (user.endDate.toDate) {
+                    currentEndDate = user.endDate.toDate();
+                } else if (user.endDate.seconds) {
+                    currentEndDate = new Date(user.endDate.seconds * 1000);
+                } else {
+                    currentEndDate = new Date(user.endDate);
+                }
+            }
+
+            // If the end date is in the past, start from today
+            if (isNaN(currentEndDate.getTime()) || currentEndDate < new Date()) {
+                currentEndDate = new Date();
+            }
+
+            // Add the days
+            const newEndDate = new Date(currentEndDate);
+            newEndDate.setDate(newEndDate.getDate() + days);
+
+            if (user.source === 'firebase') {
+                await updateDoc(doc(db, "users", user.rawId), {
+                    endDate: newEndDate.toISOString()
+                });
+            } else {
+                const result = await updateUserAdmin(user.rawId, { end_date: newEndDate.toISOString() });
+                if (!result.success) throw new Error(result.error);
+            }
+            await fetchSupabaseUsers();
+        } catch (err) {
+            console.error("Failed to extend subscription:", err);
+            throw err;
+        }
+    }, [fetchSupabaseUsers]);
+
+    return { 
+        users, loading, error, 
+        deleteUser, upgradeUser, updateUser, changeAccountType,
+        cancelSubscription, extendSubscription 
+    };
 }
 

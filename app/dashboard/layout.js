@@ -121,8 +121,8 @@ export default function DashboardLayout({ children }) {
                                     <img src="/logo/logo.png" alt="Logo" className="w-8 h-8 object-contain drop-shadow-md" />
                                 </div>
                                 <div>
-                                    <span className="text-base font-black tracking-tight bg-gradient-to-l from-[#F5F0E8] to-[#14B8A6] bg-clip-text text-transparent">مصحف أنامل</span>
-                                    <p className="text-[9px] font-bold text-[#14B8A6]/40 uppercase tracking-widest mt-0.5">Admin Dashboard</p>
+                                    <span className="text-base font-black tracking-tight bg-gradient-to-l from-[#F5F0E8] to-[#14B8A6] bg-clip-text text-transparent">مصحف أنامل للصم</span>
+                                    <p className="text-[9px] font-bold text-[#14B8A6]/40 uppercase tracking-widest mt-0.5">لوحة الإدارة المركزية</p>
                                 </div>
                             </motion.div>
                         ) : (
@@ -143,7 +143,8 @@ export default function DashboardLayout({ children }) {
                     <SidebarLink to="/dashboard" icon={<LayoutDashboard />} label="الرئيسية" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/users" icon={<Users />} label="المستخدمون" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/videos" icon={<Video />} label="الفيديوهات" isOpen={isSidebarOpen} />
-                    <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard />} label="تقارير الاشتراكات" isOpen={isSidebarOpen} />
+                    <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard />} label="الاشتراكات المالية" isOpen={isSidebarOpen} />
+                    <SidebarLink to="/dashboard/payments" icon={<CreditCard />} label="المدفوعات وميسر" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/codes" icon={<Ticket />} label="أكواد التفعيل" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/support" icon={<MessageSquare />} label="الدعم الفني" isOpen={isSidebarOpen} />
                 </nav>
@@ -194,7 +195,7 @@ export default function DashboardLayout({ children }) {
                     <div className="flex items-center gap-6">
                         <div>
                             <h2 className="text-xl font-black text-white tracking-tight">{getPageTitle()}</h2>
-                            <p className="text-[10px] font-bold text-[#14B8A6]/40 mt-0.5 uppercase tracking-widest">نظام الإدارة المتكامل</p>
+                            <p className="text-[10px] font-bold text-[#14B8A6]/40 mt-0.5 uppercase tracking-widest">مصحف أنامل للصم - نظام الإدارة المتكامل</p>
                         </div>
                         <div className="hidden lg:flex items-center gap-3 bg-[#141830]/80 border border-[#14B8A6]/10 rounded-2xl px-5 h-11 group focus-within:ring-2 focus-within:ring-[#14B8A6]/20 transition-all">
                             <Search size={16} className="text-[#14B8A6]/30 group-focus-within:text-[#14B8A6]" />

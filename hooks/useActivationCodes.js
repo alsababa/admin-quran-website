@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { generateCodesAdmin, deleteCodeAdmin, deleteBatchAdmin } from '@/app/actions/userActions';
 
 export function useActivationCodes() {
     const [codes, setCodes] = useState([]);
@@ -52,16 +53,12 @@ export function useActivationCodes() {
                 });
             }
 
-            const { data, error } = await supabase
-                .from('activation_codes')
-                .insert(newCodes)
-                .select();
-
-            if (error) throw error;
+            const result = await generateCodesAdmin(newCodes);
+            if (!result.success) throw new Error(result.error);
             
             // Refresh list
             await fetchCodes();
-            return { success: true, batchId, codes: data };
+            return { success: true, batchId, codes: result.data };
         } catch (err) {
             console.error("Error generating codes:", err);
             return { success: false, error: err.message };
@@ -71,12 +68,8 @@ export function useActivationCodes() {
     // ── Delete Specific Code ──────────────────────────────────
     const deleteCode = async (id) => {
         try {
-            const { error } = await supabase
-                .from('activation_codes')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
+            const result = await deleteCodeAdmin(id);
+            if (!result.success) throw new Error(result.error);
             setCodes(prev => prev.filter(c => c.id !== id));
             return { success: true };
         } catch (err) {
@@ -88,12 +81,8 @@ export function useActivationCodes() {
     // ── Delete Entire Batch ───────────────────────────────────
     const deleteBatch = async (batchId) => {
         try {
-            const { error } = await supabase
-                .from('activation_codes')
-                .delete()
-                .eq('batch_id', batchId);
-
-            if (error) throw error;
+            const result = await deleteBatchAdmin(batchId);
+            if (!result.success) throw new Error(result.error);
             setCodes(prev => prev.filter(c => c.batch_id !== batchId));
             return { success: true };
         } catch (err) {

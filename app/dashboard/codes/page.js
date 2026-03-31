@@ -81,7 +81,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                         >
                             <option value="" disabled className="bg-[#0A0D1A]">اختر الجهة المستفيدة...</option>
                             {organizations.map(org => (
-                                <option key={org.id} value={org.id} className="bg-[#0A0D1A]">
+                                <option key={org.id} value={org.rawId} className="bg-[#0A0D1A]">
                                     {org.displayName || org.email}
                                 </option>
                             ))}
@@ -202,8 +202,19 @@ export default function CodesPage() {
         showToast('جاري تحويل الملف للتحميل...');
     };
 
-    const filteredCodes = codes.filter(c => 
+    const enrichedCodes = useMemo(() => {
+        return codes.map(code => {
+            const org = users.find(u => u.rawId === code.org_id);
+            return {
+                ...code,
+                organization: org || { displayName: code.org_id } // Fallback to raw ID if not found
+            };
+        });
+    }, [codes, users]);
+
+    const filteredCodes = enrichedCodes.filter(c => 
         c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.organization?.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.org_id?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
