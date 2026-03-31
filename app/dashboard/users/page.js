@@ -177,7 +177,7 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                     اختر نوع الحساب المميز لـ <span className="text-[#14B8A6]">{user.displayName || user.email}</span>.
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-4 mb-6">
                     <button
                         onClick={() => setType('individual')}
                         className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
@@ -200,8 +200,32 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                     </button>
                 </div>
 
+                <AnimatePresence>
+                    {type === 'entity' && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-2 mb-8 text-right overflow-hidden"
+                        >
+                            <label className="text-[9px] font-black uppercase tracking-widest text-[#14B8A6]/50">معرف المنظمة (Organization ID)</label>
+                            <input
+                                id="org-id-input"
+                                type="text"
+                                className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20"
+                                placeholder="مثلاً: org_123"
+                                required
+                            />
+                            <p className="text-[10px] text-white/20">يستخدم هذا المعرف لربط المستخدم بمنظمته في تطبيق الجوال.</p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 <button
-                    onClick={() => onConfirm(user, type)}
+                    onClick={() => {
+                        const orgId = type === 'entity' ? document.getElementById('org-id-input')?.value : null;
+                        onConfirm(user, type, orgId);
+                    }}
                     disabled={upgrading}
                     className="w-full h-14 bg-[#14B8A6] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#0D9488] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
@@ -347,11 +371,11 @@ export default function UsersPage() {
         }
     };
 
-    const handleConfirmUpgrade = async (user, type) => {
+    const handleConfirmUpgrade = async (user, type, organizationId) => {
         setIsUpgrading(true);
-        console.log(`Upgrading user ${user.id} to ${type}...`);
+        console.log(`Upgrading user ${user.id} to ${type} (OrgID: ${organizationId})...`);
         try {
-            await upgradeUser(user, type);
+            await upgradeUser(user, type, organizationId);
             setUpgradingUser(null);
             showToast(`تمت ترقية ${user.displayName || user.email} كـ ${type === 'entity' ? 'جهة' : 'فرد'} للباقة المميزة ✨`);
         } catch (err) {
@@ -445,11 +469,22 @@ export default function UsersPage() {
                                                     {user.displayName?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || '?'}
                                                 </div>
                                                 <div className="overflow-hidden">
-                                                    <p className="font-extrabold text-white text-sm truncate">{user.displayName || 'مستخدم جديد'}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="font-extrabold text-white text-sm truncate">{user.displayName || 'مستخدم جديد'}</p>
+                                                        {user.isOrgAdmin && (
+                                                            <div className="px-1.5 py-0.5 rounded-md bg-[#14B8A6]/10 border border-[#14B8A6]/20 text-[6px] font-black text-[#14B8A6] uppercase">ADMIN</div>
+                                                        )}
+                                                    </div>
                                                     <div className="flex items-center gap-1.5 mt-0.5">
                                                         <Mail size={11} className="text-[#14B8A6]/30" />
                                                         <p className="text-[10px] font-bold text-[#14B8A6]/40 truncate max-w-[180px]">{user.email}</p>
                                                     </div>
+                                                    {user.organizationId && (
+                                                        <div className="flex items-center gap-1 mt-1">
+                                                            <Building2 size={9} className="text-[#14B8A6]/40" />
+                                                            <p className="text-[8px] font-black text-[#14B8A6]/60 uppercase tracking-tighter">ID: {user.organizationId}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>

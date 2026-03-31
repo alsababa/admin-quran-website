@@ -92,22 +92,36 @@ export function useUsers() {
         }
     }, [fetchSupabaseUsers]);
 
-    const upgradeUser = useCallback(async (user, accountType = 'individual') => {
+    const upgradeUser = useCallback(async (user, accountType = 'individual', organizationId = null) => {
         try {
+            const isEntity = accountType === 'entity';
+            const updates = {
+                subscriptionStatus: 'active',
+                subscriptionTier: 'premium',
+                accountType: accountType,
+                // New fields for mobile app matching
+                subscriptionType: isEntity ? 'organization' : 'individual',
+                isOrgAdmin: isEntity,
+                organizationId: isEntity ? organizationId : null,
+                platform: 'manual',
+                updatedAt: new Date().toISOString()
+            };
+
             if (user.source === 'firebase') {
-                await updateDoc(doc(db, "users", user.rawId), {
-                    subscriptionStatus: 'active',
-                    subscriptionTier: 'premium',
-                    accountType: accountType,
-                    platform: 'manual'
-                });
+                await updateDoc(doc(db, "users", user.rawId), updates);
             } else {
-                const result = await updateUserAdmin(user.rawId, {
+                // Map to Supabase naming conventions (snake_case)
+                const sbUpdates = {
                     subscription_status: 'active',
                     subscription_tier: 'premium',
                     account_type: accountType,
-                    platform: 'manual'
-                });
+                    subscription_type: isEntity ? 'organization' : 'individual',
+                    is_org_admin: isEntity,
+                    organization_id: isEntity ? organizationId : null,
+                    platform: 'manual',
+                    updated_at: new Date().toISOString()
+                };
+                const result = await updateUserAdmin(user.rawId, sbUpdates);
                 if (!result.success) throw new Error(result.error);
                 await fetchSupabaseUsers();
             }
