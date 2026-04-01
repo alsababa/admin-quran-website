@@ -146,6 +146,7 @@ export default function DashboardLayout({ children }) {
                     <SidebarLink to="/dashboard/subscriptions" icon={<CreditCard />} label="الاشتراكات المالية" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/payments" icon={<CreditCard />} label="المدفوعات وميسر" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/codes" icon={<Ticket />} label="أكواد التفعيل" isOpen={isSidebarOpen} />
+                    <SidebarLink to="/dashboard/notifications" icon={<Bell />} label="الإشعارات الجماعية" isOpen={isSidebarOpen} />
                     <SidebarLink to="/dashboard/support" icon={<MessageSquare />} label="الدعم الفني" isOpen={isSidebarOpen} />
                 </nav>
 
