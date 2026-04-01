@@ -68,16 +68,17 @@ function CallbackInner() {
                 return;
             }
 
-            if (!uid || !paymentId) {
+            if ((!uid && searchParams.get('type') !== 'org') || !paymentId) {
                 setStatus('error');
                 setMessage('بيانات غير مكتملة. يرجى المحاولة من التطبيق.');
                 return;
             }
 
-            setMessage('تم الدفع بنجاح! جاري تفعيل حسابك...');
+            setMessage('تم الدفع بنجاح! جاري تفعيل الاشتراك وتوليد البيانات...');
 
             // 2. Try to verify via Supabase Edge Function (most secure)
             let edgeFunctionSuccess = false;
+            let resultData = null;
             try {
                 const response = await fetch(VERIFY_PAYMENT_URL, {
                     method: 'POST',
@@ -87,27 +88,36 @@ function CallbackInner() {
                         user_id: uid,
                         email: email,
                         plan_id: planId,
-                        source: 'firebase',
+                        source: 'website',
+                        metadata: {
+                            type: searchParams.get('type') === 'org' ? 'organization' : 'individual',
+                            userCount: searchParams.get('userCount'),
+                            orgName: searchParams.get('orgName')
+                        }
                     }),
                 });
-                const result = await response.json();
-                if (result.success) {
+                resultData = await response.json();
+                if (resultData.success) {
                     edgeFunctionSuccess = true;
                     console.log('[Callback] Edge Function verified payment successfully');
                 } else {
-                    console.warn('[Callback] Edge Function returned error:', result.error);
+                    console.warn('[Callback] Edge Function returned error:', resultData.error);
                 }
             } catch (edgeErr) {
                 console.warn('[Callback] Edge Function unavailable, falling back to client-side:', edgeErr.message);
             }
 
-            // 3. Fallback: Update databases client-side if Edge Function failed
-            if (!edgeFunctionSuccess) {
+            // 3. Fallback: Update databases client-side if Edge Function failed (ONLY for Individuals)
+            if (!edgeFunctionSuccess && searchParams.get('type') !== 'org') {
                 await activateSubscriptionClientSide(uid, email, planId, paymentId, paymentStatus);
             }
 
             setStatus('success');
-            setMessage('تم تفعيل اشتراكك في النسخة المميزة بنجاح! 🎉');
+            if (searchParams.get('type') === 'org') {
+                setMessage(`تم تفعيل حساب الجهة بنجاح! تم توليد ${searchParams.get('userCount')} كود تفعيل لمنظمتك.`);
+            } else {
+                setMessage('تم تفعيل اشتراكك في النسخة المميزة بنجاح! 🎉');
+            }
 
         } catch (err) {
             console.error('[Callback] Error processing payment:', err);

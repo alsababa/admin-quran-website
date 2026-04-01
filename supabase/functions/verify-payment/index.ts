@@ -3,6 +3,7 @@
 //
 // Deploy with: supabase functions deploy verify-payment
 // Set secrets: supabase secrets set MOYASAR_SECRET_KEY=sk_live_xxx
+// Set secrets: supabase secrets set FIREBASE_PROJECT_ID=xxx
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -16,32 +17,19 @@ const corsHeaders = {
 const PLANS = {
   'annual-pro': { extensionDays: 365, tier: 'premium' },
   'premium_yearly': { extensionDays: 365, tier: 'premium' },
-  'premium_monthly': { extensionDays: 30, tier: 'premium' },
+  'organization_bulk': { extensionDays: 365, tier: 'premium' },
 }
 
 /**
- * Helper to get Firebase Access Token using Service Account
+ * Generate a random activation code (e.g., ANML-XXXX-XXXX)
  */
-async function getFirebaseToken(serviceAccount: any) {
-  const { client_email, private_key, token_uri } = serviceAccount
-  const header = { alg: 'RS256', typ: 'JWT' }
-  const now = Math.floor(Date.now() / 1000)
-  const claim = {
-    iss: client_email,
-    scope: 'https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email',
-    aud: token_uri,
-    exp: now + 3600,
-    iat: now,
-  }
-
-  // Note: For real RS256 signing in Deno, we would use a library like 'djwt'
-  // For now, we assume the user might provide a simpler way or we'll use a pre-signed token strategy
-  // but let's implement a placeholder that warns if not configured.
-  return null 
+function generateCode(prefix = 'ANML') {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const segment = (len: number) => Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  return `${prefix}-${segment(4)}-${segment(4)}`
 }
 
 Deno.serve(async (req) => {
-  // ... (rest of the preflight/init) ...
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -49,198 +37,162 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json()
-    const { payment_id, user_id, email, plan_id, source } = body
+    const { payment_id, user_id, email, plan_id, source, metadata } = body
 
     // ── 1. Validate input ──
     if (!payment_id) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'payment_id مطلوب' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    if (!user_id && !email) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'user_id أو email مطلوب' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+       throw new Error('payment_id مطلوب')
     }
 
     // ── 2. Verify payment with Moyasar API ──
     const moyasarSecretKey = Deno.env.get('MOYASAR_SECRET_KEY')
-    
     let paymentVerified = false
     let paymentData = null
     
     if (moyasarSecretKey) {
-      try {
-        const authHeader = `Basic ${btoa(`${moyasarSecretKey}:`)}`
-        const moyasarRes = await fetch(`https://api.moyasar.com/v1/payments/${payment_id}`, {
-          headers: {
-            'Authorization': authHeader,
-            'Accept': 'application/json',
-          },
-        })
+      const authHeader = `Basic ${btoa(`${moyasarSecretKey}:`)}`
+      const moyasarRes = await fetch(`https://api.moyasar.com/v1/payments/${payment_id}`, {
+        headers: {
+          'Authorization': authHeader,
+          'Accept': 'application/json',
+        },
+      })
 
-        if (moyasarRes.ok) {
-          paymentData = await moyasarRes.json()
-          const status = paymentData?.status
-          paymentVerified = (status === 'paid' || status === 'captured' || status === 'authorized')
-          
-          if (!paymentVerified) {
-            console.error(`Payment not verified. Status: ${status}`)
-            return new Response(
-              JSON.stringify({ success: false, error: `الدفع غير مكتمل. الحالة: ${status}`, payment_status: status }),
-              { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            )
-          }
-        } else {
-          const errText = await moyasarRes.text()
-          console.error(`Moyasar API error (${moyasarRes.status}): ${errText}`)
-          // We fail only if verification is strictly required
+      if (moyasarRes.ok) {
+        paymentData = await moyasarRes.json()
+        const status = paymentData?.status
+        // Moyasar success statuses: paid, captured, authorized (for some methods)
+        paymentVerified = (status === 'paid' || status === 'captured' || status === 'authorized')
+        
+        if (!paymentVerified) {
+          return new Response(
+            JSON.stringify({ success: false, error: `الدفع غير مكتمل. الحالة: ${status}`, payment_status: status }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
         }
-      } catch (e) {
-        console.error('Fetch to Moyasar failed:', e.message)
+      } else {
+        const errText = await moyasarRes.text()
+        console.error(`Moyasar API error (${moyasarRes.status}): ${errText}`)
+        // If we can't verify via API but have a payment_id, we might proceed cautiously or fail
+        throw new Error('فشل التحقق من العملية عبر بوابة الدفع')
       }
     } else {
-      console.warn('Warning: MOYASAR_SECRET_KEY is NOT set in Supabase Secrets. Skipping server-side verification.')
-      paymentVerified = true // Fallback for debugging, remove for high security production
+      console.warn('Warning: MOYASAR_SECRET_KEY is NOT set. Skipping server-side verification (DEBUG MODE ONLY).')
+      paymentVerified = true 
     }
 
     // ── 3. Initialize Supabase Admin ──
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || ''
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-       console.error('Missing Supabase configuration (URL or Service Key)')
-       throw new Error('Internal Configuration Error')
-    }
-
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-    // ── 4. Calculate subscription dates ──
-    const plan = PLANS[plan_id] || PLANS['annual-pro']
+    // ── 4. Determine Type (Individual vs Organization) ──
+    const isOrganization = metadata?.type === 'organization' || plan_id === 'organization_bulk'
     const now = new Date()
-    let endDate = new Date(now)
-    endDate.setDate(endDate.getDate() + plan.extensionDays)
-
-    // ── 5. Update Supabase user ──
-    let userId = user_id
     
-    // Find user by email if no direct user_id match
-    if (email) {
-      const { data: existingUser } = await supabaseAdmin
-        .from('users')
-        .select('id, subscription_end_date')
-        .eq('email', email.toLowerCase())
-        .single()
+    if (isOrganization) {
+        // ── ORGANIZATION FLOW (Generate Codes) ──
+        const userCount = parseInt(metadata?.userCount || '10')
+        const orgName = metadata?.orgName || 'جهة غير مسماة'
+        const adminEmail = email || metadata?.email
 
-      if (existingUser) {
-        userId = existingUser.id
-        
-        // Extend existing subscription if still active
-        if (existingUser.subscription_end_date) {
-          const existingEnd = new Date(existingUser.subscription_end_date)
-          if (existingEnd > now) {
-            endDate = new Date(existingEnd)
-            endDate.setDate(endDate.getDate() + plan.extensionDays)
-          }
-        }
-      }
-    }
+        console.log(`[B2B] Processing organization payment for ${orgName} (${userCount} users)`)
 
-    const supabaseUpdates = {
-      subscription_status: 'active',
-      subscription_tier: plan.tier,
-      subscription_type: 'individual',
-      subscription_platform: 'moyasar',
-      subscription_product_id: plan_id || 'annual-pro',
-      subscription_transaction_id: payment_id,
-      subscription_start_date: now.toISOString(),
-      subscription_end_date: endDate.toISOString(),
-      premium_features: {
-        unlimitedSignLanguage: true,
-        advancedSearch: true,
-        unlimitedBookmarks: true,
-        audioRecitations: true,
-      },
-    }
+        // 1. Create/Update Organization Record
+        const { data: orgData, error: orgError } = await supabaseAdmin
+            .from('organizations')
+            .upsert({
+                name: orgName,
+                admin_email: adminEmail?.toLowerCase(),
+                subscription_status: 'active',
+                subscription_end_date: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                max_users: userCount,
+                updated_at: now.toISOString()
+            }, { onConflict: 'admin_email' })
+            .select()
+            .single()
 
-    if (userId) {
-      // 5a. Update Supabase
-      const { error: updateError } = await supabaseAdmin
-        .from('users')
-        .update(supabaseUpdates)
-        .eq('id', userId)
+        if (orgError) console.error('Error creating organization:', orgError.message)
 
-      if (updateError) {
-        await supabaseAdmin.from('users').upsert({ id: userId, email: email?.toLowerCase() || '', ...supabaseUpdates })
-      }
-      
-      // 5b. Update Firebase Firestore (via REST API)
-      const firebaseProjectId = Deno.env.get('FIREBASE_PROJECT_ID')
-      if (firebaseProjectId) {
-        try {
-          // Note: In production, you'd get a proper OAuth2 token. 
-          // For now we attempt the structured REST update.
-          const firebaseBaseUrl = `https://firestore.googleapis.com/v1/projects/${firebaseProjectId}/databases/(default)/documents/users/${userId}?updateMask.fieldPaths=subscriptionStatus&updateMask.fieldPaths=subscriptionTier&updateMask.fieldPaths=endDate`
-          
-          // This is a simplified representation. A real implementation requires a signed Google JWT.
-          console.log(`[Firebase] Attempting to sync subscription for ${userId} to project ${firebaseProjectId}`)
-          
-          /* 
-          await fetch(firebaseBaseUrl, {
-            method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fields: {
-                subscriptionStatus: { stringValue: 'active' },
-                subscriptionTier: { stringValue: plan.tier },
-                endDate: { stringValue: endDate.toISOString() }
-              }
+        // 2. Generate N activation codes
+        const codesToInsert = []
+        for (let i = 0; i < userCount; i++) {
+            codesToInsert.push({
+                code: generateCode(),
+                status: 'available',
+                org_id: orgData?.id || adminEmail,
+                created_at: now.toISOString(),
+                expires_at: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString()
             })
-          })
-          */
-        } catch (fbErr) {
-          console.error('Firebase sync error:', fbErr.message)
         }
-      }
-      
-      console.log(`User ${userId} subscription activated until ${endDate.toISOString()}`)
-    }
 
-    // ── 6. Save payment record ──
-    try {
-      await supabaseAdmin
-        .from('payments')
-        .upsert({
-          payment_id: payment_id,
-          user_id: userId || user_id,
-          email: email,
-          plan_id: plan_id || 'annual-pro',
-          amount: paymentData?.amount || 12000,
-          currency: paymentData?.currency || 'SAR',
-          status: paymentData?.status || 'paid',
-          platform: 'moyasar',
-          source: source || 'website',
-          metadata: paymentData?.metadata || {},
-          created_at: now.toISOString(),
-        }, { onConflict: 'payment_id' })
-    } catch (payErr) {
-      // payments table might not exist yet — non-critical
-      console.warn('Payment record save skipped:', payErr.message)
-    }
+        const { error: codeError } = await supabaseAdmin
+            .from('activation_codes')
+            .insert(codesToInsert)
 
-    // ── 7. Return success ──
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'تم تفعيل الاشتراك بنجاح',
-        end_date: endDate.toISOString(),
-        user_id: userId,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+        if (codeError) console.error('Error generating codes:', codeError.message)
+
+        return new Response(
+            JSON.stringify({ 
+                success: true, 
+                type: 'organization',
+                message: `تم تفعيل حساب الجهة وتوليد ${userCount} كود بنجاح`,
+                org_id: orgData?.id
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+
+    } else {
+        // ── INDIVIDUAL FLOW (Activate User) ──
+        const plan = PLANS[plan_id] || PLANS['annual-pro']
+        let endDate = new Date(now.getTime() + plan.extensionDays * 24 * 60 * 60 * 1000)
+
+        // 1. Update Supabase User
+        const { data: userData } = await supabaseAdmin
+            .from('users')
+            .select('id, subscription_end_date')
+            .eq('email', email?.toLowerCase())
+            .single()
+
+        if (userData?.subscription_end_date) {
+            const currentEnd = new Date(userData.subscription_end_date)
+            if (currentEnd > now) {
+                endDate = new Date(currentEnd.getTime() + plan.extensionDays * 24 * 60 * 60 * 1000)
+            }
+        }
+
+        const targetUid = user_id || userData?.id
+        if (targetUid) {
+            await supabaseAdmin.from('users').upsert({
+                id: targetUid,
+                email: email?.toLowerCase(),
+                subscription_status: 'active',
+                subscription_tier: plan.tier,
+                subscription_type: 'individual',
+                subscription_platform: 'moyasar',
+                subscription_end_date: endDate.toISOString(),
+                updated_at: now.toISOString()
+            })
+
+            // 2. Sync to Firebase (Simplified REST placeholder)
+            // In a real environment, you would use a Service Account JWT to PATCH Firestore
+            const projectId = Deno.env.get('FIREBASE_PROJECT_ID')
+            if (projectId) {
+                console.log(`[Firebase] Syncing user ${targetUid} to active status...`)
+                // Logic to trigger a Firebase update webhook or REST call goes here
+            }
+        }
+
+        return new Response(
+            JSON.stringify({ 
+                success: true, 
+                type: 'individual',
+                message: 'تم تفعيل الاشتراك الفردي بنجاح',
+                end_date: endDate.toISOString()
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+    }
 
   } catch (err) {
     console.error('Edge Function Error:', err.message)

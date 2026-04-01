@@ -38,28 +38,57 @@ const MOYASAR_PK = process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY
  * ──────────────────────────────────────────────────────── */
 function PayPageInner() {
     const searchParams = useSearchParams();
-
-    const uid = searchParams.get('uid') || '';
+    const [isOrg, setIsOrg] = useState(searchParams.get('type') === 'org');
+    
+    const uid = searchParams.get('uid') || 'web-user';
     const email = searchParams.get('email') || '';
     const name = searchParams.get('name') || '';
     const planId = searchParams.get('plan') || DEFAULT_PLAN_ID;
 
-    const plan = PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
+    // Org specific state
+    const [orgName, setOrgName] = useState('');
+    const [userCount, setUserCount] = useState(10); // Default 10 for orgs
 
+    const calculatePrice = () => {
+        if (!isOrg) return PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
+        
+        const basePrice = 120;
+        let discount = 0;
+        if (userCount >= 1000) discount = 0.15;
+        else if (userCount >= 50) discount = 0.10;
+
+        const perUser = basePrice * (1 - discount);
+        const total = perUser * userCount;
+
+        return {
+            title: `باقة الجهات (${userCount} مستخدم)`,
+            price: total,
+            priceHalalas: Math.round(total * 100),
+            perUser: perUser,
+            discountPercent: Math.round(discount * 100),
+            description: `توليد ${userCount} كود تفعيل خاص بـ ${orgName || 'الجهة'}`,
+            features: [
+                `عدد ${userCount} رخصة استخدام`,
+                'لوحة تحكم إدارية',
+                'دعم فني مخصص للجهات',
+                'تقارير استخدام شهرية'
+            ]
+        };
+    };
+
+    const plan = calculatePrice();
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [errorMsg, setErrorMsg] = useState('');
 
     /* Load Moyasar SDK */
     const loadMoyasarSDK = useCallback(() => {
         return new Promise((resolve, reject) => {
-            // CSS
             if (!document.querySelector('link[href*="moyasar"]')) {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.css';
                 document.head.appendChild(link);
             }
-            // JS
             if (window.Moyasar) return resolve();
             const existing = document.querySelector('script[src*="moyasar"]');
             if (existing) {
@@ -77,7 +106,11 @@ function PayPageInner() {
 
     /* Initialize Moyasar Form */
     useEffect(() => {
-        if (!uid) {
+        if (isOrg && !orgName && status !== 'ready' && status !== 'error') {
+            setStatus('ready'); // Wait for org details if needed
+        }
+
+        if (!uid && !isOrg) {
             setStatus('error');
             setErrorMsg('بيانات المستخدم غير موجودة. يرجى المحاولة من التطبيق.');
             return;
@@ -94,27 +127,24 @@ function PayPageInner() {
             .then(() => {
                 if (!mounted) return;
 
-                // Build callback URL — back to this same site with payment result
                 const origin = window.location.origin;
-                const callbackUrl = `${origin}/pay/callback/?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}`;
+                const callbackUrl = `${origin}/pay/callback/?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
 
-                // Clear previous form if any
                 const container = document.getElementById('moyasar-form');
                 if (container) container.innerHTML = '';
 
-                // Small delay to ensure DOM is fully ready for Moyasar to inject
                 setTimeout(() => {
-                    if (!window.Moyasar) return;
+                    if (!window.Moyasar || !mounted) return;
                     
                     try {
                         window.Moyasar.init({
                             element: '#moyasar-form',
                             amount: plan.priceHalalas,
                             currency: 'SAR',
-                            description: `مصحف أنامل - ${plan.title}`,
+                            description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
                             publishable_api_key: MOYASAR_PK,
                             callback_url: callbackUrl,
-                            methods: ['mada', 'creditcard', 'stcpay', 'applepay'],
+                            methods: ['mada', 'creditcard', 'applepay', 'stcpay'],
                             apple_pay: {
                                 country: 'SA',
                                 label: 'مصحف أنامل للصم',
@@ -123,19 +153,12 @@ function PayPageInner() {
                             metadata: {
                                 userId: uid,
                                 email: email,
-                                source: 'firebase',
+                                source: 'website',
                                 planId: planId,
+                                type: isOrg ? 'organization' : 'individual',
+                                userCount: isOrg ? userCount : 1,
+                                orgName: orgName,
                             },
-                            on_initiating: function () {
-                                console.log('[Moyasar] Payment initiating...');
-                                return true; // Continue
-                            },
-                            on_completed: function (result) {
-                                console.log('[Moyasar] Payment component completed:', result);
-                            },
-                            on_failure: function (error) {
-                                console.error('[Moyasar] Payment failed error:', error);
-                            }
                         });
                         setStatus('ready');
                     } catch (initErr) {
@@ -152,7 +175,7 @@ function PayPageInner() {
             });
 
         return () => { mounted = false; };
-    }, [uid, email, name, planId, plan, loadMoyasarSDK]);
+    }, [uid, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK]);
 
     return (
         <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', 'Tajawal', sans-serif", background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%)' }}>
@@ -194,29 +217,80 @@ function PayPageInner() {
                 {/* Plan Summary Card */}
                 <div style={{
                     background: '#fff',
-                    border: '2px solid #14B8A6',
+                    border: isOrg ? '2px solid #14B8A6' : '1px solid #eee',
                     borderRadius: 24, padding: '28px 24px',
                     marginBottom: 28,
-                    boxShadow: '0 8px 32px rgba(20,184,166,0.08)',
+                    boxShadow: isOrg ? '0 8px 32px rgba(20,184,166,0.08)' : '0 4px 20px rgba(0,0,0,0.04)',
                     position: 'relative', overflow: 'hidden',
                 }}>
+                    {/* Toggle */}
                     <div style={{
-                        position: 'absolute', top: -30, left: -30,
-                        width: 120, height: 120,
-                        background: 'radial-gradient(circle, rgba(20,184,166,0.08) 0%, transparent 70%)',
-                        borderRadius: '50%', pointerEvents: 'none',
-                    }} />
+                        display: 'flex', background: '#F8FAFC', padding: 4, borderRadius: 12, marginBottom: 24,
+                        border: '1px solid #eee'
+                    }}>
+                        <button 
+                            onClick={() => setIsOrg(false)}
+                            style={{
+                                flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                                background: !isOrg ? '#fff' : 'transparent',
+                                color: !isOrg ? '#14B8A6' : '#999',
+                                boxShadow: !isOrg ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                                transition: 'all 0.2s'
+                            }}
+                        >أفراد</button>
+                        <button 
+                            onClick={() => setIsOrg(true)}
+                            style={{
+                                flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                                background: isOrg ? '#fff' : 'transparent',
+                                color: isOrg ? '#14B8A6' : '#999',
+                                boxShadow: isOrg ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                                transition: 'all 0.2s'
+                            }}
+                        >جهات / منظمات</button>
+                    </div>
+
+                    {isOrg && (
+                        <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                             <div>
+                                <label style={{ fontSize: 11, fontWeight: 900, color: '#999', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>اسم المنشأة / الجهة</label>
+                                <input 
+                                    type="text"
+                                    value={orgName}
+                                    placeholder="مثال: جمعية البر الخيرية"
+                                    onChange={(e) => setOrgName(e.target.value)}
+                                    style={{
+                                        width: '100%', height: 48, borderRadius: 12, border: '1px solid #eee',
+                                        padding: '0 16px', fontSize: 14, fontWeight: 600, outline: 'none',
+                                        background: '#FDFDFD'
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ fontSize: 11, fontWeight: 900, color: '#999', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>عدد المستخدمين (الرخص)</label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <button 
+                                        onClick={() => setUserCount(Math.max(1, userCount - 5))}
+                                        style={{ width: 42, height: 42, borderRadius: 10, border: '1px solid #eee', background: '#fff', fontSize: 20 }}>-</button>
+                                    <div style={{ flex: 1, height: 42, background: '#F8FAFC', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 18 }}>{userCount}</div>
+                                    <button 
+                                        onClick={() => setUserCount(userCount + 5)}
+                                        style={{ width: 42, height: 42, borderRadius: 10, border: '1px solid #eee', background: '#fff', fontSize: 20 }}>+</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
-                        background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
-                        color: '#fff', fontSize: 10, fontWeight: 900,
+                        background: isOrg ? 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)' : '#F1F5F9',
+                        color: isOrg ? '#fff' : '#64748B', fontSize: 10, fontWeight: 900,
                         letterSpacing: '0.2em', textTransform: 'uppercase',
                         padding: '5px 14px', borderRadius: 20,
                         marginBottom: 16,
                     }}>
                         <CreditCard size={12} />
-                        ملخص الطلب
+                        {isOrg ? 'باقة الجهات' : 'باقة الأفراد'}
                     </div>
 
                     <h2 style={{ fontSize: 22, fontWeight: 900, color: '#111', marginBottom: 6 }}>{plan.title}</h2>
@@ -235,23 +309,29 @@ function PayPageInner() {
                     {/* Price */}
                     <div style={{
                         borderTop: '1px solid #f0f0f0', paddingTop: 16,
-                        display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6,
+                        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4,
                     }}>
-                        <span style={{ fontSize: 36, fontWeight: 900, color: '#14B8A6' }}>{plan.price}</span>
-                        <span style={{ fontSize: 16, fontWeight: 700, color: '#14B8A6' }}>ر.س</span>
-                        <span style={{ fontSize: 14, color: '#999', fontWeight: 600 }}>/ {plan.period}</span>
+                        {plan.discountPercent > 0 && (
+                            <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', background: '#FEF2F2', padding: '2px 8px', borderRadius: 6 }}>تم تطبيق خصم {plan.discountPercent}%</div>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                            <span style={{ fontSize: 36, fontWeight: 900, color: '#14B8A6' }}>{plan.price.toLocaleString()}</span>
+                            <span style={{ fontSize: 16, fontWeight: 700, color: '#14B8A6' }}>ر.س</span>
+                            <span style={{ fontSize: 14, color: '#999', fontWeight: 600 }}>/ لكل {userCount > 1 ? `${userCount} مستخدم` : 'مستخدم'}</span>
+                        </div>
                     </div>
 
-                    {/* User Info */}
-                    {(name || email) && (
+                    {/* User Info / Context */}
+                    {(name || email || (isOrg && orgName)) && (
                         <div style={{
                             marginTop: 16, padding: '12px 16px',
                             background: '#F8FAFC', borderRadius: 12,
                             fontSize: 12, color: '#666', fontWeight: 600,
                             display: 'flex', flexDirection: 'column', gap: 4,
                         }}>
-                            {name && <span>👤 {name}</span>}
-                            {email && <span>📧 {email}</span>}
+                             {isOrg && orgName && <span>🏢 الجهة: {orgName}</span>}
+                            {!isOrg && name && <span>👤 المستفيد: {name}</span>}
+                            {email && <span>📧 البريد: {email}</span>}
                         </div>
                     )}
                 </div>

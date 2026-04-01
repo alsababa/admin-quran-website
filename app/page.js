@@ -396,6 +396,97 @@ export default function LandingPage() {
                 </div>
             </section>
 
+        {/* ── Pricing & Plans (Entity Focus) ── */}
+        <section id="pricing" className="py-24 bg-gray-50/50">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="text-center mb-16">
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-full mb-6"
+                    >
+                        <Shield size={14} className="text-[#14B8A6]" />
+                        <span className="text-[10px] font-black text-[#14B8A6] uppercase tracking-[0.2em]">الخطط والاشتراكات</span>
+                    </motion.div>
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">اختر الباقة المناسبة لك</h2>
+                    <p className="text-gray-400 font-bold max-w-2xl mx-auto text-lg">
+                        دعم مستمر وتطوير دائم لخدمة فئة غالية علينا. اختر باقتك وابدأ الرحلة اليوم.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    {/* Individual Plan */}
+                    <div className="bg-white border-2 border-gray-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-gray-50 rounded-bl-[4rem] -z-10 transition-colors group-hover:bg-[#14B8A6]/5" />
+                        <h3 className="text-2xl font-black text-gray-900 mb-2">باقة الأفراد</h3>
+                        <p className="text-gray-400 font-bold text-sm mb-8">للاستخدام الشخصي على جهاز واحد</p>
+                        
+                        <div className="flex items-baseline gap-2 mb-8">
+                            <span className="text-5xl font-black text-gray-900">120</span>
+                            <span className="text-lg font-bold text-gray-400">ر.س / سنوياً</span>
+                        </div>
+
+                        <ul className="space-y-4 mb-10">
+                            {['وصول كامل لـ 114 سورة', 'ترجمة إشارة احترافية', 'أذكار ومواقيت صلاة', 'دعم فني مباشر'].map((item, i) => (
+                                <li key={i} className="flex items-center gap-3 text-sm font-bold text-gray-600">
+                                    <CheckCircle2 size={18} className="text-[#14B8A6]" />
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className="bg-gray-50 rounded-2xl p-4 text-center border border-dashed border-gray-200">
+                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-wider">الاشتراك يتم من داخل التطبيق مباشرة</p>
+                        </div>
+                    </div>
+
+                    {/* Organization Plan */}
+                    <div className="bg-gray-900 border-4 border-[#14B8A6] rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group transform md:-translate-y-4">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#14B8A6]/20 rounded-bl-[5rem] -z-10" />
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#14B8A6] text-white text-[9px] font-black uppercase tracking-widest rounded-full mb-4">
+                            الأكثر توفيراً للجهات
+                        </div>
+                        <h3 className="text-2xl font-black text-white mb-2">باقة الجهات والمنظمات</h3>
+                        <p className="text-white/40 font-bold text-sm mb-8">حلول متكاملة للجمعيات والمؤسسات</p>
+                        
+                        <div className="flex items-baseline gap-2 mb-2">
+                            <span className="text-xl font-bold text-white/50 line-through">120</span>
+                            <span className="text-5xl font-black text-[#14B8A6]">102</span>
+                            <span className="text-lg font-bold text-white/50">ر.س / للمستخدم</span>
+                        </div>
+                        <p className="text-[10px] font-bold text-[#14B8A6] mb-8 uppercase tracking-widest">* عند شراء 50 رخصة أو أكثر</p>
+
+                        <ul className="space-y-4 mb-10">
+                            {[
+                                'لوحة تحكم إدارية خاصة',
+                                'توليد أكواد تفعيل فورية',
+                                'إدارة المستخدمين والأجهزة',
+                                'خصومات تصل إلى 15%',
+                                'تقارير أداء ومتابعة'
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-center gap-3 text-sm font-bold text-white/80">
+                                    <CheckCircle2 size={18} className="text-[#14B8A6]" />
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+
+                        <Link href="/pay?type=org" className="flex items-center justify-center gap-3 w-full h-14 bg-[#14B8A6] hover:bg-[#0D9488] text-white font-black uppercase tracking-widest text-xs rounded-2xl transition-all shadow-xl shadow-[#14B8A6]/20 active:scale-95">
+                            شراء للجهات الآن
+                            <ArrowLeft size={16} />
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Bulk pricing note */}
+                <div className="mt-12 text-center">
+                    <p className="text-gray-400 font-bold text-sm">
+                        تحتاج لأكثر من 1000 رخصة؟ <a href="mailto:sales@alsababah.com" className="text-[#14B8A6] hover:underline">تواصل مع قسم المبيعات</a> للحصول على عرض سعر مخصص بخصم 15%.
+                    </p>
+                </div>
+            </div>
+        </section>
+
         {/* ── Features ── */}
         <section id="features" className="py-24 bg-white border-y border-gray-100">
             <div className="max-w-7xl mx-auto px-6">
