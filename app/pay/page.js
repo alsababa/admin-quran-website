@@ -102,32 +102,48 @@ function PayPageInner() {
                 const container = document.getElementById('moyasar-form');
                 if (container) container.innerHTML = '';
 
-                window.Moyasar.init({
-                    element: '#moyasar-form',
-                    amount: plan.priceHalalas,
-                    currency: 'SAR',
-                    description: `مصحف أنامل - ${plan.title}`,
-                    publishable_api_key: MOYASAR_PK,
-                    callback_url: callbackUrl,
-                    methods: ['creditcard', 'stcpay', 'applepay'],
-                    apple_pay: {
-                        country: 'SA',
-                        label: 'مصحف أنامل للصم',
-                        validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
-                    },
-                    metadata: {
-                        userId: uid,
-                        email: email,
-                        source: 'firebase',
-                        planId: planId,
-                    },
-                    on_initiating: function () {
-                        console.log('[Moyasar] Payment initiating...');
-                    },
-                    fixed_width: false,
-                });
-
-                setStatus('ready');
+                // Small delay to ensure DOM is fully ready for Moyasar to inject
+                setTimeout(() => {
+                    if (!window.Moyasar) return;
+                    
+                    try {
+                        window.Moyasar.init({
+                            element: '#moyasar-form',
+                            amount: plan.priceHalalas,
+                            currency: 'SAR',
+                            description: `مصحف أنامل - ${plan.title}`,
+                            publishable_api_key: MOYASAR_PK,
+                            callback_url: callbackUrl,
+                            methods: ['mada', 'creditcard', 'stcpay', 'applepay'],
+                            apple_pay: {
+                                country: 'SA',
+                                label: 'مصحف أنامل للصم',
+                                validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
+                            },
+                            metadata: {
+                                userId: uid,
+                                email: email,
+                                source: 'firebase',
+                                planId: planId,
+                            },
+                            on_initiating: function () {
+                                console.log('[Moyasar] Payment initiating...');
+                                return true; // Continue
+                            },
+                            on_completed: function (result) {
+                                console.log('[Moyasar] Payment component completed:', result);
+                            },
+                            on_failure: function (error) {
+                                console.error('[Moyasar] Payment failed error:', error);
+                            }
+                        });
+                        setStatus('ready');
+                    } catch (initErr) {
+                        console.error('[Moyasar] Init error:', initErr);
+                        setStatus('error');
+                        setErrorMsg('حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني');
+                    }
+                }, 100);
             })
             .catch((err) => {
                 if (!mounted) return;
