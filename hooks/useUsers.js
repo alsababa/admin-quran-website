@@ -99,7 +99,6 @@ export function useUsers() {
                 subscriptionStatus: 'active',
                 subscriptionTier: 'premium',
                 accountType: accountType,
-                // New fields for mobile app matching
                 subscriptionType: isEntity ? 'organization' : 'individual',
                 isOrgAdmin: isEntity,
                 organizationId: isEntity ? organizationId : null,
@@ -107,32 +106,62 @@ export function useUsers() {
                 updatedAt: new Date().toISOString()
             };
 
+            // 1. Primary Upgrade
             if (user.source === 'firebase') {
                 await updateDoc(doc(db, "users", user.rawId), updates);
             } else {
-                // Map to Supabase naming conventions (snake_case)
                 const sbUpdates = {
                     subscription_status: 'active',
                     subscription_tier: 'premium',
                     account_type: accountType,
-                    subscription_type: isEntity ? 'organization' : 'individual',
-                    is_org_admin: isEntity,
-                    organization_id: isEntity ? organizationId : null,
+                    subscription_type: updates.subscriptionType,
+                    is_org_admin: updates.isOrgAdmin,
+                    organization_id: updates.organizationId,
                     platform: 'manual',
                     updated_at: new Date().toISOString()
                 };
                 const result = await updateUserAdmin(user.rawId, sbUpdates);
                 if (!result.success) throw new Error(result.error);
-                await fetchSupabaseUsers();
             }
+
+            // 2. SMART SYNC: Update the other platform if email matches
+            const userEmail = user.email?.toLowerCase();
+            if (userEmail) {
+                const otherUsers = users.filter(u => 
+                    u.email?.toLowerCase() === userEmail && u.source !== user.source
+                );
+
+                for (const otherUser of otherUsers) {
+                    console.log(`Smart Sync: Upgrading counterpart in ${otherUser.source}...`);
+                    if (otherUser.source === 'firebase') {
+                        await updateDoc(doc(db, "users", otherUser.rawId), updates);
+                    } else {
+                        await updateUserAdmin(otherUser.rawId, {
+                            subscription_status: 'active',
+                            subscription_tier: 'premium',
+                            account_type: accountType,
+                            subscription_type: updates.subscriptionType,
+                            is_org_admin: updates.isOrgAdmin,
+                            organization_id: updates.organizationId,
+                            platform: 'manual_sync',
+                            updated_at: new Date().toISOString()
+                        });
+                    }
+                }
+            }
+            
+            await fetchSupabaseUsers();
         } catch (err) {
             console.error("Upgrade user error:", err);
             throw err;
         }
-    }, [fetchSupabaseUsers]);
+    }, [users, fetchSupabaseUsers]);
 
     const updateUser = useCallback(async (user, updates) => {
         try {
+            const userEmail = user.email?.toLowerCase();
+            
+            // 1. Primary Update
             if (user.source === 'firebase') {
                 const fbUpdates = {};
                 if (updates.displayName !== undefined) fbUpdates.displayName = updates.displayName;
@@ -145,48 +174,91 @@ export function useUsers() {
                 const result = await updateUserAdmin(user.rawId, sbUpdates);
                 if (!result.success) throw new Error(result.error);
             }
+
+            // 2. SMART SYNC: Update counterparts
+            if (userEmail) {
+                const otherUsers = users.filter(u => 
+                    u.email?.toLowerCase() === userEmail && u.source !== user.source
+                );
+
+                for (const otherUser of otherUsers) {
+                    if (otherUser.source === 'firebase') {
+                        const fbUpdates = {};
+                        if (updates.displayName !== undefined) fbUpdates.displayName = updates.displayName;
+                        if (updates.email !== undefined) fbUpdates.email = updates.email;
+                        await updateDoc(doc(db, "users", otherUser.rawId), fbUpdates);
+                    } else {
+                        const sbUpdates = {};
+                        if (updates.displayName !== undefined) sbUpdates.full_name = updates.displayName;
+                        if (updates.email !== undefined) sbUpdates.email = updates.email;
+                        await updateUserAdmin(otherUser.rawId, sbUpdates);
+                    }
+                }
+            }
+
             await fetchSupabaseUsers();
         } catch (err) {
             console.error("Update user error:", err);
             throw err;
         }
-    }, [fetchSupabaseUsers]);
+    }, [users, fetchSupabaseUsers]);
 
     const changeAccountType = useCallback(async (user, accountType) => {
-        console.log(`Attempting to change account type for ${user.id} to ${accountType}`);
         try {
+            const userEmail = user.email?.toLowerCase();
+            const updates = {
+                accountType: accountType,
+                subscriptionType: accountType === 'entity' ? 'organization' : 'individual',
+                isOrgAdmin: accountType === 'entity',
+            };
+
+            // 1. Primary Update
             if (user.source === 'firebase') {
-                await updateDoc(doc(db, "users", user.rawId), {
-                    accountType: accountType,
-                    subscriptionType: accountType === 'entity' ? 'organization' : 'individual',
-                    isOrgAdmin: accountType === 'entity',
-                });
+                await updateDoc(doc(db, "users", user.rawId), updates);
             } else {
                 const result = await updateUserAdmin(user.rawId, { 
                     account_type: accountType,
-                    subscription_type: accountType === 'entity' ? 'organization' : 'individual',
-                    is_org_admin: accountType === 'entity',
+                    subscription_type: updates.subscriptionType,
+                    is_org_admin: updates.isOrgAdmin,
                 });
-                if (!result.success) {
-                    console.error("Supabase error changing account type:", result.error);
-                    throw new Error(result.error);
+                if (!result.success) throw new Error(result.error);
+            }
+
+            // 2. SMART SYNC
+            if (userEmail) {
+                const otherUsers = users.filter(u => 
+                    u.email?.toLowerCase() === userEmail && u.source !== user.source
+                );
+
+                for (const otherUser of otherUsers) {
+                    if (otherUser.source === 'firebase') {
+                        await updateDoc(doc(db, "users", otherUser.rawId), updates);
+                    } else {
+                        await updateUserAdmin(otherUser.rawId, { 
+                            account_type: accountType,
+                            subscription_type: updates.subscriptionType,
+                            is_org_admin: updates.isOrgAdmin,
+                        });
+                    }
                 }
             }
             await fetchSupabaseUsers();
-            console.log("Account type updated successfully");
         } catch (err) {
             console.error("Failed to change account type:", err);
             throw err;
         }
-    }, [fetchSupabaseUsers]);
+    }, [users, fetchSupabaseUsers]);
 
     const cancelSubscription = useCallback(async (user) => {
         try {
+            const userEmail = user.email?.toLowerCase();
+            const updates = {
+                subscriptionTier: 'free',
+                subscriptionStatus: 'inactive'
+            };
+
             if (user.source === 'firebase') {
-                await updateDoc(doc(db, "users", user.rawId), {
-                    subscriptionTier: 'free',
-                    subscriptionStatus: 'inactive'
-                });
+                await updateDoc(doc(db, "users", user.rawId), updates);
             } else {
                 const result = await updateUserAdmin(user.rawId, { 
                     subscription_tier: 'free',
@@ -194,51 +266,72 @@ export function useUsers() {
                 });
                 if (!result.success) throw new Error(result.error);
             }
+
+            // SMART SYNC
+            if (userEmail) {
+                const otherUsers = users.filter(u => 
+                    u.email?.toLowerCase() === userEmail && u.source !== user.source
+                );
+
+                for (const otherUser of otherUsers) {
+                    if (otherUser.source === 'firebase') {
+                        await updateDoc(doc(db, "users", otherUser.rawId), updates);
+                    } else {
+                        await updateUserAdmin(otherUser.rawId, { 
+                            subscription_tier: 'free',
+                            subscription_status: 'inactive'
+                        });
+                    }
+                }
+            }
             await fetchSupabaseUsers();
         } catch (err) {
             console.error("Failed to cancel subscription:", err);
             throw err;
         }
-    }, [fetchSupabaseUsers]);
+    }, [users, fetchSupabaseUsers]);
 
     const extendSubscription = useCallback(async (user, days = 30) => {
         try {
-            // Determine the base date to extend from
+            const userEmail = user.email?.toLowerCase();
             let currentEndDate = new Date();
             if (user.endDate) {
-                // Handle different date formats (Firebase Timestamp or ISO string)
-                if (user.endDate.toDate) {
-                    currentEndDate = user.endDate.toDate();
-                } else if (user.endDate.seconds) {
-                    currentEndDate = new Date(user.endDate.seconds * 1000);
-                } else {
-                    currentEndDate = new Date(user.endDate);
-                }
+                if (user.endDate.toDate) currentEndDate = user.endDate.toDate();
+                else if (user.endDate.seconds) currentEndDate = new Date(user.endDate.seconds * 1000);
+                else currentEndDate = new Date(user.endDate);
             }
+            if (isNaN(currentEndDate.getTime()) || currentEndDate < new Date()) currentEndDate = new Date();
 
-            // If the end date is in the past, start from today
-            if (isNaN(currentEndDate.getTime()) || currentEndDate < new Date()) {
-                currentEndDate = new Date();
-            }
-
-            // Add the days
             const newEndDate = new Date(currentEndDate);
             newEndDate.setDate(newEndDate.getDate() + days);
+            const isoDate = newEndDate.toISOString();
 
             if (user.source === 'firebase') {
-                await updateDoc(doc(db, "users", user.rawId), {
-                    endDate: newEndDate.toISOString()
-                });
+                await updateDoc(doc(db, "users", user.rawId), { endDate: isoDate });
             } else {
-                const result = await updateUserAdmin(user.rawId, { end_date: newEndDate.toISOString() });
+                const result = await updateUserAdmin(user.rawId, { end_date: isoDate });
                 if (!result.success) throw new Error(result.error);
+            }
+
+            // SMART SYNC
+            if (userEmail) {
+                const otherUsers = users.filter(u => 
+                    u.email?.toLowerCase() === userEmail && u.source !== user.source
+                );
+                for (const otherUser of otherUsers) {
+                    if (otherUser.source === 'firebase') {
+                        await updateDoc(doc(db, "users", otherUser.rawId), { endDate: isoDate });
+                    } else {
+                        await updateUserAdmin(otherUser.rawId, { end_date: isoDate });
+                    }
+                }
             }
             await fetchSupabaseUsers();
         } catch (err) {
             console.error("Failed to extend subscription:", err);
             throw err;
         }
-    }, [fetchSupabaseUsers]);
+    }, [users, fetchSupabaseUsers]);
 
     return { 
         users, loading, error, 
