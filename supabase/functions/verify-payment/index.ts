@@ -67,49 +67,55 @@ Deno.serve(async (req) => {
     }
 
     // ── 2. Verify payment with Moyasar API ──
-    const moyasarSecretKey = Deno.env.get('MOYASAR_SECRET_KEY') || ''
+    const moyasarSecretKey = Deno.env.get('MOYASAR_SECRET_KEY')
     
     let paymentVerified = false
     let paymentData = null
     
     if (moyasarSecretKey) {
-      const authHeader = `Basic ${btoa(`${moyasarSecretKey}:`)}`
-      const moyasarRes = await fetch(`https://api.moyasar.com/v1/payments/${payment_id}`, {
-        headers: {
-          'Authorization': authHeader,
-          'Accept': 'application/json',
-        },
-      })
+      try {
+        const authHeader = `Basic ${btoa(`${moyasarSecretKey}:`)}`
+        const moyasarRes = await fetch(`https://api.moyasar.com/v1/payments/${payment_id}`, {
+          headers: {
+            'Authorization': authHeader,
+            'Accept': 'application/json',
+          },
+        })
 
-      if (moyasarRes.ok) {
-        paymentData = await moyasarRes.json()
-        const status = paymentData?.status
-        paymentVerified = (status === 'paid' || status === 'captured' || status === 'authorized')
-        
-        if (!paymentVerified) {
-          return new Response(
-            JSON.stringify({ 
-              success: false, 
-              error: `الدفع غير مكتمل. الحالة: ${status}`,
-              payment_status: status
-            }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          )
+        if (moyasarRes.ok) {
+          paymentData = await moyasarRes.json()
+          const status = paymentData?.status
+          paymentVerified = (status === 'paid' || status === 'captured' || status === 'authorized')
+          
+          if (!paymentVerified) {
+            console.error(`Payment not verified. Status: ${status}`)
+            return new Response(
+              JSON.stringify({ success: false, error: `الدفع غير مكتمل. الحالة: ${status}`, payment_status: status }),
+              { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+          }
+        } else {
+          const errText = await moyasarRes.text()
+          console.error(`Moyasar API error (${moyasarRes.status}): ${errText}`)
+          // We fail only if verification is strictly required
         }
-      } else {
-        console.error('Moyasar API error:', moyasarRes.status)
-        // If Moyasar verification fails, we still try to proceed if called from webhook
-        // (Moyasar webhook already verified the payment)
+      } catch (e) {
+        console.error('Fetch to Moyasar failed:', e.message)
       }
     } else {
-      // No secret key configured — trust the caller (should be webhook or callback)
-      console.warn('No MOYASAR_SECRET_KEY configured, skipping verification')
-      paymentVerified = true
+      console.warn('Warning: MOYASAR_SECRET_KEY is NOT set in Supabase Secrets. Skipping server-side verification.')
+      paymentVerified = true // Fallback for debugging, remove for high security production
     }
 
     // ── 3. Initialize Supabase Admin ──
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || ''
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+       console.error('Missing Supabase configuration (URL or Service Key)')
+       throw new Error('Internal Configuration Error')
+    }
+
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
     // ── 4. Calculate subscription dates ──

@@ -25,17 +25,28 @@ Deno.serve(async (req) => {
 
     // 1. Initialize Supabase Admin
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY') || ''
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+        console.error('Missing Supabase configuration')
+        return new Response(
+            JSON.stringify({ success: false, error: 'Internal Configuration Error: Supabase Key Missing' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+    }
+
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
     // 2. Fetch all users with FCM tokens
-    // Note: Adjust column name if it's different (e.g., fcm_token or device_token)
     const { data: users, error: fetchError } = await supabaseAdmin
       .from('users')
       .select('id, fcm_token')
       .not('fcm_token', 'is', null)
 
-    if (fetchError) throw fetchError
+    if (fetchError) {
+        console.error('Database fetch error:', fetchError.message)
+        throw fetchError
+    }
 
     if (!users || users.length === 0) {
       return new Response(
