@@ -83,22 +83,37 @@ function PayPageInner() {
     /* Load Moyasar SDK */
     const loadMoyasarSDK = useCallback(() => {
         return new Promise((resolve, reject) => {
+            if (typeof window !== 'undefined' && window.Moyasar) {
+                return resolve();
+            }
             if (!document.querySelector('link[href*="moyasar"]')) {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
-                link.href = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.css';
+                link.href = 'https://cdn.moyasar.com/mpf/1.17.0/moyasar.css';
                 document.head.appendChild(link);
             }
-            if (window.Moyasar) return resolve();
-            const existing = document.querySelector('script[src*="moyasar"]');
-            if (existing) {
-                existing.addEventListener('load', () => resolve());
+            
+            let script = document.querySelector('script[src*="moyasar"]');
+            if (script) {
+                if (script.getAttribute('data-loaded') === 'true') {
+                    return resolve();
+                }
+                const onScriptLoad = () => {
+                    script.setAttribute('data-loaded', 'true');
+                    resolve();
+                };
+                script.addEventListener('load', onScriptLoad);
+                script.addEventListener('error', () => reject(new Error('فشل تحميل نموذج الدفع')));
                 return;
             }
-            const script = document.createElement('script');
-            script.src = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.js';
+            
+            script = document.createElement('script');
+            script.src = 'https://cdn.moyasar.com/mpf/1.17.0/moyasar.js';
             script.async = true;
-            script.onload = () => resolve();
+            script.onload = () => {
+                script.setAttribute('data-loaded', 'true');
+                resolve();
+            };
             script.onerror = () => reject(new Error('فشل تحميل نموذج الدفع'));
             document.head.appendChild(script);
         });
@@ -149,12 +164,7 @@ function PayPageInner() {
                             description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
                             publishable_api_key: MOYASAR_PK,
                             callback_url: callbackUrl,
-                            methods: ['mada', 'creditcard', 'applepay', 'stcpay'],
-                            apple_pay: {
-                                country: 'SA',
-                                label: 'مصحف أنامل للصم',
-                                validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
-                            },
+                            methods: ['creditcard', 'stcpay'],
                             metadata: {
                                 userId: uid,
                                 email: email,
@@ -322,7 +332,7 @@ function PayPageInner() {
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                             <span style={{ fontSize: 36, fontWeight: 900, color: '#14B8A6' }}>{plan.price.toLocaleString()}</span>
                             <span style={{ fontSize: 16, fontWeight: 700, color: '#14B8A6' }}>ر.س</span>
-                            <span style={{ fontSize: 14, color: '#999', fontWeight: 600 }}>/ لكل {userCount > 1 ? `${userCount} مستخدم` : 'مستخدم'}</span>
+                            <span style={{ fontSize: 14, color: '#999', fontWeight: 600 }}>{isOrg ? `/ لكل ${userCount > 1 ? `${userCount} مستخدم` : 'مستخدم'}` : '/ مستخدم واحد'}</span>
                         </div>
                     </div>
 
