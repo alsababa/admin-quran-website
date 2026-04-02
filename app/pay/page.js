@@ -29,9 +29,10 @@ const DEFAULT_PLAN_ID = 'annual-pro';
 /* ────────────────────────────────────────────────────────
  * Moyasar Config
  * ──────────────────────────────────────────────────────── */
-const MOYASAR_PK = process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY
-    || process.env.NEXT_PUBLIC_MOYASAR_TEST_PUBLISHABLE_KEY
-    || '';
+const isDev = process.env.NODE_ENV !== 'production';
+const MOYASAR_PK = isDev 
+    ? (process.env.NEXT_PUBLIC_MOYASAR_TEST_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY || '')
+    : (process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_MOYASAR_TEST_PUBLISHABLE_KEY || '');
 
 const MOYASAR_SDK_VERSION = '1.14.0';
 const MOYASAR_JS_URL = `https://cdn.moyasar.com/mpf/${MOYASAR_SDK_VERSION}/moyasar.js`;
@@ -169,7 +170,7 @@ function PayPageInner() {
 
 
 
-                const container = document.getElementById('moyasar-form');
+                const container = document.querySelector('.mysr-form');
                 if (container) container.innerHTML = '';
 
                 setTimeout(() => {
@@ -177,7 +178,7 @@ function PayPageInner() {
                     
                     try {
                         window.Moyasar.init({
-                            element: '#moyasar-form',
+                            element: '.mysr-form',
                             amount: plan.priceHalalas,
                             currency: 'SAR',
                             description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
@@ -403,7 +404,7 @@ function PayPageInner() {
                     )}
 
                     {/* Moyasar will inject the payment form here */}
-                    <div id="moyasar-form" />
+                    <div className="mysr-form" />
                 </div>
 
                 {/* Security badges */}
