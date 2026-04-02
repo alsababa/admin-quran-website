@@ -127,8 +127,13 @@ function PayPageInner() {
             .then(() => {
                 if (!mounted) return;
 
-                const origin = window.location.origin;
-                const callbackUrl = `${origin}/pay/callback/?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
+                // Get the current URL without query/hash and ensure it ends with the proper base for the callback
+                const currentPath = window.location.href.split('?')[0].split('#')[0];
+                const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
+                const callbackUrl = `${payBase}callback/?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
+                console.log("[Moyasar TEST] Constructed Callback URL:", callbackUrl);
+
+
 
                 const container = document.getElementById('moyasar-form');
                 if (container) container.innerHTML = '';
