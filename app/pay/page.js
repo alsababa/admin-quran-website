@@ -33,6 +33,10 @@ const MOYASAR_PK = process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY
     || process.env.NEXT_PUBLIC_MOYASAR_TEST_PUBLISHABLE_KEY
     || '';
 
+const MOYASAR_SDK_VERSION = '1.14.0';
+const MOYASAR_JS_URL = `https://cdn.moyasar.com/mpf/${MOYASAR_SDK_VERSION}/moyasar.js`;
+const MOYASAR_CSS_URL = `https://cdn.moyasar.com/mpf/${MOYASAR_SDK_VERSION}/moyasar.css`;
+
 /* ────────────────────────────────────────────────────────
  * Inner component that uses useSearchParams (requires Suspense)
  * ──────────────────────────────────────────────────────── */
@@ -80,42 +84,57 @@ function PayPageInner() {
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [errorMsg, setErrorMsg] = useState('');
 
-    /* Load Moyasar SDK */
-    const loadMoyasarSDK = useCallback(() => {
+    /* Load Moyasar SDK with Retry Logic */
+    const loadMoyasarSDK = useCallback((retries = 3) => {
         return new Promise((resolve, reject) => {
-            if (typeof window !== 'undefined' && window.Moyasar) {
-                return resolve();
-            }
-            if (!document.querySelector('link[href*="moyasar"]')) {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.css';
-                document.head.appendChild(link);
-            }
-            
-            let script = document.querySelector('script[src*="moyasar"]');
-            if (script) {
-                if (script.getAttribute('data-loaded') === 'true') {
-                    return resolve();
-                }
-                const onScriptLoad = () => {
-                    script.setAttribute('data-loaded', 'true');
+            const loadHandler = () => {
+                if (typeof window !== 'undefined' && window.Moyasar) {
                     resolve();
-                };
-                script.addEventListener('load', onScriptLoad);
-                script.addEventListener('error', () => reject(new Error('فشل تحميل نموذج الدفع')));
-                return;
-            }
-            
-            script = document.createElement('script');
-            script.src = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.js';
-            script.async = true;
-            script.onload = () => {
-                script.setAttribute('data-loaded', 'true');
-                resolve();
+                    return true;
+                }
+                return false;
             };
-            script.onerror = () => reject(new Error('فشل تحميل نموذج الدفع'));
-            document.head.appendChild(script);
+
+            if (loadHandler()) return;
+
+            const attemptLoad = (remaining) => {
+                // Ensure CSS is loaded too
+                if (!document.querySelector(`link[href="${MOYASAR_CSS_URL}"]`)) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = MOYASAR_CSS_URL;
+                    document.head.appendChild(link);
+                }
+
+                const script = document.createElement('script');
+                script.src = `${MOYASAR_JS_URL}?t=${Date.now()}`; // Add cache buster on retry
+                script.async = true;
+                
+                script.onload = () => {
+                    console.log(`[Moyasar] SDK loaded on attempt ${4 - remaining}`);
+                    if (loadHandler()) {
+                        script.setAttribute('data-loaded', 'true');
+                    } else {
+                        handleError(remaining);
+                    }
+                };
+
+                script.onerror = () => handleError(remaining);
+
+                const handleError = (rem) => {
+                    document.head.removeChild(script);
+                    if (rem > 1) {
+                        console.warn(`[Moyasar] Load failed, retrying... (${rem - 1} left)`);
+                        setTimeout(() => attemptLoad(rem - 1), 1500);
+                    } else {
+                        reject(new Error('فشل تحميل مكاتب الدفع من الخادم. يرجى التأكد من اتصال الإنترنت أو المحاولة لاحقاً.'));
+                    }
+                };
+
+                document.head.appendChild(script);
+            };
+
+            attemptLoad(retries);
         });
     }, []);
 
