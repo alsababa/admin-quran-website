@@ -89,7 +89,7 @@ function PayPageInner() {
             if (!document.querySelector('link[href*="moyasar"]')) {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
-                link.href = 'https://cdn.moyasar.com/mpf/1.17.0/moyasar.css';
+                link.href = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.css';
                 document.head.appendChild(link);
             }
             
@@ -108,7 +108,7 @@ function PayPageInner() {
             }
             
             script = document.createElement('script');
-            script.src = 'https://cdn.moyasar.com/mpf/1.17.0/moyasar.js';
+            script.src = 'https://cdn.moyasar.com/mpf/1.14.0/moyasar.js';
             script.async = true;
             script.onload = () => {
                 script.setAttribute('data-loaded', 'true');
