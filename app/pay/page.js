@@ -184,6 +184,7 @@ function PayPageInner() {
                             description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
                             publishable_api_key: MOYASAR_PK,
                             callback_url: callbackUrl,
+                            language: 'ar',
                             methods: ['creditcard', 'stcpay'],
                             metadata: {
                                 userId: uid,
@@ -213,7 +214,7 @@ function PayPageInner() {
     }, [uid, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK]);
 
     return (
-        <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', 'Tajawal', sans-serif", background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%)' }}>
+        <div dir="rtl" className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', 'Tajawal', sans-serif", background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%)' }}>
 
             {/* ── Navbar ── */}
             <nav style={{
@@ -404,7 +405,7 @@ function PayPageInner() {
                     )}
 
                     {/* Moyasar will inject the payment form here */}
-                    <div className="mysr-form" />
+                    <div className="mysr-form" dir="rtl" />
                 </div>
 
                 {/* Security badges */}

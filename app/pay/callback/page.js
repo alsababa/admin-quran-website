@@ -335,13 +335,67 @@ function CallbackInner() {
                             <div style={{
                                 background: '#F0FDF4', border: '1px solid #BBF7D0',
                                 borderRadius: 16, padding: '16px 20px',
-                                marginBottom: 28, textAlign: 'right',
+                                marginBottom: 20, textAlign: 'right',
                             }}>
                                 <div style={{ fontSize: 13, fontWeight: 700, color: '#166534', marginBottom: 4 }}>تفاصيل الاشتراك:</div>
                                 <div style={{ fontSize: 12, color: '#15803D', fontWeight: 600 }}>
                                     الباقة: {plan.title}<br />
                                     المدة: {plan.period}<br />
                                     رقم العملية: {paymentId?.substring(0, 16)}...
+                                </div>
+                            </div>
+
+                            {/* 3D Sign Language Viewer Celebration */}
+                            <div style={{
+                                width: '100%',
+                                height: 260,
+                                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                                borderRadius: 24,
+                                overflow: 'hidden',
+                                marginBottom: 28,
+                                border: '1px solid #e2e8f0',
+                                position: 'relative',
+                                boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.02)'
+                            }}>
+                                <iframe 
+                                    src="/3viewer/index.html" 
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        border: 'none',
+                                    }}
+                                    onLoad={(e) => {
+                                        // Wait specialized logic to trigger "FatehaAnim" or "Success" animation
+                                        setTimeout(() => {
+                                            try {
+                                                const iframe = e.target;
+                                                iframe.contentWindow.postMessage({ type: 'playAnimation', name: 'fatehaAnim' }, '*');
+                                                // Inject JS to trigger animation since we have access to local file
+                                                iframe.contentWindow.eval(`
+                                                    if (window.playDeAnimation) {
+                                                        playDeAnimation("fatehaAnim", "", 3/24, true);
+                                                    }
+                                                `);
+                                            } catch (err) {
+                                                console.warn('Could not trigger 3D animation:', err);
+                                            }
+                                        }, 1500);
+                                    }}
+                                />
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: 12,
+                                    right: 12,
+                                    background: 'rgba(255,255,255,0.8)',
+                                    backdropFilter: 'blur(4px)',
+                                    padding: '4px 10px',
+                                    borderRadius: 20,
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    color: '#64748b',
+                                    border: '1px solid #fff'
+                                }}>
+                                    ترجمة لغة الإشارة (تم بنجاح)
                                 </div>
                             </div>
 
