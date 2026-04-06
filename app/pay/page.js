@@ -43,16 +43,84 @@ const MOYASAR_CSS_URL = `https://cdn.moyasar.com/mpf/${MOYASAR_SDK_VERSION}/moya
  * ──────────────────────────────────────────────────────── */
 function PayPageInner() {
     const searchParams = useSearchParams();
-    const [isOrg, setIsOrg] = useState(searchParams.get('type') === 'org');
     
-    const uid = searchParams.get('uid') || 'web-user';
-    const email = searchParams.get('email') || '';
-    const name = searchParams.get('name') || '';
-    const planId = searchParams.get('plan') || DEFAULT_PLAN_ID;
+    // Use state for search-dependent values to avoid hydration mismatch
+    const [isOrg, setIsOrg] = useState(false);
+    const [uid, setUid] = useState('');
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [planId, setPlanId] = useState(DEFAULT_PLAN_ID);
+
+    // Initial mount flag to ensure search params are only processed on client
+    const [isMounted, setIsMounted] = useState(false);
 
     // Org specific state
     const [orgName, setOrgName] = useState('');
     const [userCount, setUserCount] = useState(10); // Default 10 for orgs
+
+    const [status, setStatus] = useState('loading'); // loading | ready | error
+    const [errorMsg, setErrorMsg] = useState('');
+
+    /* Handle Search Params on Mount */
+    useEffect(() => {
+        setIsMounted(true);
+        setIsOrg(searchParams.get('type') === 'org');
+        setUid(searchParams.get('uid') || 'web-user');
+        setEmail(searchParams.get('email') || '');
+        setName(searchParams.get('name') || '');
+        setPlanId(searchParams.get('plan') || DEFAULT_PLAN_ID);
+    }, [searchParams]);
+
+    /* Load Moyasar SDK with Retry Logic */
+    const loadMoyasarSDK = useCallback((retries = 3) => {
+        return new Promise((resolve, reject) => {
+            const loadHandler = () => {
+                if (typeof window !== 'undefined' && window.Moyasar) {
+                    resolve();
+                    return true;
+                }
+                return false;
+            };
+
+            if (loadHandler()) return;
+
+            const attemptLoad = (remaining) => {
+                if (!document.querySelector(`link[href="${MOYASAR_CSS_URL}"]`)) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = MOYASAR_CSS_URL;
+                    document.head.appendChild(link);
+                }
+
+                const script = document.createElement('script');
+                script.src = `${MOYASAR_JS_URL}?t=${Date.now()}`;
+                script.async = true;
+                
+                script.onload = () => {
+                    if (loadHandler()) {
+                        script.setAttribute('data-loaded', 'true');
+                    } else {
+                        handleError(remaining);
+                    }
+                };
+
+                script.onerror = () => handleError(remaining);
+
+                const handleError = (rem) => {
+                    if (script.parentNode) document.head.removeChild(script);
+                    if (rem > 1) {
+                        setTimeout(() => attemptLoad(rem - 1), 1500);
+                    } else {
+                        reject(new Error('فشل تحميل مكاتب الدفع من الخادم. يرجى التأكد من اتصال الإنترنت أو المحاولة لاحقاً.'));
+                    }
+                };
+
+                document.head.appendChild(script);
+            };
+
+            attemptLoad(retries);
+        });
+    }, []);
 
     const calculatePrice = () => {
         if (!isOrg) return PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
@@ -82,67 +150,13 @@ function PayPageInner() {
     };
 
     const plan = calculatePrice();
-    const [status, setStatus] = useState('loading'); // loading | ready | error
-    const [errorMsg, setErrorMsg] = useState('');
-
-    /* Load Moyasar SDK with Retry Logic */
-    const loadMoyasarSDK = useCallback((retries = 3) => {
-        return new Promise((resolve, reject) => {
-            const loadHandler = () => {
-                if (typeof window !== 'undefined' && window.Moyasar) {
-                    resolve();
-                    return true;
-                }
-                return false;
-            };
-
-            if (loadHandler()) return;
-
-            const attemptLoad = (remaining) => {
-                // Ensure CSS is loaded too
-                if (!document.querySelector(`link[href="${MOYASAR_CSS_URL}"]`)) {
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = MOYASAR_CSS_URL;
-                    document.head.appendChild(link);
-                }
-
-                const script = document.createElement('script');
-                script.src = `${MOYASAR_JS_URL}?t=${Date.now()}`; // Add cache buster on retry
-                script.async = true;
-                
-                script.onload = () => {
-                    console.log(`[Moyasar] SDK loaded on attempt ${4 - remaining}`);
-                    if (loadHandler()) {
-                        script.setAttribute('data-loaded', 'true');
-                    } else {
-                        handleError(remaining);
-                    }
-                };
-
-                script.onerror = () => handleError(remaining);
-
-                const handleError = (rem) => {
-                    document.head.removeChild(script);
-                    if (rem > 1) {
-                        console.warn(`[Moyasar] Load failed, retrying... (${rem - 1} left)`);
-                        setTimeout(() => attemptLoad(rem - 1), 1500);
-                    } else {
-                        reject(new Error('فشل تحميل مكاتب الدفع من الخادم. يرجى التأكد من اتصال الإنترنت أو المحاولة لاحقاً.'));
-                    }
-                };
-
-                document.head.appendChild(script);
-            };
-
-            attemptLoad(retries);
-        });
-    }, []);
 
     /* Initialize Moyasar Form */
     useEffect(() => {
+        if (!isMounted) return;
+
         if (isOrg && !orgName && status !== 'ready' && status !== 'error') {
-            setStatus('ready'); // Wait for org details if needed
+            setStatus('ready');
         }
 
         if (!uid && !isOrg) {
@@ -162,13 +176,9 @@ function PayPageInner() {
             .then(() => {
                 if (!mounted) return;
 
-                // Get the current URL without query/hash and ensure it ends with the proper base for the callback
                 const currentPath = window.location.href.split('?')[0].split('#')[0];
                 const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
                 const callbackUrl = `${payBase}callback/?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
-
-
-
 
                 const container = document.querySelector('.mysr-form');
                 if (container) container.innerHTML = '';
@@ -203,7 +213,6 @@ function PayPageInner() {
                         });
                         setStatus('ready');
                     } catch (initErr) {
-                        console.error('[Moyasar] Init error:', initErr);
                         setStatus('error');
                         setErrorMsg('حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني');
                     }
@@ -216,7 +225,16 @@ function PayPageInner() {
             });
 
         return () => { mounted = false; };
-    }, [uid, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK]);
+    }, [uid, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK, isMounted]);
+
+    if (!isMounted) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Loader2 size={32} style={{ color: '#14B8A6', animation: 'spin 1s linear infinite' }} />
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+        );
+    }
 
     return (
         <div dir="rtl" className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', 'Tajawal', sans-serif", background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%)' }}>
@@ -409,7 +427,7 @@ function PayPageInner() {
                         </div>
                     )}
 
-                    {/* Moyasar will inject the payment form here. We use dangerouslySetInnerHTML to prevent React DOM mutation crashes when Moyasar injects its elements. */}
+                    {/* Moyasar Container */}
                     <div dangerouslySetInnerHTML={{ __html: '<div class="mysr-form" dir="rtl"></div>' }} />
                 </div>
 
@@ -454,9 +472,6 @@ function PayPageInner() {
     );
 }
 
-/* ────────────────────────────────────────────────────────
- * Exported Page (wrapped in Suspense for useSearchParams)
- * ──────────────────────────────────────────────────────── */
 export default function PayPage() {
     return (
         <Suspense fallback={
