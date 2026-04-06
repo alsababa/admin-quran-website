@@ -124,6 +124,42 @@ async function syncToFirebase(userId: string, data: any) {
   }
 }
 
+/**
+ * Verify Firebase ID Token
+ */
+async function verifyFirebaseToken(token: string, projectId: string) {
+  try {
+    // 1. Fetch Google's public keys for Firebase
+    const jwksRes = await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com')
+    const jwks = await jwksRes.json()
+    
+    // 2. Decode header to find 'kid'
+    const header = JSON.parse(atob(token.split('.')[0]))
+    const kid = header.kid
+    
+    if (!jwks[kid]) throw new Error('Invalid key ID (kid)')
+    
+    // 3. Import the public key
+    const publicKey = await jose.importX509(jwks[kid], 'RS256')
+    
+    // 4. Verify JWT
+    const { payload } = await jose.jwtVerify(token, publicKey, {
+      issuer: `https://securetoken.google.com/${projectId}`,
+      audience: projectId,
+    })
+    
+    return {
+      success: true,
+      uid: payload.user_id as string,
+      email: payload.email as string,
+      payload
+    }
+  } catch (err) {
+    console.error('[VerifyToken] Token verification failed:', err.message)
+    return { success: false, error: err.message }
+  }
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -132,11 +168,32 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json()
-    const { payment_id, user_id, email, plan_id, source, metadata } = body
+    const { token, payment_id, user_id, email: bodyEmail, plan_id, source, metadata } = body
 
     // ── 1. Validate input ──
     if (!payment_id) {
        throw new Error('payment_id مطلوب')
+    }
+
+    const projectId = Deno.env.get('FIREBASE_PROJECT_ID') || ''
+    
+    // ── 2. Verify Auth (NEW: Require Token) ──
+    let verifiedUid = user_id
+    let verifiedEmail = bodyEmail
+
+    if (token) {
+        const authResult = await verifyFirebaseToken(token, projectId)
+        if (!authResult.success) {
+            return new Response(
+                JSON.stringify({ success: false, error: `فشل التحقق من الهوية: ${authResult.error}` }),
+                { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+        }
+        verifiedUid = authResult.uid
+        verifiedEmail = authResult.email || verifiedEmail
+        console.log(`[Verify] Token verified for UID: ${verifiedUid}`)
+    } else if (!user_id && metadata?.type !== 'organization') {
+        throw new Error('يجب توفير توكن التحقق أو معرف المستخدم')
     }
 
     // ── 2. Initialize Supabase Admin ──
@@ -199,20 +256,15 @@ Deno.serve(async (req) => {
     }
 
     // ── 5. Determine Type (Individual vs Organization) ──
-    const isOrganization = metadata?.type === 'organization' || plan_id === 'organization_bulk'
-    const now = new Date()
-    let activationResult = { success: true, message: '', type: '' }
-    let finalEndDate = null
-    
-    if (isOrganization) {
+    const isOrganization = metadata?.type === '    if (isOrganization) {
         // ── ORGANIZATION FLOW (Generate Codes) ──
         const userCount = parseInt(metadata?.userCount || '10')
         const orgName = metadata?.orgName || 'جهة غير مسماة'
-        const adminEmail = email || metadata?.email
+        const adminEmail = verifiedEmail || metadata?.email
 
         console.log(`[B2B] Processing organization payment for ${orgName} (${userCount} users)`)
 
-        // 1. Create/Update Organization Record
+        // 1. Create/Update Organization Record in Supabase
         const { data: orgData, error: orgError } = await supabaseAdmin
             .from('organizations')
             .upsert({
@@ -226,25 +278,69 @@ Deno.serve(async (req) => {
             .select()
             .single()
 
-        if (orgError) console.error('Error creating organization:', orgError.message)
+        if (orgError) console.error('Error creating organization in Supabase:', orgError.message)
 
-        // 2. Generate N activation codes
+        // 2. Sync Organization to Firebase
+        const orgId = orgData?.id || verifiedUid || adminEmail || 'unknown_org'
+        const expiryDate = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString()
+        
+        await syncToFirebaseCollection('organizations', orgId, {
+            name: orgName,
+            adminEmail: adminEmail?.toLowerCase(),
+            adminUserId: verifiedUid,
+            status: 'active',
+            expiryDate: expiryDate,
+            maxUsers: userCount,
+            updatedAt: now.toISOString()
+        })
+
+        // 3. Generate N activation codes
         const codesToInsert = []
+        const firebaseCodes = []
+        
         for (let i = 0; i < userCount; i++) {
+            const code = generateCode()
+            const expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString()
+            
+            // Supabase object
             codesToInsert.push({
-                code: generateCode(),
+                code,
                 status: 'available',
-                org_id: orgData?.id || adminEmail,
+                org_id: orgData?.id || verifiedUid || adminEmail,
                 created_at: now.toISOString(),
-                expires_at: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString()
+                expires_at: expiresAt
+            })
+
+            // Firebase object
+            firebaseCodes.push({
+                code: { stringValue: code },
+                status: { stringValue: 'available' },
+                orgId: { stringValue: orgId },
+                createdAt: { stringValue: now.toISOString() },
+                expiresAt: { stringValue: expiresAt }
             })
         }
 
+        // Save to Supabase
         const { error: codeError } = await supabaseAdmin
             .from('activation_codes')
             .insert(codesToInsert)
 
-        if (codeError) console.error('Error generating codes:', codeError.message)
+        if (codeError) console.error('Error generating codes in Supabase:', codeError.message)
+        
+        // Save to Firebase (Batch sync - limited to first 100 for safety in this version)
+        // In a real production environment, we'd use a transactional batch or queue
+        console.log(`[Firebase] Syncing ${Math.min(firebaseCodes.length, 100)} codes to Firestore...`)
+        for (let i = 0; i < Math.min(firebaseCodes.length, 100); i++) {
+           await syncToFirebaseCollection('activation_codes', `code_${firebaseCodes[i].code.stringValue}`, firebaseCodes[i], true)
+        }
+
+        activationResult = { 
+            success: true, 
+            type: 'organization',
+            message: `تم تفعيل حساب الجهة وتوليد ${userCount} كود بنجاح. سيتم تفعيلها في التطبيق خلال لحظات.`
+        }
+    }sage)
         
         activationResult = { 
             success: true, 
@@ -258,12 +354,12 @@ Deno.serve(async (req) => {
         let endDate = new Date(now.getTime() + plan.extensionDays * 24 * 60 * 60 * 1000)
 
         // 1. Update Supabase User
-        let targetUid = user_id;
-        if (!targetUid && email) {
+        let targetUid = verifiedUid;
+        if (!targetUid && verifiedEmail) {
             const { data: userData } = await supabaseAdmin
                 .from('users')
                 .select('id, subscription_end_date')
-                .eq('email', email?.toLowerCase())
+                .eq('email', verifiedEmail?.toLowerCase())
                 .maybeSingle()
             if (userData) {
                 targetUid = userData.id
@@ -293,7 +389,7 @@ Deno.serve(async (req) => {
         if (targetUid) {
             await supabaseAdmin.from('users').upsert({
                 id: targetUid,
-                email: email?.toLowerCase(),
+                email: verifiedEmail?.toLowerCase(),
                 subscription_status: 'active',
                 subscription_tier: plan.tier,
                 subscription_type: 'individual',
@@ -322,8 +418,8 @@ Deno.serve(async (req) => {
     // ── 6. Record Transaction in Supabase ──
     const { error: payError } = await supabaseAdmin.from('payments').insert({
         payment_id: payment_id,
-        user_id: user_id,
-        email: email,
+        user_id: verifiedUid,
+        email: verifiedEmail,
         plan_id: plan_id,
         amount: paymentData?.amount || 0,
         currency: paymentData?.currency || 'SAR',

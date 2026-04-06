@@ -39,10 +39,21 @@ function CallbackInner() {
     const paymentMessage = searchParams.get('message') || '';
 
     // Original params we passed through
-    const uid = searchParams.get('uid') || '';
+    const token = searchParams.get('token') || '';
+    let uid = searchParams.get('uid') || '';
     const email = searchParams.get('email') || '';
     const name = searchParams.get('name') || '';
     const planId = searchParams.get('plan') || 'annual-pro';
+
+    // Extract UID from token if missing
+    if (!uid && token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            uid = payload.user_id || payload.sub || '';
+        } catch (e) {
+            console.warn('Failed to parse token payload in callback:', e);
+        }
+    }
 
     const plan = PLANS[planId] || PLANS['annual-pro'];
 
@@ -68,7 +79,7 @@ function CallbackInner() {
                 return;
             }
 
-            if ((!uid && searchParams.get('type') !== 'org') || !paymentId) {
+            if ((!uid && !token && searchParams.get('type') !== 'org') || !paymentId) {
                 setStatus('error');
                 setMessage('بيانات غير مكتملة. يرجى المحاولة من التطبيق.');
                 return;
@@ -84,6 +95,7 @@ function CallbackInner() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        token: token,
                         payment_id: paymentId,
                         user_id: uid,
                         email: email,

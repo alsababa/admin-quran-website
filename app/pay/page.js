@@ -49,6 +49,7 @@ function PayPageInner() {
 
     // Use state for search-dependent values to avoid hydration mismatch
     const [isOrg, setIsOrg] = useState(false);
+    const [token, setToken] = useState('');
     const [uid, setUid] = useState('');
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
@@ -69,7 +70,22 @@ function PayPageInner() {
         try {
             setIsMounted(true);
             setIsOrg(searchParams.get('type') === 'org');
-            setUid(searchParams.get('uid') || 'web-user');
+            
+            const urlToken = searchParams.get('token') || '';
+            setToken(urlToken);
+            
+            // If we have a token, we can extract UID from it for UI purposes (insecure yet, verified later)
+            let urlUid = searchParams.get('uid') || '';
+            if (!urlUid && urlToken) {
+                try {
+                    const payload = JSON.parse(atob(urlToken.split('.')[1]));
+                    urlUid = payload.user_id || payload.sub || '';
+                } catch (e) {
+                    console.warn('Failed to parse token payload for UI:', e);
+                }
+            }
+            
+            setUid(urlUid || 'web-user');
             setEmail(searchParams.get('email') || '');
             setName(searchParams.get('name') || '');
             setPlanId(searchParams.get('plan') || DEFAULT_PLAN_ID);
@@ -177,7 +193,7 @@ function PayPageInner() {
             setStatus('ready');
         }
 
-        if (!uid && !isOrg) {
+        if (!uid && !isOrg && !token) {
             setStatus('error');
             setErrorMsg('بيانات المستخدم غير موجودة. يرجى المحاولة من التطبيق.');
             return;
@@ -197,7 +213,7 @@ function PayPageInner() {
                 try {
                     const currentPath = window.location.href.split('?')[0].split('#')[0];
                     const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
-                    const callbackUrl = `${payBase}callback/?uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
+                    const callbackUrl = `${payBase}callback/?token=${encodeURIComponent(token)}&uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
 
                     const container = document.querySelector('.mysr-form');
                     if (container) container.innerHTML = '';
@@ -221,6 +237,7 @@ function PayPageInner() {
                                     country: 'SA',
                                 },
                                 metadata: {
+                                    token: token,
                                     userId: uid,
                                     email: email,
                                     source: 'website',
@@ -249,7 +266,7 @@ function PayPageInner() {
             });
 
         return () => { mounted = false; };
-    }, [uid, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK, isMounted]);
+    }, [uid, token, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK, isMounted]);
 
     if (runtimeError) {
         return (
