@@ -1,7 +1,8 @@
 "use client";
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HandMetal, Smartphone, Accessibility, Star, Users, Video, ChevronLeft, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote } from 'lucide-react';
+import { HandMetal, Smartphone, Accessibility, Star, Users, Video, ChevronLeft, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote, Loader2 } from 'lucide-react';
 
 
 const FeatureCard = ({ icon, title, desc }) => (
@@ -35,6 +36,48 @@ const StepIndicator = ({ number, title, desc }) => (
 );
 
 export default function LandingPage() {
+    const [isMounted, setIsMounted] = useState(false);
+    const [runtimeError, setRuntimeError] = useState(null);
+
+    useEffect(() => {
+        try {
+            setIsMounted(true);
+        } catch (e) {
+            setRuntimeError(e);
+        }
+    }, []);
+
+    if (runtimeError) {
+        return (
+            <div style={{ padding: 40, background: '#fff', color: '#000', direction: 'ltr', textAlign: 'left', minHeight: '100vh' }}>
+                <h1 style={{ color: 'red', fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Production Runtime Exception (Landing)</h1>
+                <p style={{ marginBottom: 10 }}>This error is captured by the diagnostic layer.</p>
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: 20, marginBottom: 20 }}>
+                    <p style={{ fontWeight: 'bold', color: '#E53E3E' }}>{runtimeError.name}: {runtimeError.message}</p>
+                    <pre style={{ fontSize: 12, lineHeight: 1.5, marginTop: 10, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                        {runtimeError.stack}
+                    </pre>
+                </div>
+                <button 
+                    onClick={() => window.location.reload()} 
+                    style={{ padding: '12px 24px', background: '#14B8A6', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                    Retry Loading
+                </button>
+            </div>
+        );
+    }
+
+    if (!isMounted) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#F8FAFC' }}>
+                <div className="animate-spin text-[#14B8A6]">
+                    <Loader2 size={40} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-gray-900 font-sans selection:bg-[#14B8A6]/20" dir="rtl">
 
