@@ -186,7 +186,7 @@ function PayPageInner() {
                             callback_url: callbackUrl,
                             language: 'ar',
                             methods: ['creditcard', 'stcpay', 'applepay', 'googlepay'],
-                            applePay: {
+                            apple_pay: {
                                 label: 'مصحف أنامل',
                                 validate_merchant_url: window.location.origin + '/api/moyasar/applepay/validate',
                                 country: 'SA'
@@ -356,7 +356,7 @@ function PayPageInner() {
                             <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', background: '#FEF2F2', padding: '2px 8px', borderRadius: 6 }}>تم تطبيق خصم {plan.discountPercent}%</div>
                         )}
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                            <span style={{ fontSize: 36, fontWeight: 900, color: '#14B8A6' }}>{plan.price.toLocaleString()}</span>
+                            <span style={{ fontSize: 36, fontWeight: 900, color: '#14B8A6' }}>{plan.price.toLocaleString('en-US')}</span>
                             <span style={{ fontSize: 16, fontWeight: 700, color: '#14B8A6' }}>ر.س</span>
                             <span style={{ fontSize: 14, color: '#999', fontWeight: 600 }}>{isOrg ? `/ لكل ${userCount > 1 ? `${userCount} مستخدم` : 'مستخدم'}` : '/ مستخدم واحد'}</span>
                         </div>
@@ -409,8 +409,8 @@ function PayPageInner() {
                         </div>
                     )}
 
-                    {/* Moyasar will inject the payment form here */}
-                    <div className="mysr-form" dir="rtl" />
+                    {/* Moyasar will inject the payment form here. We use dangerouslySetInnerHTML to prevent React DOM mutation crashes when Moyasar injects its elements. */}
+                    <div dangerouslySetInnerHTML={{ __html: '<div class="mysr-form" dir="rtl"></div>' }} />
                 </div>
 
                 {/* Security badges */}
