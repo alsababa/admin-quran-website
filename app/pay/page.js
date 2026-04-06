@@ -185,7 +185,7 @@ function PayPageInner() {
                             publishable_api_key: MOYASAR_PK,
                             callback_url: callbackUrl,
                             language: 'ar',
-                            methods: ['creditcard', 'stcpay'],
+                            methods: ['creditcard', 'stcpay', 'applepay', 'googlepay'],
                             metadata: {
                                 userId: uid,
                                 email: email,
