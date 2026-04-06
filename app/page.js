@@ -285,7 +285,7 @@ export default function LandingPage() {
                         <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-8">عملية التعلم بسيطة جداً</h2>
 
                         <div className="space-y-12 relative before:absolute before:inset-0 before:ml-[3.5rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent mt-12">
-                            <StepIndicator number="1" title="حمل التطبيق" desc="ابحث عن 'قرآن الإشارة' في متجر آبل أو جوجل بلاي وقم بتثبيته مجاناً." />
+                            <StepIndicator number="1" title="حمل التطبيق" desc="ابحث عن 'مصحف أنامل للصم' في متجر آبل أو جوجل بلاي وقم بتثبيته مجاناً." />
                             <StepIndicator number="2" title="اختر السورة" desc="تصفح قائمة السور المنسقة بشكل رائع واختر الجزء الذي ترغب بقراءته أو حفظه." />
                             <StepIndicator number="3" title="شاهد الآيات" desc="شاهد ترجمة كل آية بلغة الإشارة بشكل مرئي وعالي الدقة لتفهم المعنى الصحيح." />
                         </div>
@@ -567,7 +567,7 @@ export default function LandingPage() {
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">جاهز لاحتضان التغيير؟</h2>
                     <p className="text-xl text-gray-500 font-medium mb-12 max-w-2xl mx-auto">
-                        قم بتحميل تطبيق قرآن الإشارة الآن، متوفر على المتاجر الرسمية لأجهزة آيفون وأندرويد وانضم لمجتمعنا الكبير.
+                        قم بتحميل تطبيق مصحف أنامل للصم الآن، متوفر على المتاجر الرسمية لأجهزة آيفون وأندرويد وانضم لمجتمعنا الكبير.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                         <a href="#" className="w-full sm:w-auto h-16 px-12 bg-gray-900 hover:bg-black text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-lg">

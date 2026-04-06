@@ -16,32 +16,35 @@ import {
     ArrowLeft,
     Star,
     Globe,
-    MessageSquare
+    MessageSquare,
+    Shield
 } from 'lucide-react';
 import Link from 'next/link';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 
-const StatCard = ({ title, value, subtitle, icon, delay }) => (
+const StatCard = ({ title, value, subtitle, icon, delay, trend }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-        className="glass-card rounded-3xl p-7 relative overflow-hidden group"
+        className="glass-card rounded-3xl p-7 relative overflow-hidden group hover:border-[#14B8A6]/40 transition-all duration-500"
     >
         <div className="absolute -top-8 -right-8 w-28 h-28 bg-[#14B8A6]/5 blur-2xl rounded-full group-hover:bg-[#14B8A6]/10 transition-all duration-700" />
         <div className="flex justify-between items-center mb-5">
-            <div className="h-11 w-11 rounded-2xl bg-[#14B8A6]/10 flex items-center justify-center text-[#14B8A6] border border-[#14B8A6]/20">
-                {React.cloneElement(icon, { size: 22, strokeWidth: 2 })}
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#14B8A6]/15 to-[#0D9488]/5 flex items-center justify-center text-[#14B8A6] border border-[#14B8A6]/20 group-hover:scale-110 transition-transform duration-500">
+                {React.cloneElement(icon, { size: 24, strokeWidth: 2 })}
             </div>
-            <div className="flex items-center gap-1 px-2.5 py-1 bg-[#14B8A6]/5 rounded-full border border-[#14B8A6]/10 text-[9px] font-black text-[#14B8A6]">
-                <ArrowUpRight size={10} strokeWidth={3} />
-                <span>+12%</span>
-            </div>
+            {trend && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-[10px] font-black text-emerald-400">
+                    <TrendingUp size={12} strokeWidth={3} />
+                    <span>{trend}</span>
+                </div>
+            )}
         </div>
-        <p className="text-[9px] font-black uppercase tracking-[0.15em] text-[#14B8A6]/40">{title}</p>
-        <h3 className="text-3xl font-black text-white tracking-tighter mt-1">{value}</h3>
-        <p className="mt-3 text-[9px] font-bold text-[#14B8A6]/30 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]" />
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/40 mb-1">{title}</p>
+        <h3 className="text-4xl font-black text-white tracking-tighter">{value}</h3>
+        <p className="mt-4 text-[10px] font-bold text-[#14B8A6]/30 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#14B8A6] shadow-[0_0_8px_rgba(20,184,166,0.4)]" />
             {subtitle}
         </p>
     </motion.div>
@@ -90,59 +93,60 @@ export default function Overview() {
 
             {/* ─── Hero: App Identity ─── */}
             <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-[2.5rem] overflow-hidden"
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="relative rounded-[3rem] overflow-hidden group"
                 style={{
-                    background: 'linear-gradient(135deg, #0A0D1A 0%, #141830 40%, #1a1608 100%)',
-                    border: '1px solid rgba(201,168,76,0.2)',
-                    boxShadow: '0 0 80px rgba(201,168,76,0.07), inset 0 0 60px rgba(201,168,76,0.03)'
+                    background: 'linear-gradient(135deg, #0A0D1A 0%, #151B33 40%, #121626 100%)',
+                    border: '1px solid rgba(20, 184, 166, 0.15)',
+                    boxShadow: '0 40px 100px -20px rgba(0,0,0,0.5), inset 0 0 80px rgba(20, 184, 166, 0.05)'
                 }}
             >
-                {/* Gold shimmer top line */}
-                <div className="absolute top-0 left-10 right-10 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/50 to-transparent" />
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/30 to-transparent" />
+                <div className="absolute inset-0 arabic-pattern opacity-40 mix-blend-overlay" />
+                
+                {/* Glowing Orbs */}
+                <div className="absolute -top-24 -left-20 w-96 h-96 bg-[#14B8A6]/10 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute -bottom-24 -right-20 w-80 h-80 bg-[#0D9488]/15 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
 
-                {/* Background pattern */}
-                <div className="absolute inset-0 arabic-pattern opacity-60" />
-                <div className="absolute top-[-30%] left-[-10%] w-[50%] h-[120%] bg-[#14B8A6]/6 blur-[100px] rounded-full" />
-                <div className="absolute bottom-[-30%] right-[-5%] w-[30%] h-[100%] bg-[#0D9488]/10 blur-[80px] rounded-full" />
-
-                <div className="relative z-10 p-12 flex flex-col md:flex-row items-center md:items-start gap-8">
-                    {/* Logo mark */}
-                    <div className="shrink-0">
-                        <div className="h-24 w-24 rounded-[2rem] bg-gradient-to-br from-[#14B8A6] to-[#0D9488] flex items-center justify-center shadow-2xl shadow-[#14B8A6]/30">
-                            <BookOpen size={44} strokeWidth={2} className="text-[#0A0D1A]" />
+                <div className="relative z-10 p-10 md:p-14 flex flex-col md:flex-row items-center md:items-start gap-10">
+                    {/* Logo mark with improved glassmorphism */}
+                    <div className="shrink-0 relative group">
+                        <div className="absolute -inset-4 bg-[#14B8A6]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="h-28 w-28 rounded-[2.5rem] bg-gradient-to-br from-[#14B8A6] to-[#0D9488] flex items-center justify-center shadow-2xl shadow-[#14B8A6]/30 transform group-hover:scale-105 transition-transform duration-500 relative">
+                            <BookOpen size={48} strokeWidth={2} className="text-[#0A0D1A]" />
                         </div>
-                        <div className="mt-3 flex justify-center gap-1.5">
+                        <div className="mt-4 flex justify-center gap-2">
                             {[...Array(3)].map((_, i) => (
-                                <div key={i} className={`rounded-full bg-[#14B8A6] ${i === 1 ? 'w-4 h-1.5' : 'w-1.5 h-1.5 opacity-40'}`} />
+                                <div key={i} className={`rounded-full transition-all duration-500 ${i === 1 ? 'w-6 h-1.5 bg-[#14B8A6]' : 'w-1.5 h-1.5 bg-[#14B8A6]/30'}`} />
                             ))}
                         </div>
                     </div>
 
-                    {/* App info */}
-                    <div className="text-right flex-1">
-                        <div className="flex items-center justify-end gap-3 mb-4">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6] bg-[#14B8A6]/10 border border-[#14B8A6]/20 px-3 py-1.5 rounded-full">
-                                v2.0 — إصدار نشط
+                    {/* App info with better typography */}
+                    <div className="text-right flex-1 pt-2">
+                        <div className="flex items-center justify-end gap-3 mb-5">
+                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#14B8A6] bg-[#14B8A6]/10 border border-[#14B8A6]/20 px-4 py-2 rounded-full backdrop-blur-md">
+                                Version 2.0.4 — نظام نشط
                             </span>
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)] animate-pulse" />
                         </div>
-                        <h1 className="text-5xl font-black text-white tracking-tighter leading-none">قرآن الإشارة</h1>
-                        <p className="text-[#14B8A6] font-bold text-sm mt-1 tracking-widest uppercase">Quran Sign Language</p>
-                        <p className="mt-4 text-[#F5F0E8]/50 font-medium text-sm leading-relaxed max-w-xl">
-                            منصة رقمية متكاملة تجمع بين تعليم القرآن الكريم ولغة الإشارة، تتيح للصم وضعاف السمع تلاوة وتعلم القرآن الكريم عبر مقاطع فيديو متخصصة باللغة العربية للإشارة SAL.
+                        <h1 className="text-6xl font-black text-white tracking-tighter leading-tight drop-shadow-sm">مصحف أنامل للصم</h1>
+                        <p className="text-[#14B8A6] font-extrabold text-sm mt-2 tracking-[0.3em] uppercase opacity-80">Anaml Quran for the Deaf</p>
+                        <p className="mt-6 text-[#F5F0E8]/50 font-medium text-base leading-relaxed max-w-2xl bg-gradient-to-l from-white/10 to-transparent bg-clip-text text-transparent">
+                            المنصة الرائدة لتمكين الصم وضعاف السمع من الوصول لبيان القرآن الكريم وتدبر آياته عبر لغة الإشارة العربية المتخصصة وحلول الوصول الرقمي المتقدمة.
                         </p>
 
-                        <div className="mt-6 flex flex-wrap justify-end gap-3">
+                        <div className="mt-8 flex flex-wrap justify-end gap-4">
                             {[
-                                { label: 'iOS & Android', icon: <Smartphone size={14} /> },
-                                { label: 'عربي كامل', icon: <Globe size={14} /> },
-                                { label: 'مجاني + مميز', icon: <Star size={14} /> },
+                                { label: 'Cross-Platform', icon: <Smartphone size={16} /> },
+                                { label: 'Universal Access', icon: <Globe size={16} /> },
+                                { label: 'Verified Content', icon: <Shield size={16} /> },
                             ].map(({ label, icon }) => (
-                                <div key={label} className="flex items-center gap-2 px-3 py-1.5 bg-[#1E2448]/80 border border-[#14B8A6]/15 rounded-full text-[10px] font-bold text-[#14B8A6]/70">
-                                    {icon}
+                                <div key={label} className="flex items-center gap-3 px-5 py-2.5 bg-[#1E2448]/40 border border-[#14B8A6]/10 hover:border-[#14B8A6]/30 rounded-2xl text-[11px] font-bold text-[#14B8A6]/80 transition-all duration-300 backdrop-blur-sm group/tag cursor-default">
+                                    <span className="text-[#14B8A6] group-hover/tag:scale-110 transition-transform">{icon}</span>
                                     {label}
                                 </div>
                             ))}
@@ -165,9 +169,9 @@ export default function Overview() {
                     </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <StatCard title="المستخدمون النشطون" value={loading ? '...' : stats.totalUsers} subtitle="إجمالي المسجلين في المنصة" icon={<Users />} delay={0.1} />
-                    <StatCard title="إجمالي الفيديوهات" value="1,240+" subtitle="محتوى لغة الإشارة المرفوع" icon={<Video />} delay={0.2} />
-                    <StatCard title="طلبات الدعم" value="8" subtitle="تذاكر بانتظار المراجعة" icon={<MessageSquare />} delay={0.3} />
+                    <StatCard title="المستخدمون النشطون" value={loading ? '...' : stats.totalUsers} subtitle="إجمالي المسجلين في المنصة" icon={<Users />} trend="+14.2%" delay={0.1} />
+                    <StatCard title="إجمالي الفيديوهات" value="1,240+" subtitle="محتوى لغة الإشارة المرفوع" icon={<Video />} trend="+5.8%" delay={0.2} />
+                    <StatCard title="طلبات الدعم" value="8" subtitle="تذاكر بانتظار المراجعة" icon={<MessageSquare />} trend="-2" delay={0.3} />
                 </div>
             </div>
 
