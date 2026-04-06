@@ -186,7 +186,7 @@ function PayPageInner() {
                             callback_url: callbackUrl,
                             language: 'ar',
                             methods: ['creditcard', 'stcpay', 'applepay', 'googlepay'],
-                            apple_pay: {
+                            applePay: {
                                 label: 'مصحف أنامل',
                                 validate_merchant_url: window.location.origin + '/api/moyasar/applepay/validate',
                                 country: 'SA'
