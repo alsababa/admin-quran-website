@@ -17,7 +17,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Moyasar Secret Key is not configured' }, { status: 500 });
     }
 
-    const response = await fetch('https://api.moyasar.com/v1/applepay/initiation', {
+    const response = await fetch('https://api.moyasar.com/v1/applepay/initiate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
