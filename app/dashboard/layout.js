@@ -18,6 +18,7 @@ import {
     Ticket
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { AuthProvider } from '@/context/AuthContext';
 
 const SidebarLink = ({ to, icon, label, isOpen }) => {
     const pathname = usePathname();
@@ -58,6 +59,14 @@ const SidebarLink = ({ to, icon, label, isOpen }) => {
 };
 
 export default function DashboardLayout({ children }) {
+    return (
+        <AuthProvider>
+            <DashboardInner>{children}</DashboardInner>
+        </AuthProvider>
+    );
+}
+
+function DashboardInner({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const { user, logout, loading: authLoading } = useAuth();
     const pathname = usePathname();

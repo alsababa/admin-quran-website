@@ -185,11 +185,11 @@ function PayPageInner() {
                             publishable_api_key: MOYASAR_PK,
                             callback_url: callbackUrl,
                             language: 'ar',
-                            methods: ['creditcard', 'stcpay', 'applepay', 'googlepay'],
+                            methods: ['creditcard', 'stcpay', 'applepay'],
                             apple_pay: {
                                 label: 'مصحف أنامل',
-                                validate_merchant_url: window.location.origin + '/api/moyasar/applepay/validate',
-                                country: 'SA'
+                                validate_merchant_url: 'https://efwffwyslgidrzumarqf.supabase.co/functions/v1/applepay-merchant-validation',
+                                country: 'SA',
                             },
                             metadata: {
                                 userId: uid,
