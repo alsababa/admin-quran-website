@@ -8,7 +8,13 @@ export function useDashboardStats() {
     const [loading, setLoading] = useState(true);
     const [fbCounts, setFbCounts] = useState({ total: 0, active: 0 });
     const [sbCounts, setSbCounts] = useState({ total: 0, active: 0, codes: 0, videos: 0 });
-    const [extraStats, setExtraStats] = useState({ codes: 0, videos: 0, tickets: 0 });
+    const [extraStats, setExtraStats] = useState({ 
+        codesTotal: 0, 
+        codesAvailable: 0, 
+        codesConsumed: 0,
+        videos: 0, 
+        tickets: 0 
+    });
 
     // 1. Firebase Real-time Stats
     useEffect(() => {
@@ -26,13 +32,19 @@ export function useDashboardStats() {
         // Simple fetch for extra collections (non-realtime for now to save listeners)
         const fetchExtras = async () => {
             try {
-                const codesSnap = await supabase.from('activation_codes').select('*', { count: 'exact', head: true });
+                const { count: codesTotal } = await supabase.from('activation_codes').select('*', { count: 'exact', head: true });
+                const { count: codesAvailable } = await supabase.from('activation_codes').select('*', { count: 'exact', head: true }).eq('status', 'available');
+                const { count: codesConsumed } = await supabase.from('activation_codes').select('*', { count: 'exact', head: true }).eq('status', 'consumed');
                 const videosSnap = await supabase.from('videos').select('*', { count: 'exact', head: true });
-                // We'll use a mocked or real tickets count if table exists
+                
+                const { count: ticketsCount } = await supabase.from('support_tickets').select('*', { count: 'exact', head: true });
+                
                 setExtraStats({
-                    codes: codesSnap.count || 0,
+                    codesTotal: codesTotal || 0,
+                    codesAvailable: codesAvailable || 0,
+                    codesConsumed: codesConsumed || 0,
                     videos: videosSnap.count || 0,
-                    tickets: 2 // Mocked for now until we verify table name
+                    tickets: ticketsCount || 0
                 });
             } catch (e) {
                 console.warn("Extras fetch error:", e);
@@ -73,7 +85,9 @@ export function useDashboardStats() {
             totalUsers,
             activeSubs,
             revenue: activeSubs * 10,
-            codes: extraStats.codes,
+            codes: extraStats.codesTotal,
+            codesAvailable: extraStats.codesAvailable,
+            codesConsumed: extraStats.codesConsumed,
             videos: extraStats.videos,
             tickets: extraStats.tickets
         };

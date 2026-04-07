@@ -238,7 +238,7 @@ export default function Overview() {
                     <StatCard title="إجمالي المستخدمين" value={statsLoading ? '...' : stats.totalUsers} subtitle="إجمالي المسجلين في المنصة" icon={<Users />} trend="+14.2%" delay={0.1} />
                     <StatCard title="المشتركون النشطون" value={statsLoading ? '...' : stats.activeSubs} subtitle="باقات البريميوم الفعالة" icon={<Star />} trend="+8.4%" delay={0.15} />
                     <StatCard title="إجمالي الفيديوهات" value={statsLoading ? '...' : stats.videos} subtitle="محتوى لغة الإشارة المرفوع" icon={<Video />} trend="+5.8%" delay={0.2} />
-                    <StatCard title="أكواد التفعيل" value={statsLoading ? '...' : stats.codes} subtitle="الأكواد الصالحة للاستخدام" icon={<Accessibility />} trend="Stable" delay={0.25} />
+                    <StatCard title="أكواد التفعيل" value={statsLoading ? '...' : stats.codesAvailable} subtitle="الأكواد الصالحة للاستخدام" icon={<Accessibility />} trend={stats.codesConsumed > 0 ? "Active" : "Stable"} delay={0.25} />
                 </div>
             </div>
 
@@ -409,7 +409,7 @@ export default function Overview() {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[10px] font-bold text-white/50">أكواد مستخدمة</span>
-                                <span className="text-[10px] font-black text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded-md border border-[#D4AF37]/20">142 كود</span>
+                                <span className="text-[10px] font-black text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded-md border border-[#D4AF37]/20">{statsLoading ? '...' : stats.codesConsumed} كود</span>
                             </div>
                         </div>
                     </div>
