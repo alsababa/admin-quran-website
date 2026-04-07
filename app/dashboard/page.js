@@ -17,7 +17,8 @@ import {
     Star,
     Globe,
     MessageSquare,
-    Shield
+    Shield,
+    Search
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
