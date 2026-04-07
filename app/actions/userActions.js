@@ -36,6 +36,13 @@ export async function updateUserAdmin(userId, updates) {
 }
 
 /**
+ * الحصول على إحصائيات لوحة التحكم باستخدام صلاحيات المشرف
+ */
+export async function getDashboardStatsAdmin() {
+    return await callAdminApi('get-stats', {});
+}
+
+/**
  * حذف مستخدم في Supabase باستخدام صلاحيات المشرف
  */
 export async function deleteUserAdmin(userId) {

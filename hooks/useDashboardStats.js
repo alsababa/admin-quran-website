@@ -55,20 +55,25 @@ export function useDashboardStats() {
         return () => unsubscribe();
     }, []);
 
-    // 2. Supabase Stats
+    // 2. Supabase Stats via Admin API (Secure bypass for RLS)
     useEffect(() => {
         async function fetchSbStats() {
             try {
-                const { count: totalCount } = await supabase
-                    .from('users')
-                    .select('*', { count: 'exact', head: true });
-
-                const { count: activeCount } = await supabase
-                    .from('users')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('subscription_status', 'active');
-
-                setSbCounts(prev => ({ ...prev, total: totalCount || 0, active: activeCount || 0 }));
+                const result = await getDashboardStatsAdmin();
+                if (result.success && result.data) {
+                    const d = result.data;
+                    setSbCounts({ 
+                        total: d.users || 0, 
+                        active: d.activeSubs || 0 
+                    });
+                    setExtraStats({
+                        codesTotal: d.codesTotal || 0,
+                        codesAvailable: d.codesAvailable || 0,
+                        codesConsumed: d.codesConsumed || 0,
+                        videos: d.videos || 0,
+                        tickets: d.tickets || 0
+                    });
+                }
             } catch (err) {
                 console.warn("Supabase Stats Error:", err);
             }

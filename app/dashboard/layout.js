@@ -15,10 +15,14 @@ import {
     Search,
     Loader2,
     MessageSquare,
-    Ticket
+    Ticket,
+    Building2,
+    AlertTriangle,
+    Clock
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthProvider } from '@/context/AuthContext';
+import { useAdminAlerts } from '@/hooks/useAdminAlerts';
 
 const SidebarLink = ({ to, icon, label, isOpen }) => {
     const pathname = usePathname();
@@ -69,6 +73,8 @@ export default function DashboardLayout({ children }) {
 function DashboardInner({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const { user, logout, loading: authLoading } = useAuth();
+    const { alerts, unreadCount } = useAdminAlerts();
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
 
@@ -221,10 +227,16 @@ function DashboardInner({ children }) {
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="p-2.5 bg-[#1E2448]/60 border border-[#5AA564]/10 rounded-xl text-[#5AA564]/50 hover:text-[#5AA564] hover:bg-[#5AA564]/5 transition-all relative"
+                            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                            className={`p-2.5 rounded-xl transition-all relative border
+                                ${isNotificationsOpen 
+                                    ? 'bg-[#5AA564] text-[#0A0D1A] border-[#5AA564]' 
+                                    : 'bg-[#1E2448]/60 border-[#5AA564]/10 text-[#5AA564]/50 hover:text-[#5AA564] hover:bg-[#5AA564]/5'}`}
                         >
                             <Bell size={18} strokeWidth={2} />
-                            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#5AA564] rounded-full ring-2 ring-[#0A0D1A]" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-[#5AA564] rounded-full ring-2 ring-[#0A0D1A] animate-pulse" />
+                            )}
                         </motion.button>
 
                         <div className="h-8 w-[1px] bg-[#5AA564]/10" />
@@ -250,6 +262,78 @@ function DashboardInner({ children }) {
                     </div>
                 </div>
             </main>
+
+            {/* Notifications Drawer */}
+            <AnimatePresence>
+                {isNotificationsOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsNotificationsOpen(false)}
+                            className="fixed inset-0 bg-[#0A0D1A]/60 backdrop-blur-sm z-[100]"
+                        />
+                        <motion.div
+                            initial={{ x: 400 }}
+                            animate={{ x: 0 }}
+                            exit={{ x: 400 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed left-0 top-0 bottom-0 w-full max-w-sm glass-panel border-r border-[#5AA564]/10 z-[110] flex flex-col shadow-2xl"
+                        >
+                            <div className="p-8 border-b border-[#5AA564]/8 flex items-center justify-between">
+                                <h3 className="text-xl font-black text-white">إشعارات النظام</h3>
+                                <button 
+                                    onClick={() => setIsNotificationsOpen(false)}
+                                    className="p-2 rounded-lg hover:bg-white/5 text-white/20 transition-colors"
+                                >
+                                    <ChevronRight size={20} className="rotate-180" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                                {alerts.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-40 opacity-30">
+                                        <Bell size={40} className="mb-4" />
+                                        <p className="text-xs font-bold uppercase tracking-widest">لا توجد إشعارات حالية</p>
+                                    </div>
+                                ) : (
+                                    alerts.map((alert) => (
+                                        <motion.div
+                                            key={alert.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className={`p-5 rounded-2xl border backdrop-blur-xl group cursor-pointer hover:scale-[1.02] transition-all
+                                                ${alert.type === 'urgent' 
+                                                    ? 'bg-rose-500/5 border-rose-500/15' 
+                                                    : alert.type === 'warning'
+                                                    ? 'bg-amber-500/5 border-amber-500/15'
+                                                    : 'bg-[#5AA564]/5 border-[#5AA564]/15'}`}
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                <div className={`p-2.5 rounded-xl border shrink-0
+                                                    ${alert.type === 'urgent' 
+                                                        ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' 
+                                                        : alert.type === 'warning'
+                                                        ? 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                                                        : 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'}`}>
+                                                    {alert.category === 'codes' ? <Ticket size={18} /> : 
+                                                     alert.category === 'stock' ? <Building2 size={18} /> : 
+                                                     <MessageSquare size={18} />}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h4 className="text-xs font-black text-white mb-1">{alert.title}</h4>
+                                                    <p className="text-[10px] font-bold text-white/40 leading-relaxed text-right">{alert.message}</p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
