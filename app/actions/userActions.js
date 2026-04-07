@@ -2,6 +2,7 @@
 // Refactored to call Supabase Edge Functions (Compatible with Static Export)
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const ADMIN_API_URL = `${SUPABASE_URL}/functions/v1/admin-api`;
 
 /**
@@ -13,8 +14,8 @@ async function callAdminApi(action, payload) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // Note: Security depends on Edge Function itself (Auth role or hidden endpoint)
-                // In production, you might pass a JWT token here.
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
             },
             body: JSON.stringify({ action, payload }),
         });
