@@ -293,7 +293,7 @@ function CallbackInner() {
                 </div>
                 <div>
                     <div style={{ fontWeight: 900, fontSize: 16, color: '#111' }}>مصحف أنامل</div>
-                    <div style={{ fontSize: 9, fontWeight: 800, color: '#14B8A6', letterSpacing: '0.15em' }}>نتيجة الدفع</div>
+                    <div style={{ fontSize: 9, fontWeight: 800, color: '#5AA564', letterSpacing: '0.15em' }}>نتيجة الدفع</div>
                 </div>
             </nav>
 
@@ -315,12 +315,12 @@ function CallbackInner() {
                         <>
                             <div style={{
                                 width: 80, height: 80, borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: 'linear-gradient(135deg, #5AA564 0%, #4A8F53 100%)',
+                                display: 'flex', alignItems: 'center', justifySelf: 'center',
                                 margin: '0 auto 24px',
-                                boxShadow: '0 8px 24px rgba(20,184,166,0.3)',
+                                boxShadow: '0 8px 24px rgba(90,165,100,0.3)',
                             }}>
-                                <Loader2 size={36} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                                <Loader2 size={36} color="#fff" style={{ animation: 'spin 1.5s linear infinite' }} />
                             </div>
                             <h2 style={{ fontSize: 22, fontWeight: 900, color: '#111', marginBottom: 12 }}>جاري المعالجة</h2>
                             <p style={{ fontSize: 14, color: '#777', fontWeight: 600, lineHeight: 1.7 }}>{message}</p>
@@ -333,10 +333,10 @@ function CallbackInner() {
                         <>
                             <div style={{
                                 width: 88, height: 88, borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+                                background: 'linear-gradient(135deg, #5AA564 0%, #4A8F53 100%)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 margin: '0 auto 24px',
-                                boxShadow: '0 12px 32px rgba(20,184,166,0.3)',
+                                boxShadow: '0 12px 32px rgba(90,165,100,0.3)',
                                 animation: 'popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                             }}>
                                 <CheckCircle2 size={44} color="#fff" />
@@ -458,7 +458,7 @@ function CallbackInner() {
                                 style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                                     width: '100%', height: 52, borderRadius: 16,
-                                    background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+                                    background: 'linear-gradient(135deg, #5AA564 0%, #4A8F53 100%)',
                                     color: '#fff', fontWeight: 800, fontSize: 14,
                                     textDecoration: 'none', marginBottom: 12,
                                 }}>
@@ -525,7 +525,7 @@ export default function CallbackPage() {
     return (
         <Suspense fallback={
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Loader2 size={32} style={{ color: '#14B8A6', animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite' }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         }>

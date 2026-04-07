@@ -281,7 +281,7 @@ function PayPageInner() {
                 </div>
                 <button 
                     onClick={() => window.location.reload()} 
-                    style={{ padding: '12px 24px', background: '#14B8A6', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 'bold', cursor: 'pointer' }}
+                    style={{ padding: '12px 24px', background: '#5AA564', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 'bold', cursor: 'pointer' }}
                 >
                     Retry Loading
                 </button>
@@ -292,7 +292,7 @@ function PayPageInner() {
     if (!isMounted) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Loader2 size={32} style={{ color: '#14B8A6', animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite' }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         );
@@ -320,10 +320,10 @@ function PayPageInner() {
                     </div>
                     <div>
                         <div style={{ fontWeight: 900, fontSize: 16, color: '#111' }}>مصحف أنامل</div>
-                        <div style={{ fontSize: 9, fontWeight: 800, color: '#14B8A6', letterSpacing: '0.15em', textTransform: 'uppercase' }}>الدفع الآمن</div>
+                        <div style={{ fontSize: 9, fontWeight: 800, color: '#5AA564', letterSpacing: '0.15em', textTransform: 'uppercase' }}>الدفع الآمن</div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#14B8A6', fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#5AA564', fontSize: 12, fontWeight: 700 }}>
                     <Shield size={16} />
                     <span>دفع مشفّر وآمن</span>
                 </div>
@@ -338,10 +338,10 @@ function PayPageInner() {
                 {/* Plan Summary Card */}
                 <div style={{
                     background: '#fff',
-                    border: isOrg ? '2px solid #14B8A6' : '1px solid #eee',
+                    border: isOrg ? '2px solid #5AA564' : '1px solid #eee',
                     borderRadius: 24, padding: '28px 24px',
                     marginBottom: 28,
-                    boxShadow: isOrg ? '0 8px 32px rgba(20,184,166,0.08)' : '0 4px 20px rgba(0,0,0,0.04)',
+                    boxShadow: isOrg ? '0 8px 32px rgba(90,165,100,0.12)' : '0 4px 20px rgba(0,0,0,0.04)',
                     position: 'relative', overflow: 'hidden',
                 }}>
                     {/* Toggle */}
@@ -354,7 +354,7 @@ function PayPageInner() {
                             style={{
                                 flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
                                 background: !isOrg ? '#fff' : 'transparent',
-                                color: !isOrg ? '#14B8A6' : '#999',
+                                color: !isOrg ? '#5AA564' : '#999',
                                 boxShadow: !isOrg ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
                                 transition: 'all 0.2s'
                             }}
@@ -364,7 +364,7 @@ function PayPageInner() {
                             style={{
                                 flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
                                 background: isOrg ? '#fff' : 'transparent',
-                                color: isOrg ? '#14B8A6' : '#999',
+                                color: isOrg ? '#5AA564' : '#999',
                                 boxShadow: isOrg ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
                                 transition: 'all 0.2s'
                             }}
@@ -404,7 +404,7 @@ function PayPageInner() {
 
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
-                        background: isOrg ? 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)' : '#F1F5F9',
+                        background: isOrg ? 'linear-gradient(135deg, #5AA564 0%, #4A8F53 100%)' : '#F1F5F9',
                         color: isOrg ? '#fff' : '#64748B', fontSize: 10, fontWeight: 900,
                         letterSpacing: '0.2em', textTransform: 'uppercase',
                         padding: '5px 14px', borderRadius: 20,
@@ -421,7 +421,7 @@ function PayPageInner() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
                         {plan.features.map((f, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <CheckCircle2 size={16} style={{ color: '#14B8A6', flexShrink: 0 }} />
+                                <CheckCircle2 size={16} style={{ color: '#5AA564', flexShrink: 0 }} />
                                 <span style={{ fontSize: 13, color: '#444', fontWeight: 600 }}>{f}</span>
                             </div>
                         ))}
@@ -436,8 +436,8 @@ function PayPageInner() {
                             <div style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', background: '#FEF2F2', padding: '2px 8px', borderRadius: 6 }}>تم تطبيق خصم {plan.discountPercent}%</div>
                         )}
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                            <span style={{ fontSize: 36, fontWeight: 900, color: '#14B8A6' }}>{plan.price.toLocaleString('en-US')}</span>
-                            <span style={{ fontSize: 16, fontWeight: 700, color: '#14B8A6' }}>ر.س</span>
+                            <span style={{ fontSize: 36, fontWeight: 900, color: '#5AA564' }}>{plan.price.toLocaleString('en-US')}</span>
+                            <span style={{ fontSize: 16, fontWeight: 700, color: '#5AA564' }}>ر.س</span>
                             <span style={{ fontSize: 14, color: '#999', fontWeight: 600 }}>{isOrg ? `/ لكل ${userCount > 1 ? `${userCount} مستخدم` : 'مستخدم'}` : '/ مستخدم واحد'}</span>
                         </div>
                     </div>
@@ -466,13 +466,13 @@ function PayPageInner() {
                     position: 'relative',
                 }}>
                     <h3 style={{ fontSize: 16, fontWeight: 900, color: '#111', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <CreditCard size={18} style={{ color: '#14B8A6' }} />
+                        <CreditCard size={18} style={{ color: '#5AA564' }} />
                         طريقة الدفع
                     </h3>
 
                     {status === 'loading' && (
                         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                            <Loader2 size={32} style={{ color: '#14B8A6', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+                            <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
                             <p style={{ color: '#999', fontWeight: 600, fontSize: 14 }}>جاري تحميل نموذج الدفع...</p>
                             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                         </div>
@@ -538,7 +538,7 @@ export default function PayPage() {
     return (
         <Suspense fallback={
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Loader2 size={32} style={{ color: '#14B8A6', animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite' }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         }>

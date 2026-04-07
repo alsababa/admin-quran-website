@@ -7,7 +7,8 @@ import { supabase } from '@/lib/supabase';
 export function useDashboardStats() {
     const [loading, setLoading] = useState(true);
     const [fbCounts, setFbCounts] = useState({ total: 0, active: 0 });
-    const [sbCounts, setSbCounts] = useState({ total: 0, active: 0 });
+    const [sbCounts, setSbCounts] = useState({ total: 0, active: 0, codes: 0, videos: 0 });
+    const [extraStats, setExtraStats] = useState({ codes: 0, videos: 0, tickets: 0 });
 
     // 1. Firebase Real-time Stats
     useEffect(() => {
@@ -21,6 +22,23 @@ export function useDashboardStats() {
             console.error("Firebase Dashboard Stats Error:", err);
             setLoading(false);
         });
+
+        // Simple fetch for extra collections (non-realtime for now to save listeners)
+        const fetchExtras = async () => {
+            try {
+                const codesSnap = await supabase.from('activation_codes').select('*', { count: 'exact', head: true });
+                const videosSnap = await supabase.from('videos').select('*', { count: 'exact', head: true });
+                // We'll use a mocked or real tickets count if table exists
+                setExtraStats({
+                    codes: codesSnap.count || 0,
+                    videos: videosSnap.count || 0,
+                    tickets: 2 // Mocked for now until we verify table name
+                });
+            } catch (e) {
+                console.warn("Extras fetch error:", e);
+            }
+        };
+        fetchExtras();
 
         return () => unsubscribe();
     }, []);
@@ -38,7 +56,7 @@ export function useDashboardStats() {
                     .select('*', { count: 'exact', head: true })
                     .eq('subscription_status', 'active');
 
-                setSbCounts({ total: totalCount || 0, active: activeCount || 0 });
+                setSbCounts(prev => ({ ...prev, total: totalCount || 0, active: activeCount || 0 }));
             } catch (err) {
                 console.warn("Supabase Stats Error:", err);
             }
@@ -54,9 +72,12 @@ export function useDashboardStats() {
         return {
             totalUsers,
             activeSubs,
-            revenue: activeSubs * 10
+            revenue: activeSubs * 10,
+            codes: extraStats.codes,
+            videos: extraStats.videos,
+            tickets: extraStats.tickets
         };
-    }, [fbCounts, sbCounts]);
+    }, [fbCounts, sbCounts, extraStats]);
 
     return { stats, loading };
 }

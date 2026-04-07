@@ -58,6 +58,7 @@ export function useUsers() {
                     subscriptionTier: user.subscription_tier || 'free',
                     accountType: user.account_type || 'individual',
                     platform: user.platform || 'manual',
+                    phoneNumber: user.phone_number || user.phone || '',
                     createdAt: user.created_at ? { seconds: Math.floor(new Date(user.created_at).getTime() / 1000) } : null,
                     source: 'supabase'
                 }));

@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gold:    #14B8A6;
+  --color-primary: #5AA564;
+  --color-gold:    #D4AF37;
   --color-gold-light: #E8C97A;
-  --color-gold-dark:  #0D9488;
+  --color-gold-dark:  #B48A2D;
   --color-navy:    #0A0D1A;
   --color-indigo:  #141830;
   --color-indigo2: #1E2448;
@@ -13,7 +14,7 @@
 :root {
   --background: #0A0D1A;
   --foreground: #F5F0E8;
-  --accent-primary: #14B8A6;
+  --accent-primary: #5AA564;
 }
 
 body {
@@ -25,41 +26,41 @@ body {
 }
 
 ::selection {
-  background-color: rgba(20, 184, 166, 0.2);
-  color: #14B8A6;
+  background-color: rgba(90, 165, 100, 0.2);
+  color: #5AA564;
 }
 
 /* Premium Glassmorphism Utilities (Gold/Indigo Tinted) */
 @utility glass-panel {
   background-color: rgba(10, 13, 26, 0.5);
   backdrop-filter: blur(28px);
-  border: 1px solid rgba(201, 168, 76, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.15);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 @utility glass-card {
   background-color: rgba(30, 36, 72, 0.25);
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(201, 168, 76, 0.18);
+  border: 1px solid rgba(212, 175, 55, 0.18);
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility glass-card-hover {
-  border-color: rgba(201, 168, 76, 0.5);
-  background-color: rgba(201, 168, 76, 0.08);
-  box-shadow: 0 0 30px rgba(201, 168, 76, 0.12);
+  border-color: rgba(212, 175, 55, 0.5);
+  background-color: rgba(212, 175, 55, 0.08);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.12);
 }
 
 @utility glass-input {
   background-color: rgba(10, 13, 26, 0.7);
-  border: 1px solid rgba(201, 168, 76, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.2);
   transition: all 0.3s;
   outline: none;
 }
 
 @utility glass-input-focus {
-  border-color: rgba(201, 168, 76, 0.6);
-  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.08);
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
 }
 
 /* Custom Scrollbar (Gold) */
@@ -77,11 +78,11 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #14B8A6;
+  background: #5AA564;
 }
 
-/* Animations (Teal Glow) */
-@keyframes pulse-glow-teal {
+/* Animations (Green Glow) */
+@keyframes pulse-glow-green {
   0%, 100% {
     opacity: 0.25;
     filter: blur(100px);
@@ -92,8 +93,8 @@ body {
   }
 }
 
-@utility animate-glow-teal {
-  animation: pulse-glow-teal 10s ease-in-out infinite;
+@utility animate-glow-green {
+  animation: pulse-glow-green 10s ease-in-out infinite;
 }
 
 @keyframes infinite-scroll {
@@ -105,8 +106,45 @@ body {
   animation: infinite-scroll 25s linear infinite;
 }
 
+/* Premium Effects */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@utility animate-shimmer {
+  animation: shimmer 8s linear infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  50%, 100% { transform: translateX(200%) skewX(-15deg); }
+}
+
+@utility animate-shine {
+  animation: shine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@utility animate-ripple {
+  animation: ripple 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 /* Arabic geometric pattern overlay */
 @utility arabic-pattern {
-  background-image: radial-gradient(circle at 1px 1px, rgba(20,184,166,0.06) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(90,165,100,0.08) 1px, transparent 0);
   background-size: 32px 32px;
 }

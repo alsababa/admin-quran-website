@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Trash2, Shield, Mail, Calendar,
@@ -16,7 +17,7 @@ const Toast = ({ message, type, onClose }) => (
         exit={{ opacity: 0, y: 20, scale: 0.95 }}
         className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border text-sm font-bold backdrop-blur-xl
             ${type === 'success'
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'
                 : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
     >
         {type === 'success' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
@@ -48,39 +49,39 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(201,168,76,0.1)]"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#14B8A6]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-[#5AA564]/40 hover:text-white transition-colors">
                     <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-8 text-right">
-                    <div className="h-14 w-14 rounded-2xl bg-[#14B8A6]/10 border border-[#14B8A6]/20 flex items-center justify-center font-black text-[#14B8A6] text-xl">
+                    <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center font-black text-[#5AA564] text-xl">
                         {name?.charAt(0) || <User size={22} />}
                     </div>
                     <div>
                         <h4 className="text-2xl font-black text-white">تعديل المستخدم</h4>
-                        <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">تحديث معلومات الحساب</p>
+                        <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">تحديث معلومات الحساب</p>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="space-y-2 text-right">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-[#14B8A6]/50">الاسم الكامل</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-[#5AA564]/50">الاسم الكامل</label>
                         <input
                             type="text"
-                            className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20"
+                            className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="اسم المستخدم"
                         />
                     </div>
                     <div className="space-y-2 text-right">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-[#14B8A6]/50">البريد الإلكتروني</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-[#5AA564]/50">البريد الإلكتروني</label>
                         <div className="relative">
-                            <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#14B8A6]/25" />
+                            <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5AA564]/25" />
                             <input
                                 type="email"
-                                className="w-full h-13 glass-input rounded-xl pr-11 pl-5 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20"
+                                className="w-full h-13 glass-input rounded-xl pr-11 pl-5 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="user@example.com"
@@ -90,7 +91,7 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
                     <button
                         type="submit"
                         disabled={saving}
-                        className="w-full h-13 bg-[#14B8A6] text-[#0A0D1A] font-black rounded-xl hover:bg-[#E8C97A] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                        className="w-full h-13 bg-[#5AA564] text-[#0A0D1A] font-black rounded-xl hover:bg-[#E8C97A] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
                     >
                         {saving ? <Loader2 size={18} className="animate-spin" /> : 'حفظ التغييرات'}
                     </button>
@@ -125,7 +126,7 @@ const DeleteModal = ({ user, onConfirm, onClose, deleting }) => (
             <div className="flex gap-3">
                 <button
                     onClick={onClose}
-                    className="flex-1 h-12 glass-card border-[#14B8A6]/10 rounded-xl text-[#F5F0E8]/50 font-bold text-sm hover:text-white transition-all"
+                    className="flex-1 h-12 glass-card border-[#5AA564]/10 rounded-xl text-[#F5F0E8]/50 font-bold text-sm hover:text-white transition-all"
                 >
                     إلغاء
                 </button>
@@ -156,25 +157,25 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(20,184,166,0.15)]"
+                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(90,165,100,0.15)]"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#14B8A6]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-[#5AA564]/40 hover:text-white transition-colors">
                     <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="h-14 w-14 rounded-2xl bg-[#14B8A6]/10 border border-[#14B8A6]/20 flex items-center justify-center text-[#14B8A6]">
+                    <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center text-[#5AA564]">
                         <Shield size={28} />
                     </div>
                     <div>
                         <h4 className="text-2xl font-black text-white">ترقية الحساب</h4>
-                        <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">منح العضوية المميزة ✨</p>
+                        <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">منح العضوية المميزة ✨</p>
                     </div>
                 </div>
 
                 <p className="text-sm font-bold text-white/60 mb-8 leading-relaxed">
-                    اختر نوع الحساب المميز لـ <span className="text-[#14B8A6]">{user.displayName || user.email}</span>.
+                    اختر نوع الحساب المميز لـ <span className="text-[#5AA564]">{user.displayName || user.email}</span>.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
@@ -182,20 +183,20 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                         onClick={() => setType('individual')}
                         className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
                             ${type === 'individual' 
-                                ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-white' 
+                                ? 'bg-[#5AA564]/10 border-[#5AA564]/40 text-white' 
                                 : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
                     >
-                        <User size={24} className={type === 'individual' ? 'text-[#14B8A6]' : 'text-white/20'} />
+                        <User size={24} className={type === 'individual' ? 'text-[#5AA564]' : 'text-white/20'} />
                         <span className="text-sm font-black">حساب فردي</span>
                     </button>
                     <button
                         onClick={() => setType('entity')}
                         className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
                             ${type === 'entity' 
-                                ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-white' 
+                                ? 'bg-[#5AA564]/10 border-[#5AA564]/40 text-white' 
                                 : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
                     >
-                        <Building2 size={24} className={type === 'entity' ? 'text-[#14B8A6]' : 'text-white/20'} />
+                        <Building2 size={24} className={type === 'entity' ? 'text-[#5AA564]' : 'text-white/20'} />
                         <span className="text-sm font-black">جهة / منظمة</span>
                     </button>
                 </div>
@@ -208,11 +209,11 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                             exit={{ opacity: 0, height: 0 }}
                             className="space-y-2 mb-8 text-right overflow-hidden"
                         >
-                            <label className="text-[9px] font-black uppercase tracking-widest text-[#14B8A6]/50">معرف المنظمة (Organization ID)</label>
+                            <label className="text-[9px] font-black uppercase tracking-widest text-[#5AA564]/50">معرف المنظمة (Organization ID)</label>
                             <input
                                 id="org-id-input"
                                 type="text"
-                                className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20"
+                                className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20"
                                 placeholder="مثلاً: org_123"
                                 required
                             />
@@ -227,7 +228,7 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                         onConfirm(user, type, orgId);
                     }}
                     disabled={upgrading}
-                    className="w-full h-14 bg-[#14B8A6] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#0D9488] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full h-14 bg-[#5AA564] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#4A8F53] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                     {upgrading ? <Loader2 size={20} className="animate-spin" /> : 'تأكيد الترقية الآن'}
                 </button>
@@ -251,25 +252,25 @@ const ChangeTypeModal = ({ user, onConfirm, onClose, saving }) => {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(20,184,166,0.15)]"
+                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(90,165,100,0.15)]"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#14B8A6]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-[#5AA564]/40 hover:text-white transition-colors">
                     <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="h-14 w-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                    <div className="h-14 w-14 rounded-2xl bg-gold-gradient/10 border border-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
                         <Building2 size={28} />
                     </div>
                     <div>
                         <h4 className="text-2xl font-black text-white">تغيير نوع الحساب</h4>
-                        <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">تحديد طبيعة الحساب 🏢</p>
+                        <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">تحديد طبيعة الحساب 🏢</p>
                     </div>
                 </div>
 
                 <p className="text-sm font-bold text-white/60 mb-8 leading-relaxed">
-                    اختر نوع الحساب لـ <span className="text-[#14B8A6]">{user.displayName || user.email}</span>.
+                    اختر نوع الحساب لـ <span className="text-[#5AA564]">{user.displayName || user.email}</span>.
                     <br/><span className="text-[10px] text-white/30">لن يتأثر اشتراك المستخدم الحالي.</span>
                 </p>
 
@@ -278,10 +279,10 @@ const ChangeTypeModal = ({ user, onConfirm, onClose, saving }) => {
                         onClick={() => setType('individual')}
                         className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3
                             ${type === 'individual'
-                                ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-white'
+                                ? 'bg-[#5AA564]/10 border-[#5AA564]/40 text-white'
                                 : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
                     >
-                        <User size={24} className={type === 'individual' ? 'text-[#14B8A6]' : 'text-white/20'} />
+                        <User size={24} className={type === 'individual' ? 'text-[#5AA564]' : 'text-white/20'} />
                         <span className="text-sm font-black">حساب فردي</span>
                         <span className="text-[10px] text-white/30">مستخدم واحد</span>
                     </button>
@@ -300,7 +301,7 @@ const ChangeTypeModal = ({ user, onConfirm, onClose, saving }) => {
 
                 {/* Current Status Indicator */}
                 <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-white/3 rounded-2xl border border-white/5">
-                    <div className="w-2 h-2 rounded-full bg-[#14B8A6]" />
+                    <div className="w-2 h-2 rounded-full bg-[#5AA564]" />
                     <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
                         النوع الحالي: {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
                     </p>
@@ -334,6 +335,15 @@ export default function UsersPage() {
     const [isUpgrading, setIsUpgrading] = useState(false);
     const [isChangingType, setIsChangingType] = useState(false);
     const [toast, setToast] = useState(null);
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        const query = searchParams.get('search');
+        if (query) {
+            setSearchTerm(query);
+            showToast(`تصفية لوجود: ${query}`, 'success');
+        }
+    }, [searchParams]);
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
@@ -342,7 +352,8 @@ export default function UsersPage() {
 
     const filteredUsers = users.filter(u =>
         u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
+        u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleSaveEdit = async (user, updates) => {
@@ -409,20 +420,20 @@ export default function UsersPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div className="text-right">
                     <h3 className="text-4xl font-black text-white tracking-tighter">قائمة المستخدمين</h3>
-                    <p className="text-[#14B8A6]/40 font-bold text-sm mt-2">إدارة والتحكم في حسابات المستخدمين المسجلين.</p>
+                    <p className="text-[#5AA564]/40 font-bold text-sm mt-2">إدارة والتحكم في حسابات المستخدمين المسجلين.</p>
                 </div>
                 <div className="flex flex-wrap gap-4 w-full md:w-auto">
                     <div className="relative flex-1 md:w-80 group">
-                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#14B8A6]/30 group-focus-within:text-[#14B8A6] transition-colors" size={17} />
+                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30 group-focus-within:text-[#5AA564] transition-colors" size={17} />
                         <input
                             type="text"
                             placeholder="ابحث عن مستخدم..."
-                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20 focus:border-[#14B8A6]/40 transition-all"
+                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20 focus:border-[#5AA564]/40 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="h-13 px-5 py-3.5 glass-panel border-[#14B8A6]/10 rounded-2xl text-[#14B8A6]/50 hover:text-[#14B8A6] flex items-center gap-2.5 transition-all">
+                    <button className="h-13 px-5 py-3.5 glass-panel border-[#5AA564]/10 rounded-2xl text-[#5AA564]/50 hover:text-[#5AA564] flex items-center gap-2.5 transition-all">
                         <Filter size={16} />
                         <span className="text-[10px] font-black uppercase tracking-widest">تصفية</span>
                         <ChevronDown size={13} />
@@ -431,20 +442,20 @@ export default function UsersPage() {
             </div>
 
             {/* Table */}
-            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#14B8A6]/10 shadow-2xl">
+            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#5AA564]/10 shadow-2xl">
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-right">
                         <thead>
-                            <tr className="border-b border-[#14B8A6]/8 bg-[#14B8A6]/5">
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">المستخدم</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">نوع الحساب</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">الحالة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">المنصة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">تاريخ التسجيل</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-left">الإجراءات</th>
+                            <tr className="border-b border-[#5AA564]/8 bg-[#5AA564]/5">
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">المستخدم</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">نوع الحساب</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">الحالة</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">المنصة</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">تاريخ التسجيل</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-left">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#14B8A6]/5">
+                        <tbody className="divide-y divide-[#5AA564]/5">
                             <AnimatePresence>
                                 {loading ? (
                                     [1, 2, 3, 4].map(i => (
@@ -461,28 +472,28 @@ export default function UsersPage() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: idx * 0.04 }}
-                                        className="group hover:bg-[#14B8A6]/3 transition-colors"
+                                        className="group hover:bg-[#5AA564]/3 transition-colors"
                                     >
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#14B8A6]/20 to-[#0D9488]/15 border border-[#14B8A6]/20 flex items-center justify-center font-black text-[#14B8A6] text-sm shrink-0">
+                                                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#5AA564]/20 to-[#4A8F53]/15 border border-[#5AA564]/20 flex items-center justify-center font-black text-[#5AA564] text-sm shrink-0">
                                                     {user.displayName?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || '?'}
                                                 </div>
                                                 <div className="overflow-hidden">
                                                     <div className="flex items-center gap-2">
                                                         <p className="font-extrabold text-white text-sm truncate">{user.displayName || 'مستخدم جديد'}</p>
                                                         {user.isOrgAdmin && (
-                                                            <div className="px-1.5 py-0.5 rounded-md bg-[#14B8A6]/10 border border-[#14B8A6]/20 text-[6px] font-black text-[#14B8A6] uppercase">ADMIN</div>
+                                                            <div className="px-1.5 py-0.5 rounded-md bg-[#5AA564]/10 border border-[#5AA564]/20 text-[6px] font-black text-[#5AA564] uppercase">ADMIN</div>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                                        <Mail size={11} className="text-[#14B8A6]/30" />
-                                                        <p className="text-[10px] font-bold text-[#14B8A6]/40 truncate max-w-[180px]">{user.email}</p>
+                                                        <Mail size={11} className="text-[#5AA564]/30" />
+                                                        <p className="text-[10px] font-bold text-[#5AA564]/40 truncate max-w-[180px]">{user.email}</p>
                                                     </div>
                                                     {user.organizationId && (
                                                         <div className="flex items-center gap-1 mt-1">
-                                                            <Building2 size={9} className="text-[#14B8A6]/40" />
-                                                            <p className="text-[8px] font-black text-[#14B8A6]/60 uppercase tracking-tighter">ID: {user.organizationId}</p>
+                                                            <Building2 size={9} className="text-[#5AA564]/40" />
+                                                            <p className="text-[8px] font-black text-[#5AA564]/60 uppercase tracking-tighter">ID: {user.organizationId}</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -492,7 +503,7 @@ export default function UsersPage() {
                                             <div className="flex justify-center">
                                                 <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-[10px] font-bold
                                                     ${user.accountType === 'entity' 
-                                                        ? 'bg-[#14B8A6]/20 border-[#14B8A6]/30 text-[#14B8A6]' 
+                                                        ? 'bg-[#5AA564]/20 border-[#5AA564]/30 text-[#5AA564]' 
                                                         : 'bg-white/5 border-white/10 text-white/60'}`}>
                                                     {user.accountType === 'entity' ? <Building2 size={12} /> : <User size={12} />}
                                                     {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
@@ -503,16 +514,16 @@ export default function UsersPage() {
                                             <div className="flex justify-center">
                                                 <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest
                                                     ${user.subscriptionStatus === 'active'
-                                                        ? 'bg-[#14B8A6]/10 border-[#14B8A6]/20 text-[#14B8A6]'
+                                                        ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'
                                                         : 'bg-[#1E2448]/80 border-white/10 text-[#F5F0E8]/35'}`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-[#14B8A6]' : 'bg-white/20'}`} />
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-[#5AA564]' : 'bg-white/20'}`} />
                                                     {user.subscriptionStatus === 'active' ? 'مميز' : 'مجاني'}
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="flex justify-center">
-                                                <div className="flex items-center gap-2 text-[#14B8A6]/60">
+                                                <div className="flex items-center gap-2 text-[#5AA564]/60">
                                                     {user.platform === 'ios' && <Apple size={14} />}
                                                     {user.platform === 'android' && <Smartphone size={14} />}
                                                     {user.platform === 'manual' && <Globe size={14} />}
@@ -525,7 +536,7 @@ export default function UsersPage() {
                                                 <p className="text-xs font-bold text-[#F5F0E8]/45">
                                                     {user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ar-SA') : 'غير متوفر'}
                                                 </p>
-                                                <Calendar size={13} className="text-[#14B8A6]/20" />
+                                                <Calendar size={13} className="text-[#5AA564]/20" />
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
@@ -533,7 +544,7 @@ export default function UsersPage() {
                                                 {/* Edit */}
                                                 <button
                                                     onClick={() => setEditingUser(user)}
-                                                    className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-[#F5F0E8]/40 hover:text-white hover:bg-[#14B8A6]/15 hover:border-[#14B8A6]/25 transition-all"
+                                                    className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-[#F5F0E8]/40 hover:text-white hover:bg-[#5AA564]/15 hover:border-[#5AA564]/25 transition-all"
                                                     title="تعديل"
                                                 >
                                                     <Edit3 size={15} />
@@ -561,7 +572,7 @@ export default function UsersPage() {
                                                 {user.subscriptionStatus !== 'active' && (
                                                     <button
                                                         onClick={() => handleUpgradeClick(user)}
-                                                        className="h-10 px-4 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-xl text-[#14B8A6] hover:bg-[#14B8A6] hover:text-[#0A0D1A] font-black text-[9px] transition-all flex items-center gap-1.5"
+                                                        className="h-10 px-4 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-xl text-[#5AA564] hover:bg-[#5AA564] hover:text-[#0A0D1A] font-black text-[9px] transition-all flex items-center gap-1.5"
                                                         title="ترقية لمميز"
                                                     >
                                                         <Shield size={13} strokeWidth={2.5} />
@@ -578,14 +589,14 @@ export default function UsersPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-10 py-6 bg-[#14B8A6]/3 border-t border-[#14B8A6]/5 flex justify-between items-center">
-                    <p className="text-[9px] font-black text-[#14B8A6]/40 uppercase tracking-widest">
+                <div className="px-10 py-6 bg-[#5AA564]/3 border-t border-[#5AA564]/5 flex justify-between items-center">
+                    <p className="text-[9px] font-black text-[#5AA564]/40 uppercase tracking-widest">
                         عرض {filteredUsers.length} من أصل {users.length} مستخدم
                     </p>
                     <div className="flex gap-2">
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#14B8A6] transition-all rotate-180"><ChevronDown size={13} /></button>
-                        <button className="px-4 py-2 bg-[#14B8A6]/10 border border-[#14B8A6]/20 rounded-lg text-[#14B8A6] text-[9px] font-black">1</button>
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#14B8A6] transition-all"><ChevronDown size={13} /></button>
+                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#5AA564] transition-all rotate-180"><ChevronDown size={13} /></button>
+                        <button className="px-4 py-2 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-lg text-[#5AA564] text-[9px] font-black">1</button>
+                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#5AA564] transition-all"><ChevronDown size={13} /></button>
                     </div>
                 </div>
             </div>

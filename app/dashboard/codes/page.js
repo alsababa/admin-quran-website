@@ -18,7 +18,7 @@ const Toast = ({ message, type, onClose }) => (
         exit={{ opacity: 0, y: 20, scale: 0.95 }}
         className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border text-sm font-bold backdrop-blur-xl
             ${type === 'success'
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'
                 : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
     >
         {type === 'success' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
@@ -52,18 +52,18 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 className="glass-panel w-full max-w-lg rounded-[2.5rem] p-10 relative overflow-hidden shadow-2xl"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
                 
                 <div className="flex items-center justify-between mb-8">
-                    <button onClick={onClose} className="text-[#14B8A6]/40 hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-[#5AA564]/40 hover:text-white transition-colors">
                         <X size={20} />
                     </button>
                     <div className="flex items-center gap-4">
                         <div className="text-right">
                             <h4 className="text-2xl font-black text-white">توليد أكواد جديدة</h4>
-                            <p className="text-[#14B8A6]/40 text-xs font-bold mt-0.5">إنشاء مجموعة من الأكواد الفريدة</p>
+                            <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">إنشاء مجموعة من الأكواد الفريدة</p>
                         </div>
-                        <div className="h-14 w-14 rounded-2xl bg-[#14B8A6]/10 border border-[#14B8A6]/20 flex items-center justify-center text-[#14B8A6]">
+                        <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center text-[#5AA564]">
                             <Plus size={28} />
                         </div>
                     </div>
@@ -72,7 +72,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Organization Selection */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-[#14B8A6]/50 mr-2">الجهة / المنظمة</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">الجهة / المنظمة</label>
                         <select 
                             required
                             className="w-full h-13 glass-input rounded-xl px-4 text-sm font-medium text-white appearance-none cursor-pointer"
@@ -91,7 +91,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                     <div className="grid grid-cols-2 gap-4">
                         {/* Count */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-[#14B8A6]/50 mr-2">عدد الأكواد (بحد أقصى 500)</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">عدد الأكواد (بحد أقصى 500)</label>
                             <input
                                 type="number"
                                 required
@@ -104,7 +104,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                         </div>
                         {/* Prefix */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-[#14B8A6]/50 mr-2">بادئة الكود (Prefix)</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">بادئة الكود (Prefix)</label>
                             <input
                                 type="text"
                                 maxLength="6"
@@ -117,7 +117,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
 
                     {/* Expiry */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-[#14B8A6]/50 mr-2">تاريخ الانتهاء (اختياري)</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">تاريخ الانتهاء (اختياري)</label>
                         <input
                             type="date"
                             className="w-full h-13 glass-input rounded-xl px-4 text-sm font-medium text-white"
@@ -130,7 +130,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-14 bg-[#14B8A6] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#0D9488] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full h-14 bg-[#5AA564] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#4A8F53] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {loading ? <Loader2 size={20} className="animate-spin" /> : 'توليد المجموعات الآن'}
                         </button>
@@ -236,7 +236,7 @@ export default function CodesPage() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
                 <div className="text-right">
                     <h3 className="text-4xl font-black text-white tracking-tighter">أكواد التفعيل (نسخة المطور - مُحدثة)</h3>
-                    <p className="text-[#14B8A6]/40 font-bold text-sm mt-2">إدارة وتوليد مفاتيح الدخول المميزة للمنظمات.</p>
+                    <p className="text-[#5AA564]/40 font-bold text-sm mt-2">إدارة وتوليد مفاتيح الدخول المميزة للمنظمات.</p>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4 w-full lg:w-auto">
@@ -257,16 +257,16 @@ export default function CodesPage() {
             <div className="flex flex-wrap items-center justify-between gap-6">
                 <div className="flex items-center gap-4 flex-1 min-w-[300px]">
                     <div className="relative flex-1 max-w-md group">
-                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#14B8A6]/30 group-focus-within:text-[#14B8A6] transition-colors" size={17} />
+                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30 group-focus-within:text-[#5AA564] transition-colors" size={17} />
                         <input
                             type="text"
                             placeholder="ابحث عن كود أو جهة..."
-                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#14B8A6]/20 focus:border-[#14B8A6]/40 transition-all"
+                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20 focus:border-[#5AA564]/40 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="h-13 px-5 glass-panel border-[#14B8A6]/10 rounded-2xl text-[#14B8A6]/50 hover:text-[#14B8A6] transition-all flex items-center gap-2">
+                    <button className="h-13 px-5 glass-panel border-[#5AA564]/10 rounded-2xl text-[#5AA564]/50 hover:text-[#5AA564] transition-all flex items-center gap-2">
                         <Filter size={16} />
                     </button>
                 </div>
@@ -274,14 +274,14 @@ export default function CodesPage() {
                 <div className="flex gap-3">
                     <button 
                         onClick={exportToCSV}
-                        className="h-13 px-6 glass-panel border-[#14B8A6]/10 rounded-2xl text-white/60 hover:text-white hover:bg-[#14B8A6]/10 transition-all flex items-center gap-2.5"
+                        className="h-13 px-6 glass-panel border-[#5AA564]/10 rounded-2xl text-white/60 hover:text-white hover:bg-[#5AA564]/10 transition-all flex items-center gap-2.5"
                     >
                         <Download size={18} />
                         <span className="text-[10px] font-black uppercase tracking-widest">تصدير CSV</span>
                     </button>
                     <button 
                         onClick={() => setIsGenerateOpen(true)}
-                        className="h-13 px-8 bg-[#14B8A6] text-[#0A0D1A] rounded-2xl font-black text-xs hover:bg-[#0D9488] shadow-lg shadow-[#14B8A6]/10 transition-all active:scale-95 flex items-center gap-2.5"
+                        className="h-13 px-8 bg-[#5AA564] text-[#0A0D1A] rounded-2xl font-black text-xs hover:bg-[#4A8F53] shadow-lg shadow-[#5AA564]/10 transition-all active:scale-95 flex items-center gap-2.5"
                     >
                         <Plus size={18} strokeWidth={3} />
                         <span>توليد أكواد</span>
@@ -290,19 +290,19 @@ export default function CodesPage() {
             </div>
 
             {/* Table */}
-            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#14B8A6]/10 shadow-2xl">
+            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#5AA564]/10 shadow-2xl">
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-right" dir="rtl">
                         <thead>
-                            <tr className="border-b border-[#14B8A6]/8 bg-[#14B8A6]/5">
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">الكود</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-center">الحالة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">الجهة المستفيدة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50">تاريخ الانتهاء</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/50 text-left">الإجراءات</th>
+                            <tr className="border-b border-[#5AA564]/8 bg-[#5AA564]/5">
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">الكود</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">الحالة</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">الجهة المستفيدة</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">تاريخ الانتهاء</th>
+                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-left">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#14B8A6]/5">
+                        <tbody className="divide-y divide-[#5AA564]/5">
                             <AnimatePresence>
                                 {loading && codes.length === 0 ? (
                                     [1, 2, 3, 4].map(i => (
@@ -320,14 +320,14 @@ export default function CodesPage() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: Math.min(idx * 0.03, 0.5) }}
-                                        className="group hover:bg-[#14B8A6]/3 transition-colors"
+                                        className="group hover:bg-[#5AA564]/3 transition-colors"
                                     >
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-3">
-                                                <span className="font-mono text-sm font-black text-white selection:bg-[#14B8A6]">{code.code}</span>
+                                                <span className="font-mono text-sm font-black text-white selection:bg-[#5AA564]">{code.code}</span>
                                                 <button 
                                                     onClick={() => copyToClipboard(code.code)}
-                                                    className="p-1.5 rounded-lg bg-white/5 text-white/20 hover:text-[#14B8A6] hover:bg-[#14B8A6]/10 transition-all opacity-0 group-hover:opacity-100"
+                                                    className="p-1.5 rounded-lg bg-white/5 text-white/20 hover:text-[#5AA564] hover:bg-[#5AA564]/10 transition-all opacity-0 group-hover:opacity-100"
                                                 >
                                                     <Copy size={12} />
                                                 </button>
@@ -337,7 +337,7 @@ export default function CodesPage() {
                                             <div className="flex justify-center">
                                                 <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border
                                                     ${code.status === 'available' 
-                                                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                                                        ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]' 
                                                         : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
                                                     {code.status === 'available' ? 'متوفر' : 'مستخدم'}
                                                 </div>
@@ -345,20 +345,20 @@ export default function CodesPage() {
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-2.5">
-                                                <Building2 size={13} className="text-[#14B8A6]/30" />
+                                                <Building2 size={13} className="text-[#5AA564]/30" />
                                                 <div className="flex flex-col">
                                                     <span className="text-xs font-bold text-white/60">
                                                         {code.organization?.displayName || code.org_id || 'بيان مفقود'}
                                                     </span>
                                                     {code.organization?.email && (
-                                                        <span className="text-[8px] text-[#14B8A6]/40 uppercase font-black">{code.organization.email}</span>
+                                                        <span className="text-[8px] text-[#5AA564]/40 uppercase font-black">{code.organization.email}</span>
                                                     )}
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-2.5">
-                                                <Calendar size={13} className="text-[#14B8A6]/30" />
+                                                <Calendar size={13} className="text-[#5AA564]/30" />
                                                 <span className="text-xs font-bold text-white/40">
                                                     {code.expires_at ? new Date(code.expires_at).toLocaleDateString('ar-SA') : 'مفتوح'}
                                                 </span>
@@ -382,13 +382,13 @@ export default function CodesPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-10 py-6 bg-[#14B8A6]/3 border-t border-[#14B8A6]/5 flex justify-between items-center text-right">
-                    <p className="text-[9px] font-black text-[#14B8A6]/40 uppercase tracking-[0.2em]">
+                <div className="px-10 py-6 bg-[#5AA564]/3 border-t border-[#5AA564]/5 flex justify-between items-center text-right">
+                    <p className="text-[9px] font-black text-[#5AA564]/40 uppercase tracking-[0.2em]">
                         عرض {filteredCodes.length} كود من أصل {codes.length}
                     </p>
                     <div className="flex gap-2">
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-white/30 hover:text-[#14B8A6]"><ChevronDown size={14} className="rotate-90" /></button>
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-white/30 hover:text-[#14B8A6]"><ChevronDown size={14} className="-rotate-90" /></button>
+                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-white/30 hover:text-[#5AA564]"><ChevronDown size={14} className="rotate-90" /></button>
+                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-white/30 hover:text-[#5AA564]"><ChevronDown size={14} className="-rotate-90" /></button>
                     </div>
                 </div>
             </div>

@@ -30,12 +30,12 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-[#0A0D1A] flex items-center justify-center p-4 relative overflow-hidden text-[#F5F0E8] font-sans" dir="rtl">
             {/* Background */}
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#14B8A6]/8 blur-[130px] rounded-full animate-glow-teal" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#1E2448]/80 blur-[130px] rounded-full animate-glow-teal" style={{ animationDelay: '-5s' }} />
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#5AA564]/8 blur-[130px] rounded-full animate-glow-green" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#1E2448]/80 blur-[130px] rounded-full animate-glow-green" style={{ animationDelay: '-5s' }} />
             <div className="absolute inset-0 arabic-pattern" />
 
             {/* Teal top shimmer */}
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/30 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/30 to-transparent" />
 
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
@@ -49,7 +49,7 @@ export default function LoginPage() {
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
-                        className="inline-flex p-3 rounded-3xl bg-gradient-to-br from-[#14B8A6]/20 to-[#0D9488]/20 shadow-2xl shadow-[#14B8A6]/15 border border-[#14B8A6]/20 mb-5 text-[#0A0D1A]"
+                        className="inline-flex p-3 rounded-3xl bg-gradient-to-br from-[#5AA564]/20 to-[#4A8F53]/20 shadow-2xl shadow-[#5AA564]/15 border border-[#5AA564]/20 mb-5 text-[#0A0D1A]"
                     >
                         <img src="/logo/logo.png" alt="مصحف أنامل للصم" className="w-16 h-16 object-contain drop-shadow-xl" />
                     </motion.div>
@@ -65,7 +65,7 @@ export default function LoginPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="text-[#14B8A6]/60 font-bold text-xs mt-2 uppercase tracking-widest"
+                        className="text-[#5AA564]/60 font-bold text-xs mt-2 uppercase tracking-widest"
                     >
                         إدارة محتوى الصم
                     </motion.p>
@@ -73,7 +73,7 @@ export default function LoginPage() {
 
                 {/* Login Card */}
                 <div className="glass-panel rounded-[2.5rem] p-10 shadow-2xl relative">
-                    <div className="absolute top-0 left-10 right-10 h-[1px] bg-gradient-to-r from-transparent via-[#14B8A6]/40 to-transparent" />
+                    <div className="absolute top-0 left-10 right-10 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
 
                     <form onSubmit={handleSubmit} className="space-y-7">
                         <AnimatePresence mode="wait">
@@ -91,14 +91,14 @@ export default function LoginPage() {
                         </AnimatePresence>
 
                         <div className="space-y-2.5 text-right">
-                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/60 pr-4">البريد الإلكتروني</label>
+                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/60 pr-4">البريد الإلكتروني</label>
                             <div className="relative">
-                                <Mail className="absolute right-5 top-1/2 -translate-y-1/2 text-[#14B8A6]/30" size={18} strokeWidth={1.5} />
+                                <Mail className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30" size={18} strokeWidth={1.5} />
                                 <input
                                     type="email"
                                     required
                                     placeholder="admin@example.com"
-                                    className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-[#F5F0E8] placeholder:text-[#14B8A6]/20 outline-none"
+                                    className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-[#F5F0E8] placeholder:text-[#5AA564]/20 outline-none"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
@@ -106,14 +106,14 @@ export default function LoginPage() {
                         </div>
 
                         <div className="space-y-2.5 text-right">
-                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#14B8A6]/60 pr-4">كلمة المرور</label>
+                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/60 pr-4">كلمة المرور</label>
                             <div className="relative">
-                                <Lock className="absolute right-5 top-1/2 -translate-y-1/2 text-[#14B8A6]/30" size={18} strokeWidth={1.5} />
+                                <Lock className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30" size={18} strokeWidth={1.5} />
                                 <input
                                     type="password"
                                     required
                                     placeholder="••••••••"
-                                    className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-[#F5F0E8] placeholder:text-[#14B8A6]/20 outline-none"
+                                    className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-[#F5F0E8] placeholder:text-[#5AA564]/20 outline-none"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
@@ -123,7 +123,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-14 bg-gradient-to-r from-[#14B8A6] to-[#0D9488] hover:brightness-110 text-[#0A0D1A] font-extrabold rounded-2xl shadow-xl shadow-[#14B8A6]/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group relative overflow-hidden"
+                            className="w-full h-14 bg-gradient-to-r from-[#5AA564] to-[#4A8F53] hover:brightness-110 text-[#0A0D1A] font-extrabold rounded-2xl shadow-xl shadow-[#5AA564]/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group relative overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                             {loading ? (
@@ -142,7 +142,7 @@ export default function LoginPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1 }}
-                    className="text-center text-[#14B8A6]/30 text-[9px] mt-10 font-bold tracking-widest uppercase"
+                    className="text-center text-[#5AA564]/30 text-[9px] mt-10 font-bold tracking-widest uppercase"
                 >
                     © 2026 مصحف أنامل للصم — نظام الإدارة
                 </motion.p>
