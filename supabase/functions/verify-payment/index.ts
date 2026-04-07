@@ -220,11 +220,16 @@ Deno.serve(async (req) => {
       throw new Error('payment_id مطلوب')
     }
 
+    // ── 1.1 Support dual metadata formats ──
+    const userId = metadata?.userId || metadata?.user_id || body.user_id
+    const planId = metadata?.planId || metadata?.plan_id || body.plan_id
+    const emailFromMeta = metadata?.email || body.email
+
     const projectId = Deno.env.get('FIREBASE_PROJECT_ID') || ''
 
     // ── 2. Verify Auth ──
-    let verifiedUid = user_id
-    let verifiedEmail = bodyEmail
+    let verifiedUid = userId
+    let verifiedEmail = emailFromMeta
 
     if (token) {
       const authResult = await verifyFirebaseToken(token, projectId)
@@ -237,7 +242,7 @@ Deno.serve(async (req) => {
       verifiedUid = authResult.uid
       verifiedEmail = authResult.email || verifiedEmail
       console.log(`[Verify] Token verified for UID: ${verifiedUid}`)
-    } else if (!user_id && metadata?.type !== 'organization') {
+    } else if (!userId && metadata?.type !== 'organization') {
       throw new Error('يجب توفير توكن التحقق أو معرف المستخدم')
     }
 
@@ -379,7 +384,7 @@ Deno.serve(async (req) => {
       }
     } else {
       // ── INDIVIDUAL FLOW (Activate User) ──
-      const plan = PLANS[plan_id] || PLANS['annual-pro']
+      const plan = PLANS[planId] || PLANS['annual-pro']
       let endDate = new Date(now.getTime() + plan.extensionDays * 24 * 60 * 60 * 1000)
 
       let targetUid = verifiedUid;
@@ -447,7 +452,7 @@ Deno.serve(async (req) => {
       payment_id: payment_id,
       user_id: verifiedUid,
       email: verifiedEmail,
-      plan_id: plan_id,
+      plan_id: planId,
       amount: paymentData?.amount || 0,
       currency: paymentData?.currency || 'SAR',
       status: paymentStatus,

@@ -110,10 +110,53 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 })
   }
-
   try {
-    // 1. Parse Payload
-    const body = await req.json()
+    // 1. Get Secret and Signature
+    const webhookSecret = Deno.env.get('MOYASAR_WEBHOOK_SECRET')
+    const signature = req.headers.get('Moyasar-Signature')
+
+    // 2. Read Raw Body for Verification
+    const rawBody = await req.text()
+    
+    // 3. Verify Signature if Secret is present
+    if (webhookSecret && signature) {
+      const encoder = new TextEncoder()
+      const keyData = encoder.encode(webhookSecret)
+      const data = encoder.encode(rawBody)
+
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw', 
+        keyData, 
+        { name: 'HMAC', hash: 'SHA-256' }, 
+        false, 
+        ['verify']
+      )
+
+      // Convert hex signature to Uint8Array
+      const hexSignature = signature.trim()
+      const signatureBytes = new Uint8Array(
+        hexSignature.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+      )
+
+      const isValid = await crypto.subtle.verify(
+        'HMAC',
+        cryptoKey,
+        signatureBytes,
+        data
+      )
+
+      if (!isValid) {
+        console.error('[Webhook] Invalid HMAC signature')
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 })
+      }
+      console.log('[Webhook] Signature verified successfully')
+    } else if (webhookSecret) {
+      console.warn('[Webhook] MOYASAR_WEBHOOK_SECRET is set but Moyasar-Signature header is missing')
+      return new Response(JSON.stringify({ error: 'Missing signature' }), { status: 401 })
+    }
+
+    // 4. Parse Payload
+    const body = JSON.parse(rawBody)
     console.log("Moyasar Webhook Received:", JSON.stringify(body))
 
     const paymentData = body.data || body;

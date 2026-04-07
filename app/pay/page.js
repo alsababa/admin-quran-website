@@ -239,12 +239,16 @@ function PayPageInner() {
                                 metadata: {
                                     token: token,
                                     userId: uid,
+                                    user_id: uid, // Support both formats
                                     email: email,
                                     source: 'website',
                                     planId: planId,
+                                    plan_id: planId, // Support both formats
                                     type: isOrg ? 'organization' : 'individual',
                                     userCount: isOrg ? userCount : 1,
                                     orgName: orgName,
+                                    order_id: `quran_admin_${Date.now()}_${uid.substring(0, 5)}`,
+                                    platform: 'admin_dashboard'
                                 },
                             });
                             setStatus('ready');
