@@ -148,3 +148,11 @@ body {
   background-image: radial-gradient(circle at 1px 1px, rgba(90,165,100,0.08) 1px, transparent 0);
   background-size: 32px 32px;
 }
+/* Section background colors */
+.section-hero { background-color: #f8fafc; }
+.section-3d { background-color: #e6f4ea; position: relative; overflow: hidden; }
+.section-3d-bg { background-image: url('/images/3d-welcome-bg.png'); background-size: cover; background-position: center; border-radius: 1.5rem; position: absolute; inset: 0; z-index: -1; }
+.section-interface { background-color: #f0f9ff; }
+.section-process { background-color: #fff5e6; }
+.section-pricing { background-color: #f5e6ff; }
+.section-features { background-color: #eaeaea; }
