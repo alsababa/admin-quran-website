@@ -233,7 +233,6 @@ export default function LandingPage() {
             </motion.section>
             {/* ── 3D Interactive Welcome Section ── */}
             <section className="relative py-12 bg-white overflow-hidden">
-                <div className="absolute inset-0 arabic-pattern opacity-[0.03] pointer-events-none" />
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         {/* 3D Viewer Container */}
@@ -262,32 +261,9 @@ export default function LandingPage() {
                                 title="3D Sign Language Translator"
                                 scrolling="no"
                             />
-                            {/* Overlay Controls Hint with improved glassmorphism */}
-                            <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end pointer-events-none z-20">
-                                <motion.div 
-                                    initial={{ opacity: 0, y: 10 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    className="bg-white/60 backdrop-blur-2xl px-6 py-4 rounded-3xl border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.1)]"
-                                >
-                                    <div className="text-[10px] font-black text-[#5AA564] uppercase tracking-[0.25em] flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#5AA564] animate-pulse" />
-                                        المترجم الافتراضي الذكي
-                                    </div>
-                                    <p className="text-xs font-bold text-gray-500 mt-1">تفاعل مع الشخصية الثلاثية الأبعاد الآن</p>
-                                </motion.div>
-                            </div>
                         </motion.div>
 
                         <div className="text-right flex flex-col justify-center">
-                            <motion.div
-                                initial={{ opacity: 0, x: 20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                className="inline-flex items-center gap-2 px-5 py-2 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-full mb-8 max-w-max mr-0 ml-auto"
-                            >
-                                <div className="w-2 h-2 rounded-full bg-[#5AA564] animate-ripple" />
-                                <span className="text-[11px] font-black text-[#5AA564] uppercase tracking-[0.2em]">تقنية الترجمة الفورية الذكية</span>
-                            </motion.div>
 
                             <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter mb-10 leading-[1.1]">
                                 نرحب بكم في المشروع <br /> <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#5AA564] to-[#4A8F53]">الأول عالمياً</span> لترجمة <br /> القرآن بتقنية 3D
@@ -387,14 +363,6 @@ export default function LandingPage() {
                                 <h3 className="text-3xl font-black text-gray-900 mb-4">ترجمة الأذكار</h3>
                                 <p className="text-gray-400 font-bold text-base leading-relaxed">أذكار الصباح والمساء وأذكار الصلاة مسجلة بدقة عالية بلغة الإشارة ليسهل حفظها وترديدها يومياً.</p>
                             </div>
-                            <div className="absolute left-0 bottom-[-5%] w-[55%] pointer-events-none">
-                                <motion.img 
-                                    whileHover={{ scale: 1.05, rotate: -2 }}
-                                    src="/logo/app_assets_images_azkartranslate.png" 
-                                    alt="Azkar" 
-                                    className="w-full h-auto drop-shadow-[0_30px_60px_rgba(0,0,0,0.15)] brightness-105 transition-transform duration-700" 
-                                />
-                            </div>
                         </motion.div>
 
                         {/* Bento Box 2: Location (Vertical) */}
@@ -413,12 +381,7 @@ export default function LandingPage() {
                                     <Compass size={28} strokeWidth={2.5} />
                                 </div>
                                 <h3 className="text-2xl font-black text-white mb-4">القبلة والصلاة</h3>
-                                <p className="text-white/40 font-bold text-sm mb-12 leading-relaxed">مواقيت وتحديد اتجاه مرئي يعتمد على الموقع الجغرافي.</p>
-                                <img 
-                                    src="/logo/app_assets_images_indexitemlocationmecca.png" 
-                                    alt="Mecca" 
-                                    className="w-auto h-52 mx-auto drop-shadow-[0_40px_80px_rgba(0,0,0,0.5)] transform group-hover:-translate-y-8 group-hover:scale-105 transition-all duration-700" 
-                                />
+                                <p className="text-white/40 font-bold text-sm leading-relaxed">مواقيت وتحديد اتجاه مرئي يعتمد على الموقع الجغرافي.</p>
                             </div>
                         </motion.div>
 
@@ -435,11 +398,7 @@ export default function LandingPage() {
                                     <BookOpen size={20} strokeWidth={2.5} />
                                 </div>
                                 <h3 className="text-3xl font-black text-white mb-4">القرآن كاملاً</h3>
-                                <p className="text-white/70 font-bold text-base max-w-xs transition-colors group-hover:text-white/90">30 جزءاً مسجلاً وحاضراً للتصفح المُيسر بنقرة واحدة.</p>
-                            </div>
-                            <div className="mt-auto w-full flex justify-end relative">
-                                <div className="absolute inset-0 bg-white/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <img src="/logo/app_assets_images_indexpart.png" className="w-auto h-64 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] transform group-hover:-translate-y-6 group-hover:rotate-2 transition-transform duration-700 relative z-10" />
+                                <p className="text-white/70 font-bold text-base transition-colors group-hover:text-white/90">30 جزءاً مسجلاً وحاضراً للتصفح المُيسر بنقرة واحدة.</p>
                             </div>
                         </motion.div>
 
@@ -458,11 +417,6 @@ export default function LandingPage() {
                                 <h3 className="text-3xl font-black text-gray-900 mb-4">سهولة المتابعة</h3>
                                 <p className="text-gray-400 font-bold text-base max-w-sm">تتبع تقدمك في الحفظ والتلاوة مع واجهات ذكية ومريحة للرؤية.</p>
                             </div>
-                            <div className="flex gap-8 items-center relative">
-                                <div className="absolute inset-0 bg-[#5AA564]/5 blur-3xl rounded-full" />
-                                <img src="/logo/app_assets_images_accept.png" className="w-auto h-48 drop-shadow-2xl transform group-hover:-translate-y-4 group-hover:-rotate-2 transition-all duration-700 relative z-10" />
-                                <img src="/logo/app_assets_images_bottombar_prayer.png" className="w-auto h-48 drop-shadow-2xl transform group-hover:-translate-y-4 group-hover:rotate-2 transition-all duration-700 delay-75 relative z-10" />
-                            </div>
                         </motion.div>
                     </div>
                 </div>
@@ -479,14 +433,13 @@ export default function LandingPage() {
 
                         <div className="space-y-12 relative before:absolute before:inset-0 before:ml-[3.5rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent mt-12">
                             <StepIndicator number="1" title="حمل التطبيق" desc="ابحث عن 'مصحف أنامل للصم' في متجر آبل أو جوجل بلاي وقم بتثبيته مجاناً." />
-                            <StepIndicator number="2" title="اختر السورة" desc="تصفح قائمة السور المنسقة بشكل رائع واختر الجزء الذي ترغب بقراءته أو حفظه." />
+                            <StepIndicator number="2" title="اختر الترجمة" desc="تصفح قائمة التراجم المنسقة بشكل رائع واختر الجزء الذي ترغب بقراءته أو حفظه." />
                             <StepIndicator number="3" title="شاهد الآيات" desc="شاهد ترجمة كل آية بلغة الإشارة بشكل مرئي وعالي الدقة لتفهم المعنى الصحيح." />
                         </div>
                     </div>
 
                     <div className="relative flex justify-center lg:justify-end mt-10 lg:mt-0">
                         <div className="w-[300px] bg-white rounded-[2.5rem] p-2 shadow-2xl relative border-8 border-gray-900 overflow-hidden">
-                            <img src="/logo/app_assets_images_indexpart.png" className="w-full h-auto object-contain rounded-2xl border border-gray-100" />
                             <div className="absolute top-0 inset-x-0 h-6 flex justify-center">
                                 <div className="w-1/3 h-5 bg-gray-900 rounded-b-xl" />
                             </div>
