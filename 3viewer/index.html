@@ -50,8 +50,12 @@
                 });
             }
             
+            let translationQueue = [];
+            let isTranslating = false;
+
             function playDeAnimation(anToPlay, source_letter = "", cross_time = 1, isFirstLetter = false) {                                                  
                 if (isFirstLetter) {
+                    stopTranslation();
                     anim_scene.stopAllAnimations();
                     currentAnimation = null;
                 }
@@ -59,26 +63,72 @@
                 play_name(anToPlay, source_letter, cross_time);
             }
 
-            function play_name(name, source_letter, cross_time){  
+            function stopTranslation() {
+                translationQueue = [];
+                isTranslating = false;
+                if (anim_scene) anim_scene.stopAllAnimations();
+            }
 
+            function processQueue() {
+                if (translationQueue.length === 0) {
+                    isTranslating = false;
+                    return;
+                }
+                isTranslating = true;
+                const next = translationQueue.shift();
+                play_name(next.anim, next.char, 1, () => {
+                    setTimeout(processQueue, 100); // Small gap between letters
+                });
+            }
+
+            window.addEventListener('message', function(event) {
+                if (!event.data) return;
+                
+                if (event.data.type === 'playAnimation' || event.data.type === 'startSignLanguage') {
+                    const animName = event.data.animationName || 'fatehaAnim';
+                    playDeAnimation(animName, '', 1, true);
+                } else if (event.data.type === 'translateText') {
+                    const text = event.data.text;
+                    if (!text) return;
+                    
+                    stopTranslation();
+                    // Clean text (basic)
+                    const cleanText = text.replace(/[^\u0600-\u06FF\s]/g, '').trim();
+                    for (let char of cleanText) {
+                        const hex = char.hexEncode();
+                        translationQueue.push({ anim: hex, char: char });
+                    }
+                    translationQueue.push({ anim: 'qafla', char: '' }); // End animation
+                    processQueue();
+                } else if (event.data.type === 'stop') {
+                    stopTranslation();
+                }
+            });
+
+            function play_name(name, source_letter, cross_time, onEnd){  
                 const action = scene.getAnimationGroupByName(name);
+                if (!action) {
+                    console.warn('Animation not found:', name);
+                    if (onEnd) onEnd();
+                    return;
+                }
                 
                 currentAnimationName = name;
                 debugToRN(name);
                 
                 if (currentAnimation == null){    
                     action.play();    
-                }else
-                {                        
+                } else {                        
                     action.syncAllAnimationsWith(currentAnimation.animatables[0]);
                     action.play();    
                 }
-                action.onAnimationGroupEndObservable.addOnce(function (){
-                    // on finish
-                    sendToRN(currentAnimationName);                        
-                })
-                currentAnimation = action;    
                 
+                action.onAnimationGroupEndObservable.addOnce(function (){
+                    sendToRN(currentAnimationName);
+                    if (onEnd) onEnd();
+                });
+                
+                currentAnimation = action;    
             }
             function setAnimationSpeed(speed) {                
                 anim_scene.animationTimeScale = speed;

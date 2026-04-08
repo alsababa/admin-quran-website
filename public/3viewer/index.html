@@ -118,6 +118,54 @@
 <body>
     <canvas id="renderCanvas"></canvas>
 
+    <!-- Premium Translation Overlay -->
+    <div id="translation-container" style="
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
+        left: 30px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 24px;
+        padding: 20px 30px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        direction: rtl;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        z-index: 100;
+        pointer-events: none;
+    ">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div style="width: 8px; height: 8px; background: #5AA564; border-radius: 50%; animation: pulse 2s infinite;"></div>
+            <span style="font-size: 10px; font-weight: 900; color: #5AA564; text-transform: uppercase; letter-spacing: 0.1em;">الترجمة الفورية للغة الإشارة</span>
+        </div>
+        <div id="verse-text" style="
+            font-size: 20px;
+            font-weight: 800;
+            color: #1a1a1a;
+            line-height: 1.4;
+            transition: all 0.5s ease;
+        ">جاري التحميل...</div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        #translation-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
 
     <script>
         var canvas = document.getElementById("renderCanvas");
@@ -254,9 +302,9 @@
 
                     // Auto-start the first animation group to ensure the character is "moving"
                     if (anim_scene.animationGroups && anim_scene.animationGroups.length > 0) {
+                        console.log("Animation groups found:", anim_scene.animationGroups.map(g => g.name));
+                        // Play the first group by default, ensure it's descriptive
                         anim_scene.animationGroups[0].play(true);
-                    } else {
-                        anim_scene.stopAllAnimations();
                     }
 
                     var assignATrigger = anim_scene.getNodeByName("RootNode");
@@ -266,6 +314,43 @@
                     }
 
                     assignATrigger.setAbsolutePosition(new BABYLON.Vector3(0, -0.075, 0))
+
+                    // Animation-Sync Translation Logic
+                    const verses = [
+                        "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+                        "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+                        "الرَّحْمَنِ الرَّحِيمِ",
+                        "مَالِكِ يَوْمِ الدِّينِ",
+                        "إِيَّاكَا نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+                        "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+                        "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ"
+                    ];
+                    
+                    const container = document.getElementById('translation-container');
+                    const textDisplay = document.getElementById('verse-text');
+                    
+                    if (anim_scene.animationGroups && anim_scene.animationGroups.length > 0) {
+                        const mainAnim = anim_scene.animationGroups[0];
+                        container.classList.add('visible');
+                        
+                        scene.onBeforeRenderObservable.add(() => {
+                            // Robust progress calculation based on loop time
+                            const currentTime = mainAnim.animatables[0] ? mainAnim.animatables[0].masterFrame : 0;
+                            const totalFrames = mainAnim.to;
+                            const progress = currentTime / totalFrames;
+                            
+                            const index = Math.floor(progress * verses.length);
+                            const safeIndex = Math.min(index, verses.length - 1);
+                            
+                            if (textDisplay.innerText !== verses[safeIndex]) {
+                                textDisplay.style.opacity = 0;
+                                setTimeout(() => {
+                                    textDisplay.innerText = verses[safeIndex];
+                                    textDisplay.style.opacity = 1;
+                                }, 300);
+                            }
+                        });
+                    }
                 });
 
 
