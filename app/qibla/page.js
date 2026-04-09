@@ -45,9 +45,12 @@ export default function QiblaPage() {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        setIsMounted(true);
+        const frame = requestAnimationFrame(() => setIsMounted(true));
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-        return () => clearInterval(timer);
+        return () => {
+            cancelAnimationFrame(frame);
+            clearInterval(timer);
+        };
     }, []);
 
     if (!isMounted) return (
@@ -191,7 +194,10 @@ export default function QiblaPage() {
                             <div className="flex items-center justify-between mb-10 relative z-10">
                                 <div className="flex flex-col">
                                     <span className="text-3xl font-black tracking-tight text-gray-900">مواقيت اليوم</span>
-                                    <span className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                    <span className="text-xs font-bold text-[#D4AF37] mt-1 uppercase tracking-widest">
+                                        {currentTime.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    </span>
+                                    <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">{currentTime.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                 </div>
                                 <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-[#D4AF37]">
                                     <Clock size={28} />

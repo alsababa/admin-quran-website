@@ -160,7 +160,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
 
 // ── Main Page ─────────────────────────────────────────────
 export default function CodesPage() {
-    const { codes, loading, generateBulkCodes, deleteCode } = useActivationCodes();
+    const { codes, generateBulkCodes, deleteCode } = useActivationCodes();
     const { users } = useUsers();
     
     const [searchTerm, setSearchTerm] = useState('');
@@ -479,7 +479,7 @@ export default function CodesPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50 bg-white/30">
-                                        {filteredCodes.map((code, idx) => (
+                                        {filteredCodes.map((code) => (
                                             <tr key={code.id} className="hover:bg-gray-50/80 transition-all cursor-pointer group">
                                                 <td className="px-10 py-6">
                                                    <div className="flex items-center gap-4 text-gray-900 font-mono text-base font-black">
