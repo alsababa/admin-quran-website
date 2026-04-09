@@ -328,96 +328,116 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── App Interface Showcase (Bento Grid) ── */}
-            <section id="interface" className="relative py-20 bg-white">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
+            {/* ── App Interface Showcase (Visual Mockups) ── */}
+            <section id="interface" className="relative py-32 bg-white overflow-hidden">
+                {/* Background Decor */}
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5AA564]/5 blur-[120px] rounded-full pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                    <div className="text-center mb-24">
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-full mb-6"
                         >
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#5AA564]" />
-                            <span className="text-[10px] font-black text-[#5AA564] uppercase tracking-[0.2em]">واجهة التطبيق</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#5AA564] shadow-[0_0_8px_#5AA564]" />
+                            <span className="text-[10px] font-black text-[#5AA564] uppercase tracking-[0.2em]">واجهة التطبيق الذكية</span>
                         </motion.div>
-                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-6">مصمم ليكون بين يديك دائماً</h2>
-                        <p className="text-gray-400 font-bold max-w-2xl mx-auto text-lg">
-                            تجربة تصفح بديهية وسريعة، بنيت بدقة لتناسب احتياجات الصم وضعاف السمع بكل مرونة.
+                        <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter mb-8 leading-tight">تجربة رقمية فريدة <br /> <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#5AA564] to-[#4A8F53]">بين يديك دائماً</span></h2>
+                        <p className="text-gray-400 font-bold max-w-2xl mx-auto text-xl leading-relaxed">
+                            بنينا التطبيق ليعمل بسلاسة فائقة، مع واجهات تجمع بين الجمال البصري والسهولة المطلقة لمجتمع الصم.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[280px]">
-                        {/* Bento Box 1: Azkar (Large) */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            whileHover={{ y: -5 }}
-                            viewport={{ once: true }}
-                            className="md:col-span-8 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-slate-50 to-white rounded-[3rem] border border-gray-100 p-12 flex flex-col items-start text-right transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.08)]"
-                        >
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#5AA564]/5 blur-[80px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                            <div className="relative z-10 max-w-md">
-                                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#5AA564] mb-8 border border-gray-50 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                                    <Globe size={24} strokeWidth={2.5} />
-                                </div>
-                                <h3 className="text-3xl font-black text-gray-900 mb-4">ترجمة الأذكار</h3>
-                                <p className="text-gray-400 font-bold text-base leading-relaxed">أذكار الصباح والمساء وأذكار الصلاة مسجلة بدقة عالية بلغة الإشارة ليسهل حفظها وترديدها يومياً.</p>
-                            </div>
-                        </motion.div>
-
-                        {/* Bento Box 2: Location (Vertical) */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            whileHover={{ y: -5 }}
-                            viewport={{ once: true }}
-                            className="md:col-span-4 md:row-span-2 relative group overflow-hidden bg-[#0A0D1A] rounded-[3rem] p-12 flex flex-col items-center text-center shadow-2xl shadow-gray-900/20"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-[#5AA564]/30 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
-                            <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[#5AA564]/10 blur-[100px] rounded-full" />
-                            
-                            <div className="relative z-10 mt-auto">
-                                <div className="w-16 h-16 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center text-white mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
-                                    <Compass size={28} strokeWidth={2.5} />
-                                </div>
-                                <h3 className="text-2xl font-black text-white mb-4">القبلة والصلاة</h3>
-                                <p className="text-white/40 font-bold text-sm leading-relaxed">مواقيت وتحديد اتجاه مرئي يعتمد على الموقع الجغرافي.</p>
-                            </div>
-                        </motion.div>
-
-                        {/* Bento Box 3: Quran (Primary) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[350px]">
+                        {/* Bento Box 1: Quran Main Translation (The Hero) */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
+                            whileHover={{ y: -8 }}
                             viewport={{ once: true }}
-                            className="md:col-span-6 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-[#5AA564] to-[#4A8F53] rounded-[3rem] p-12 flex flex-col items-start gap-10 shadow-2xl shadow-[#5AA564]/20"
+                            className="md:col-span-12 lg:col-span-7 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-slate-50 to-white rounded-[4rem] border border-gray-100 p-12 flex flex-col items-start text-right transition-all duration-700 hover:shadow-[0_50px_100px_rgba(0,0,0,0.08)]"
                         >
-                            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                            <div className="relative z-10 w-full">
-                                <div className="w-12 h-12 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl flex items-center justify-center text-white mb-6">
-                                    <BookOpen size={20} strokeWidth={2.5} />
+                            <div className="relative z-10 max-w-sm">
+                                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#5AA564] mb-8 border border-gray-50 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                                    <BookOpen size={28} strokeWidth={2.2} />
                                 </div>
-                                <h3 className="text-3xl font-black text-white mb-4">القرآن كاملاً</h3>
-                                <p className="text-white/70 font-bold text-base transition-colors group-hover:text-white/90">30 جزءاً مسجلاً وحاضراً للتصفح المُيسر بنقرة واحدة.</p>
+                                <h3 className="text-4xl font-black text-gray-900 mb-6 tracking-tight">القرآن بلغة الإشارة</h3>
+                                <p className="text-gray-400 font-bold text-lg leading-relaxed mb-8">أول مصحف تفاعلي يدمج النص القرآني مع ترجمة فورية لـ 114 سورة عبر مترجم 3D عالي الدقة، لضمان الفهم الصحيح لكل آية.</p>
+                                <div className="flex gap-4">
+                                    <div className="px-4 py-2 bg-emerald-50 text-[#5AA564] text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100">3D Technology</div>
+                                    <div className="px-4 py-2 bg-blue-50 text-blue-500 text-[10px] font-black uppercase tracking-widest rounded-xl border border-blue-100">114 Surahs</div>
+                                </div>
                             </div>
+                            
+                            {/* Floating Mockup Image */}
+                            <motion.div 
+                                animate={{ y: [0, -20, 0] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute bottom-[-100px] left-[-40px] w-full max-w-[420px] drop-shadow-[0_50px_100px_rgba(0,0,0,0.2)] md:block hidden"
+                            >
+                                <img src="/images/mockups/quran_main.png" alt="Quran Interface Mockup" className="w-full h-auto rounded-[3rem] group-hover:scale-105 transition-transform duration-1000" />
+                            </motion.div>
                         </motion.div>
 
-                        {/* Bento Box 4: Success (Wide) */}
+                        {/* Bento Box 2: Prayer Times & Qibla */}
                         <motion.div
-                            initial={{ opacity: 0, x: -20 }}
+                            initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
-                            whileHover={{ y: -5 }}
+                            whileHover={{ y: -8 }}
                             viewport={{ once: true }}
-                            className="md:col-span-6 md:row-span-2 relative group overflow-hidden bg-slate-50 rounded-[3rem] border border-gray-100 p-12 flex flex-col justify-center items-center text-center transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.08)]"
+                            className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-[#0A0D1A] rounded-[4rem] p-12 flex flex-col items-center text-center shadow-2xl shadow-gray-900/40"
                         >
-                            <div className="relative z-10 mb-12">
-                                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#5AA564] mb-8 mx-auto border border-gray-50 group-hover:scale-110 transition-transform duration-500">
-                                    <Check size={24} strokeWidth={2.5} />
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#5AA564]/40 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
+                            
+                            <div className="relative z-10 w-full mb-10">
+                                <div className="w-16 h-16 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center text-white mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
+                                    <Compass size={32} strokeWidth={2.2} />
                                 </div>
-                                <h3 className="text-3xl font-black text-gray-900 mb-4">سهولة المتابعة</h3>
-                                <p className="text-gray-400 font-bold text-base max-w-sm">تتبع تقدمك في الحفظ والتلاوة مع واجهات ذكية ومريحة للرؤية.</p>
+                                <h3 className="text-3xl font-black text-white mb-4 tracking-tight">القبلة ومواقيت الصلاة</h3>
+                                <p className="text-white/40 font-bold text-lg leading-relaxed">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي لضمان صلاتك في وقتها.</p>
                             </div>
+
+                            <motion.div 
+                                whileHover={{ scale: 1.1, rotate: 2 }}
+                                className="relative w-full max-w-[280px] drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
+                            >
+                                <img src="/images/mockups/prayer.png" alt="Prayer Times Mockup" className="w-full h-auto rounded-[2.5rem]" />
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Bento Box 3: Adhkar (Wide Panel) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            whileHover={{ y: -8 }}
+                            viewport={{ once: true }}
+                            className="md:col-span-6 lg:col-span-12 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-[#5AA564] to-[#4A8F53] rounded-[4rem] p-16 flex flex-col lg:flex-row items-center gap-16 shadow-2xl shadow-[#5AA564]/20"
+                        >
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[100px] rounded-full pointer-events-none" />
+                            
+                            <div className="relative z-10 flex-1 text-right">
+                                <div className="w-16 h-16 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl flex items-center justify-center text-white mb-8">
+                                    <Globe size={32} strokeWidth={2.2} />
+                                </div>
+                                <h3 className="text-4xl font-black text-white mb-6 tracking-tight">ترجمة كاملة للأذكار</h3>
+                                <p className="text-white/80 font-bold text-xl leading-relaxed mb-8 max-w-md">أذكار الصباح والمساء والتحصينات اليومية، مسجلة بلغة الإشارة بمقاطع فيديو ذات جودة فائقة لترافقك في يومك.</p>
+                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all cursor-pointer">
+                                    <span>اكتشف المزيد من الخصائص</span>
+                                    <ArrowLeft size={16} />
+                                </div>
+                            </div>
+
+                            <motion.div 
+                                initial={{ x: 100, opacity: 0 }}
+                                whileInView={{ x: 0, opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                                className="relative w-full max-w-[320px] lg:max-w-[400px] drop-shadow-[0_40px_80px_rgba(0,0,0,0.3)]"
+                            >
+                                <img src="/images/mockups/adhkar.png" alt="Adhkar Interface Mockup" className="w-full h-auto rounded-[3rem]" />
+                            </motion.div>
                         </motion.div>
                     </div>
                 </div>
