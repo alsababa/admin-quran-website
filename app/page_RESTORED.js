@@ -305,36 +305,42 @@ export default function LandingPage() {
                                 <h3 className="text-4xl font-black text-gray-900 mb-6 tracking-tight">القرآن بلغة الإشارة</h3>
                                 <p className="text-gray-400 font-bold text-lg leading-relaxed mb-8">أول مصحف تفاعلي يدمج النص القرآني مع ترجمة فورية لـ 114 سورة عبر مترجم 3D عالي الدقة.</p>
                             </div>
-                            <div className="absolute bottom-[-100px] left-[-40px] w-full max-w-[420px] md:block hidden">
-                                <img src="/mockups/quran_main.png" alt="Quran Interface" className="w-full h-auto rounded-[3rem]" />
+                            <div className="absolute bottom-[-100px] left-[-40px] w-full max-w-[420px] md:block hidden rotate-[-5deg] group-hover:rotate-0 transition-transform duration-700">
+                                <img src="/mockups/quran_main.png" alt="Quran Interface" className="w-full h-auto rounded-[3rem] shadow-2xl" />
                             </div>
                         </motion.div>
 
-                        <Link href="/qibla" className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-white rounded-[4rem] p-12 flex flex-col items-center text-center shadow-[0_40px_100px_rgba(0,0,0,0.05)] border border-gray-100 hover:scale-[1.02] transition-all duration-500 cursor-pointer">
-                            <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4AF37]/5 blur-3xl rounded-full -mr-20 -mt-20 group-hover:bg-[#D4AF37]/10 transition-colors duration-700" />
-
-                            <div className="relative z-10 w-full mb-8">
-                                <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-[2rem] flex items-center justify-center text-[#D4AF37] mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 shadow-[0_15px_30px_rgba(212,175,55,0.15)]">
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            whileHover={{ y: -8 }}
+                            viewport={{ once: true }}
+                            className="md:col-span-12 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-white rounded-[4rem] p-0 flex flex-col shadow-[0_40px_100px_rgba(0,0,0,0.05)] border border-gray-100 hover:scale-[1.02] transition-all duration-500"
+                        >
+                            <Link href="/qibla" className="flex flex-col h-full p-12 w-full relative z-10 group/q">
+                                <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4AF37]/5 blur-3xl rounded-full -mr-20 -mt-20 group-hover/q:bg-[#D4AF37]/10 transition-colors duration-700" />
+                                
+                                <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-[2rem] flex items-center justify-center text-[#D4AF37] mb-8 mx-auto group-hover/q:scale-110 group-hover/q:-rotate-6 transition-all duration-700 shadow-[0_15px_30px_rgba(212,175,55,0.15)]">
                                     <Compass size={40} className="drop-shadow-sm" />
                                 </div>
-                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">القبلة ومواقيت الصلاة</h3>
-                                <p className="text-gray-400 font-bold text-lg leading-relaxed">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي بتصميم عصري (اضغط هنا للاستكشاف).</p>
-                            </div>
+                                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight text-center">القبلة ومواقيت الصلاة</h3>
+                                <p className="text-gray-400 font-bold text-lg leading-relaxed text-center mb-8">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي بتصميم عصري (اضغط للاستكشاف).</p>
 
-                            {/* Mini Prayer Times List Mockup inside the card */}
-                            <div className="relative z-10 w-full space-y-3 mt-auto">
-                                {[
-                                    { name: 'الفجر', time: '05:15 AM' },
-                                    { name: 'الظهر', time: '12:30 PM' },
-                                    { name: 'العصر', time: '03:45 PM' }
-                                ].map((p, i) => (
-                                    <div key={i} className="flex items-center justify-between px-6 py-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 group-hover:bg-white group-hover:border-[#D4AF37]/20 transition-all duration-500">
-                                        <span className="text-gray-400 text-xs font-black uppercase tracking-widest">{p.name}</span>
-                                        <span className="text-gray-900 text-sm font-black">{p.time}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </Link>
+                                <div className="space-y-3 mt-auto">
+                                    {[
+                                        { name: 'الفجر', time: '05:15 AM' },
+                                        { name: 'الظهر', time: '12:30 PM' },
+                                        { name: 'العصر', time: '03:45 PM' }
+                                    ].map((p, i) => (
+                                        <div key={i} className="flex items-center justify-between px-6 py-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 group-hover/q:bg-white group-hover/q:border-[#D4AF37]/20 transition-all duration-500">
+                                            <span className="text-gray-400 text-xs font-black uppercase tracking-widest">{p.name}</span>
+                                            <span className="text-gray-900 text-sm font-black">{p.time}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Link>
+                        </motion.div>
+
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
