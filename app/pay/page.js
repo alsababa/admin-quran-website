@@ -30,7 +30,7 @@ const DEFAULT_PLAN_ID = 'annual-pro';
  * Moyasar Config
  * ──────────────────────────────────────────────────────── */
 const isDev = process.env.NODE_ENV !== 'production';
-const MOYASAR_PK = isDev 
+const MOYASAR_PK = isDev
     ? (process.env.NEXT_PUBLIC_MOYASAR_TEST_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY || '')
     : (process.env.NEXT_PUBLIC_MOYASAR_LIVE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_MOYASAR_TEST_PUBLISHABLE_KEY || '');
 
@@ -43,7 +43,7 @@ const MOYASAR_CSS_URL = `https://cdn.moyasar.com/mpf/${MOYASAR_SDK_VERSION}/moya
  * ──────────────────────────────────────────────────────── */
 function PayPageInner() {
     const searchParams = useSearchParams();
-    
+
     // Runtime Error Catching for Diagnostics
     const [runtimeError, setRuntimeError] = useState(null);
 
@@ -68,12 +68,14 @@ function PayPageInner() {
     /* Handle Search Params on Mount */
     useEffect(() => {
         try {
-            setIsMounted(true);
-            setIsOrg(searchParams.get('type') === 'org');
-            
+            queueMicrotask(() => {
+                setIsMounted(true);
+                setIsOrg(searchParams.get('type') === 'org');
+            });
+
             const urlToken = searchParams.get('token') || '';
             setToken(urlToken);
-            
+
             // If we have a token, we can extract UID from it for UI purposes (insecure yet, verified later)
             let urlUid = searchParams.get('uid') || '';
             if (!urlUid && urlToken) {
@@ -84,7 +86,7 @@ function PayPageInner() {
                     console.warn('Failed to parse token payload for UI:', e);
                 }
             }
-            
+
             setUid(urlUid || 'web-user');
             setEmail(searchParams.get('email') || '');
             setName(searchParams.get('name') || '');
@@ -120,7 +122,7 @@ function PayPageInner() {
                     const script = document.createElement('script');
                     script.src = `${MOYASAR_JS_URL}?t=${Date.now()}`;
                     script.async = true;
-                    
+
                     script.onload = () => {
                         if (loadHandler()) {
                             script.setAttribute('data-loaded', 'true');
@@ -153,7 +155,7 @@ function PayPageInner() {
     const calculatePrice = () => {
         try {
             if (!isOrg) return PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
-            
+
             const basePrice = 120;
             let discount = 0;
             if (userCount >= 1000) discount = 0.15;
@@ -220,7 +222,7 @@ function PayPageInner() {
 
                     setTimeout(() => {
                         if (!window.Moyasar || !mounted) return;
-                        
+
                         try {
                             window.Moyasar.init({
                                 element: '.mysr-form',
@@ -283,8 +285,8 @@ function PayPageInner() {
                         {runtimeError.stack}
                     </pre>
                 </div>
-                <button 
-                    onClick={() => window.location.reload()} 
+                <button
+                    onClick={() => window.location.reload()}
                     style={{ padding: '12px 24px', background: '#5AA564', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 'bold', cursor: 'pointer' }}
                 >
                     Retry Loading
@@ -353,7 +355,7 @@ function PayPageInner() {
                         display: 'flex', background: '#F8FAFC', padding: 4, borderRadius: 12, marginBottom: 24,
                         border: '1px solid #eee'
                     }}>
-                        <button 
+                        <button
                             onClick={() => setIsOrg(false)}
                             style={{
                                 flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
@@ -363,7 +365,7 @@ function PayPageInner() {
                                 transition: 'all 0.2s'
                             }}
                         >أفراد</button>
-                        <button 
+                        <button
                             onClick={() => setIsOrg(true)}
                             style={{
                                 flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
@@ -377,9 +379,9 @@ function PayPageInner() {
 
                     {isOrg && (
                         <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                             <div>
+                            <div>
                                 <label style={{ fontSize: 11, fontWeight: 900, color: '#999', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>اسم المنشأة / الجهة</label>
-                                <input 
+                                <input
                                     type="text"
                                     value={orgName}
                                     placeholder="مثال: جمعية البر الخيرية"
@@ -394,11 +396,11 @@ function PayPageInner() {
                             <div>
                                 <label style={{ fontSize: 11, fontWeight: 900, color: '#999', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>عدد المستخدمين (الرخص)</label>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <button 
+                                    <button
                                         onClick={() => setUserCount(Math.max(1, userCount - 5))}
                                         style={{ width: 42, height: 42, borderRadius: 10, border: '1px solid #eee', background: '#fff', fontSize: 20 }}>-</button>
                                     <div style={{ flex: 1, height: 42, background: '#F8FAFC', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 18 }}>{userCount}</div>
-                                    <button 
+                                    <button
                                         onClick={() => setUserCount(userCount + 5)}
                                         style={{ width: 42, height: 42, borderRadius: 10, border: '1px solid #eee', background: '#fff', fontSize: 20 }}>+</button>
                                 </div>
@@ -454,7 +456,7 @@ function PayPageInner() {
                             fontSize: 12, color: '#666', fontWeight: 600,
                             display: 'flex', flexDirection: 'column', gap: 4,
                         }}>
-                             {isOrg && orgName && <span>🏢 الجهة: {orgName}</span>}
+                            {isOrg && orgName && <span>🏢 الجهة: {orgName}</span>}
                             {!isOrg && name && <span>👤 المستفيد: {name}</span>}
                             {email && <span>📧 البريد: {email}</span>}
                         </div>

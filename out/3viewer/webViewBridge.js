@@ -48,7 +48,11 @@
 							};
 						}
 
-						window.ReactNativeWebView.postMessage(msg);
+						if (window.ReactNativeWebView) {
+							window.ReactNativeWebView.postMessage(msg);
+						} else {
+							console.warn('ReactNativeWebView is not available. Message not sent:', msgObj.targetFunc);
+						}
 
 						resolve();
 					})

@@ -15,12 +15,17 @@ export const AuthProvider = ({ children }) => {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
+        const timer = setTimeout(() => {
+            setMounted(true);
+        }, 0);
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
             setLoading(false);
         });
-        return unsubscribe;
+        return () => {
+            clearTimeout(timer);
+            unsubscribe();
+        };
     }, []);
 
     const login = (email, password) => {

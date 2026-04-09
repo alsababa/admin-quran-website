@@ -64,7 +64,7 @@ export function useAdminAlerts() {
             }
         });
 
-        const lowStockOrgs = Object.entries(orgs).filter(([id, count]) => count < 10);
+        const lowStockOrgs = Object.entries(orgs).filter(([_, count]) => count < 10);
         lowStockOrgs.forEach(([orgId, count]) => {
             const orgUser = users.find(u => u.id === orgId || u.rawId === orgId);
             list.push({

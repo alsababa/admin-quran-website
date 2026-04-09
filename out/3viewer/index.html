@@ -1,121 +1,167 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="google-site-verification" content="fNDZ-pVQhwYnD4QpwEx0WaaPfuPn3liPXiWP8tMDXAc" />
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
 
-        <title>Babylon.js sample code</title>
-        <script src="webViewBridge.js" defer="defer"></script>
-        <!-- Babylon.js -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+<head>
+    <meta name="google-site-verification" content="fNDZ-pVQhwYnD4QpwEx0WaaPfuPn3liPXiWP8tMDXAc" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
+
+    <title>Babylon.js sample code</title>
+    <script src="webViewBridge.js" defer="defer"></script>
+    <!-- Babylon.js -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
         <script src="https://preview.babylonjs.com/ammo.js"></script>
         <script src="https://preview.babylonjs.com/cannon.js"></script>
         <script src="https://preview.babylonjs.com/Oimo.js"></script>
         <script src="https://preview.babylonjs.com/earcut.min.js"></script> -->
-        <script src="babylon.js"></script>
-        <!-- <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="babylon.js"></script>
+    <!-- <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
         <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
         <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script> -->
-        <script src="babylonjs.loaders.js"></script>
-        <!-- <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+    <script src="babylonjs.loaders.js"></script>
+    <!-- <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
         <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script> -->
-        <!-- <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script> -->
+    <!-- <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script> -->
 
-        
-        <script>
-            "use strict";
-            String.prototype.hexEncode = function(){
+
+    <script>
+        "use strict";
+        String.prototype.hexEncode = function () {
             var hex, i;
             var result = "";
-            for (i=0; i<this.length; i++) {
+            for (i = 0; i < this.length; i++) {
                 hex = this.charCodeAt(i).toString(16);
-                result += ("000"+hex).slice(-4);
+                result += ("000" + hex).slice(-4);
             }
-                return result
-            }
-            let currentAnimationName = "";
-            let currentAnimation = null;
-            let anim_scene = null;
-            var rn_call_time = 0;
-            var comm_delay = 0;
-            function sendToRN(arg){
-                window.webViewBridge.send('handleDataReceived', arg, function(res) {
-                }, function(err) {  
-                });
-            }
-            function debugToRN(arg){
-                window.webViewBridge.send('debugMessage', "got:" + arg, function(res) {
-                }, function(err) {  
-                });
-            }
-            
-            function playDeAnimation(anToPlay, source_letter = "", cross_time = 1, isFirstLetter = false) {                                                  
-                if (isFirstLetter) {
-                    anim_scene.stopAllAnimations();
-                    currentAnimation = null;
-                }
-                comm_delay = window.performance.now() - rn_call_time;                    
-                play_name(anToPlay, source_letter, cross_time);
-            }
+            return result
+        }
+        let currentAnimationName = "";
+        let currentAnimation = null;
+        let anim_scene = null;
+        var rn_call_time = 0;
+        var comm_delay = 0;
+        function sendToRN(arg) {
+            window.webViewBridge.send('handleDataReceived', arg, function (res) {
+            }, function (err) {
+            });
+        }
+        function debugToRN(arg) {
+            window.webViewBridge.send('debugMessage', "got:" + arg, function (res) {
+            }, function (err) {
+            });
+        }
 
-            function play_name(name, source_letter, cross_time){  
+        function playDeAnimation(anToPlay, source_letter = "", cross_time = 1, isFirstLetter = false) {
+            if (isFirstLetter) {
+                anim_scene.stopAllAnimations();
+                currentAnimation = null;
+            }
+            comm_delay = window.performance.now() - rn_call_time;
+            play_name(anToPlay, source_letter, cross_time);
+        }
 
-                const action = scene.getAnimationGroupByName(name);
-                
-                currentAnimationName = name;
-                debugToRN(name);
-                
-                if (currentAnimation == null){    
-                    action.play();    
-                }else
-                {                        
-                    action.syncAllAnimationsWith(currentAnimation.animatables[0]);
-                    action.play();    
-                }
-                action.onAnimationGroupEndObservable.addOnce(function (){
-                    // on finish
-                    sendToRN(currentAnimationName);                        
-                })
-                currentAnimation = action;    
-                
-            }
-            function setAnimationSpeed(speed) {                
-                anim_scene.animationTimeScale = speed;
-            }
+        function play_name(name, source_letter, cross_time) {
 
-        </script>
-        <style>
-            h1 {
-                text-align:center;
-                position: absolute;
-                left: 700px;
-                color: black;
-                font-size: 112px;
-            }
-          </style>
-        <style>
-            html, body {
-                overflow: hidden;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                background: transparent !important;
-            }
+            const action = scene.getAnimationGroupByName(name);
 
-            #renderCanvas {
-                width: 100%;
-                height: 100%;
-                touch-action: none;
-                background: transparent !important;
-                outline: none;
+            currentAnimationName = name;
+            debugToRN(name);
+
+            if (currentAnimation == null) {
+                action.play();
+            } else {
+                action.syncAllAnimationsWith(currentAnimation.animatables[0]);
+                action.play();
             }
-        </style>
-    </head>
+            action.onAnimationGroupEndObservable.addOnce(function () {
+                // on finish
+                sendToRN(currentAnimationName);
+            })
+            currentAnimation = action;
+
+        }
+        function setAnimationSpeed(speed) {
+            anim_scene.animationTimeScale = speed;
+        }
+
+    </script>
+    <style>
+        h1 {
+            text-align: center;
+            position: absolute;
+            left: 700px;
+            color: black;
+            font-size: 112px;
+        }
+    </style>
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: transparent !important;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            background: transparent !important;
+            outline: none;
+        }
+    </style>
+</head>
+
 <body>
     <canvas id="renderCanvas"></canvas>
-    
+
+    <!-- Premium Translation Overlay -->
+    <div id="translation-container" style="
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
+        left: 30px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 24px;
+        padding: 20px 30px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        direction: rtl;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        z-index: 100;
+        pointer-events: none;
+    ">
+        <div id="verse-text" style="
+            font-size: 20px;
+            font-weight: 800;
+            color: #1a1a1a;
+            line-height: 1.4;
+            transition: all 0.5s ease;
+        ">جاري التحميل...</div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        #translation-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
 
     <script>
         var canvas = document.getElementById("renderCanvas");
@@ -123,13 +169,13 @@
         var engine = null;
         var scene = null;
         var sceneToRender = null;
-        var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
-        
+        var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false }); };
+
         var delayCreateScene = function () {
             // Create a scene.
             BABYLON.Animation.AllowMatricesInterpolation = true;
             var scene = new BABYLON.Scene(engine);
-            
+
             BABYLON.SceneLoader.ShowLoadingScreen = false;
             // Create a default skybox with an environment.
             // var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
@@ -138,20 +184,20 @@
             // BABYLON.SceneLoader.Append("./new_AAHS/mutipleAnim(2)/", "SoudiFinalTakes.glb", scene, function (scene) {
             //BABYLON.SceneLoader.Append("./new/", "modelGeo.glb", scene, function (scene) {    
             // BABYLON.SceneLoader.Append("./new2/", "deafultCharII.glb", scene, function (scene) {    
-            BABYLON.SceneLoader.Append("./deafultCharIII/", "deafultCharIII.glb", scene, function (scene) {    
-                
+            BABYLON.SceneLoader.Append("./deafultCharIII/", "deafultCharIII.glb", scene, function (scene) {
+
                 window.gscene = scene;
                 // Create a default arc rotate camera and light.
                 scene.createDefaultCameraOrLight(true, true, true);
-                scene.createDefaultEnvironment({ 
+                scene.createDefaultEnvironment({
                     createSkybox: false, // Disabled skybox to show CSS background pattern
                     skyboxSize: 150,
-                    enableGroundShadow: true, 
-                    groundYBias: 1 
+                    enableGroundShadow: true,
+                    groundYBias: 1
                 });
                 scene.environmentIntensity = 1.2; // Brighter environment for gold reflections
                 // scene.ambientColor = new BABYLON.Color3(6, 6, 6);
-                
+
                 scene.imageProcessingConfiguration.exposure = 1.0;
                 scene.imageProcessingConfiguration.contrast = 1.0;
 
@@ -159,7 +205,7 @@
                 //light.intensity = 0;//.2;
 
                 var dlight = new BABYLON.DirectionalLight("DHemiLight", new BABYLON.Vector3(-0.385, -0.592, -0.708), scene)
-                dlight.position = new BABYLON.Vector3(0,10,10);
+                dlight.position = new BABYLON.Vector3(0, 10, 10);
                 dlight.autoUpdateExtends = true;
                 dlight.shadowEnabled = true;
                 dlight.autoCalcShadowZBounds = true;
@@ -167,27 +213,27 @@
 
                 var camera = scene.activeCamera;
                 camera.panningSensibility = 0; //prevent moving
-                var camerasBorderFunction = function () {        
+                var camerasBorderFunction = function () {
                     //Lock Angle        
-                    camera.beta = (Math.PI / 2);                                                            
+                    camera.beta = (Math.PI / 2);
                 };
-                    
+
                 scene.registerBeforeRender(camerasBorderFunction);
 
 
 
-                    
-                scene.getMeshByName("Mesh_Hi").receiveShadows= true;
+
+                scene.getMeshByName("Mesh_Hi").receiveShadows = true;
 
                 var shadowGenerator = new BABYLON.ShadowGenerator(1024, dlight);
 
                 // SHADOW ENABLE:
                 // shadowGenerator.getShadowMap().renderList.push(scene.getMeshByName("Mesh_Hi"));
                 // shadowGenerator.useBlurExponentialShadowMap = true;
-                
+
                 scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-                
-                
+
+
                 // The default camera looks at the back of the asset.
                 // Rotate the camera by 180 degrees to the front of the asset.
 
@@ -197,17 +243,17 @@
                 // scene.activeCamera.targetScreenOffset.y = 100;
                 scene.activeCamera.lowerRadiusLimit = 2.1;
                 scene.activeCamera.upperRadiusLimit = 2.1;
-                
+
                 //scene.activeCamera.inputs.removeByType("FreeCameraKeyboardMoveInput");
                 //scene.activeCamera.inputs.removeByType("FreeCameraMouseMoveInput");
-                scene.activeCamera.targetScreenOffset.y = -0.2;                
-                window.c = scene.activeCamera;    
+                scene.activeCamera.targetScreenOffset.y = -0.2;
+                window.c = scene.activeCamera;
                 // scene.activeCamera.inputs.remove(scene.activeCamera.inputs.attached.mousewheel);
-                
+
                 // scene.activeCamera
                 // BABYLON.SceneLoader.ImportAnimationsAsync("./new_AAHS/mutipleAnim(2)/", "mutipleAnim (5).glb", scene).then(function (scene) {
-                    // BABYLON.SceneLoader.ImportAnimationsAsync("./new/", "animSL2.glb", scene).then(function (scene) {
-                
+                // BABYLON.SceneLoader.ImportAnimationsAsync("./new/", "animSL2.glb", scene).then(function (scene) {
+
 
                 BABYLON.SceneLoader.ImportAnimationsAsync("./new2/", "SLAplhabet.glb", scene).then(function (scene) {
                     anim_scene = scene;
@@ -217,25 +263,25 @@
                     anim_scene.animationsEnabled = true;
                     anim_scene.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
                     anim_scene.animationPropertiesOverride.enableBlending = true;
-                    anim_scene.animationPropertiesOverride.blendingSpeed = 5 / 24;
+                    anim_scene.animationPropertiesOverride.blendingSpeed = 0.05;
                     anim_scene.animationPropertiesOverride.loopMode = 1;
-                    anim_scene.animationTimeScale = 3;
+                    anim_scene.animationTimeScale = 1.2;
                     anim_scene.stopAllAnimations();
                     // start by end animation
                     // const sambaAnim = scene.getAnimationGroupByName("06dd");
                     // sambaAnim.start();
 
-                    
+
                     var assignATrigger = anim_scene.getNodeByName("RootNode");
-                    for (var n= 0; n < anim_scene.getNodes().length ; n++){
+                    for (var n = 0; n < anim_scene.getNodes().length; n++) {
                         if (anim_scene.getNodes()[n].material != null)
-                        anim_scene.getNodes()[n].material.backFaceCulling =false;
+                            anim_scene.getNodes()[n].material.backFaceCulling = false;
                     }
-                    
+
                     assignATrigger.setAbsolutePosition(new BABYLON.Vector3(0, -0.075, 0))
 
 
-                });                     
+                });
 
 
                 BABYLON.SceneLoader.ImportAnimationsAsync("./deafultCharIII/", "fatehaAnim.glb", scene).then(function (scene) {
@@ -246,24 +292,60 @@
                     anim_scene.animationsEnabled = true;
                     anim_scene.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
                     anim_scene.animationPropertiesOverride.enableBlending = true;
-                    anim_scene.animationPropertiesOverride.blendingSpeed = 5 / 24;
+                    anim_scene.animationPropertiesOverride.blendingSpeed = 0.05;
                     anim_scene.animationPropertiesOverride.loopMode = 1;
-                    anim_scene.animationTimeScale = 3;
-                    anim_scene.stopAllAnimations();
-                    // start by end animation
-                    // const sambaAnim = scene.getAnimationGroupByName("06dd");
-                    // sambaAnim.start();
-                    
-                    var assignATrigger = anim_scene.getNodeByName("RootNode");
-                    for (var n= 0; n < anim_scene.getNodes().length ; n++){
-                        if (anim_scene.getNodes()[n].material != null)
-                        anim_scene.getNodes()[n].material.backFaceCulling =false;
+                    anim_scene.animationTimeScale = 1.2;
+
+                    // Auto-start the first animation group to ensure the character is "moving"
+                    if (anim_scene.animationGroups && anim_scene.animationGroups.length > 0) {
+                        console.log("Animation groups found:", anim_scene.animationGroups.map(g => g.name));
+                        // Play the first group by default, ensure it's descriptive
+                        anim_scene.animationGroups[0].play(true);
                     }
-                    
+
+                    var assignATrigger = anim_scene.getNodeByName("RootNode");
+                    for (var n = 0; n < anim_scene.getNodes().length; n++) {
+                        if (anim_scene.getNodes()[n].material != null)
+                            anim_scene.getNodes()[n].material.backFaceCulling = false;
+                    }
+
                     assignATrigger.setAbsolutePosition(new BABYLON.Vector3(0, -0.075, 0))
 
-
-                });     
+                    // Animation-Sync Translation Logic
+                    const verses = [
+                        "نرحب بكم في المشروع الأول عالمياً لترجمة القرآن بتقنية 3D",
+                        "ثورة في عالم التواصل الديني؛ نستخدم تقنيات \"التقاط الحركة\" المتقدمة لنقل أدق تفاصيل تعابير الوجه وحركات اليدين لتجسيد قدسية القرآن الكريم بلغة الإشارة بشكل حيّ وتفاعلي.",
+                        "ترجمة لغوية فورية: تفسير دقيق لمعاني القرآن الكريم تم تحويله إلى لغة إشارة معتمدة.",
+                        "تفاعل حركي ذكي: استخدام تقنيات الذكاء الاصطناعي لضمان سلاسة الربط بين الكلمات والإشارات.",
+                        "قاموس إشاري متكامل: مكتبة ضخمة تغطي جميع المفردات القرآنية لخدمة مجتمع الصم."
+                    ];
+                    
+                    const container = document.getElementById('translation-container');
+                    const textDisplay = document.getElementById('verse-text');
+                    
+                    if (anim_scene.animationGroups && anim_scene.animationGroups.length > 0) {
+                        const mainAnim = anim_scene.animationGroups[0];
+                        container.classList.add('visible');
+                        
+                        scene.onBeforeRenderObservable.add(() => {
+                            // Robust progress calculation based on loop time
+                            const currentTime = mainAnim.animatables[0] ? mainAnim.animatables[0].masterFrame : 0;
+                            const totalFrames = mainAnim.to;
+                            const progress = currentTime / totalFrames;
+                            
+                            const index = Math.floor(progress * verses.length);
+                            const safeIndex = Math.min(index, verses.length - 1);
+                            
+                            if (textDisplay.innerText !== verses[safeIndex]) {
+                                textDisplay.style.opacity = 0;
+                                setTimeout(() => {
+                                    textDisplay.innerText = verses[safeIndex];
+                                    textDisplay.style.opacity = 1;
+                                }, 300);
+                            }
+                        });
+                    }
+                });
 
 
 
@@ -280,28 +362,34 @@
 
 
 
-        
+
             return scene;
         };
-                window.initFunction = async function() {               
-                    var asyncEngineCreation = async function() {
-                        try {
-                        return createDefaultEngine();
-                        } catch(e) {
-                        console.log("the available createEngine function failed. Creating the default engine instead");
-                        return createDefaultEngine();
-                        }
-                    }
+        window.initFunction = async function () {
+            var asyncEngineCreation = async function () {
+                try {
+                    return createDefaultEngine();
+                } catch (e) {
+                    console.log("the available createEngine function failed. Creating the default engine instead");
+                    return createDefaultEngine();
+                }
+            }
 
-                    window.engine = await asyncEngineCreation();
-        if (!engine) throw 'engine should not be null.';
-        window.scene = delayCreateScene();};
-        initFunction().then(() => {sceneToRender = scene        
-            
+            window.engine = await asyncEngineCreation();
+            if (!engine) throw 'engine should not be null.';
+            window.scene = delayCreateScene();
+        };
+        initFunction().then(() => {
+            sceneToRender = scene
+
             engine.runRenderLoop(function () {
                 if (sceneToRender && sceneToRender.activeCamera) {
+                    // Add subtle breathing/orbiting effect to the camera for "improved movement"
+                    const time = Date.now() * 0.001;
+                    sceneToRender.activeCamera.alpha += Math.sin(time * 0.5) * 0.001;
+                    sceneToRender.activeCamera.beta = (Math.PI / 2) + Math.sin(time * 0.3) * 0.02;
+
                     sceneToRender.render();
-            
                 }
             });
         });
@@ -313,13 +401,14 @@
 
         window.addEventListener("load", function () {
 
-            window.webViewBridge.send('loaded', "", function(res) {
-                }, function(err) {  
-                });            
+            window.webViewBridge.send('loaded', "", function (res) {
+            }, function (err) {
+            });
 
         });
 
 
     </script>
 </body>
+
 </html>

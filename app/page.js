@@ -2,21 +2,10 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HandMetal, Smartphone, Accessibility, Star, Users, Video, ChevronLeft, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote, Loader2 } from 'lucide-react';
-
-
-const FeatureCard = ({ icon, title, desc }) => (
-    <div className="bg-white border border-gray-100 shadow-sm rounded-3xl p-8 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
-        <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 flex items-center justify-center text-[#5AA564] mb-6">
-            {icon}
-        </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
-        <p className="text-sm font-medium text-gray-500 leading-relaxed">{desc}</p>
-    </div>
-);
+import { HandMetal, Smartphone, Star, Users, Video, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote, Loader2 } from 'lucide-react';
 
 const StatBadge = ({ value, label, icon }) => (
-    <motion.div 
+    <motion.div
         whileHover={{ y: -8, scale: 1.05 }}
         className="text-center group p-8 bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_40px_80px_rgba(90,165,100,0.08)] transition-all duration-500 relative overflow-hidden"
     >
@@ -25,7 +14,7 @@ const StatBadge = ({ value, label, icon }) => (
             {icon}
         </div>
         <p className="text-5xl md:text-6xl font-black text-gray-900 mb-2 tracking-tighter transition-colors group-hover:text-[#5AA564]">{value}</p>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">{label}</p>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{label}</p>
     </motion.div>
 );
 
@@ -49,11 +38,10 @@ export default function LandingPage() {
     const section3DRef = useRef(null);
 
     useEffect(() => {
-        try {
+        const timer = setTimeout(() => {
             setIsMounted(true);
-        } catch (e) {
-            setRuntimeError(e);
-        }
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
@@ -62,7 +50,7 @@ export default function LandingPage() {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setShow3D(true);
-                    observer.disconnect(); // Load once and keep it
+                    observer.disconnect();
                 }
             },
             { threshold: 0.1 }
@@ -159,7 +147,6 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 className="relative pt-24 pb-12 px-6 mx-auto overflow-hidden bg-white"
             >
-                {/* Advanced Premium Background Elements */}
                 <div className="absolute top-0 inset-x-0 h-[800px] pointer-events-none">
                     <motion.div
                         animate={{
@@ -179,15 +166,6 @@ export default function LandingPage() {
                         }}
                         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
                         className="absolute top-20 right-[-100px] w-[500px] h-[500px] bg-gradient-to-br from-[#4A8F53]/15 to-blue-500/5 blur-[100px] rounded-full"
-                    />
-                    <motion.div
-                        animate={{
-                            scale: [1, 1.3, 1],
-                            opacity: [0.1, 0.2, 0.1],
-                            x: [-100, 100, -100]
-                        }}
-                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                        className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-[#5AA564]/5 blur-[150px] rounded-full"
                     />
                 </div>
 
@@ -229,15 +207,10 @@ export default function LandingPage() {
                         </span> هي نافذتك الشاملة لتعلم وتدبر كتاب الله، مع مكتبة تفاعلية متكاملة مصممة خصيصاً للصم وضعاف السمع بجودة فائقة.
                     </motion.p>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="flex flex-col sm:flex-row justify-center items-center gap-6 mb-16"
-                    >
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mb-16">
                         <a href="#download" className="group w-full sm:w-auto relative overflow-hidden flex items-center justify-center gap-3 h-20 px-14 bg-gray-900 hover:bg-black text-white font-black uppercase tracking-widest text-xs rounded-[2rem] transition-all hover:scale-105 shadow-[0_20px_50px_rgba(0,0,0,0.2)] active:scale-95">
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shine" />
-                            <Smartphone size={20} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
+                            <Smartphone size={20} className="group-hover:rotate-12 transition-transform" />
                             تحميل التطبيق مجاناً
                         </a>
                         <a href="#demo" className="w-full sm:w-auto flex items-center justify-center gap-3 h-20 px-14 bg-white text-gray-900 hover:text-[#5AA564] border border-gray-100 hover:border-[#5AA564]/30 font-black uppercase tracking-widest text-xs rounded-[2rem] transition-all shadow-[0_10px_30px_rgba(0,0,0,0.02)] active:scale-95 group/demo">
@@ -246,37 +219,21 @@ export default function LandingPage() {
                             </div>
                             كيف يعمل؟
                         </a>
-                    </motion.div>
+                    </div>
                 </div>
-
-
             </motion.section>
+
             {/* ── 3D Interactive Welcome Section ── */}
             <section className="relative py-12 bg-white overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                        {/* 3D Viewer Container */}
                         <motion.div
                             ref={section3DRef}
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
-                            whileHover={{ scale: 1.03, rotate: 0.5 }}
-                            animate={{ 
-                                y: [0, -15, 0],
-                                rotate: [0, 0.5, -0.5, 0]
-                            }}
-                            transition={{ 
-                                opacity: { duration: 0.8 },
-                                scale: { duration: 0.8 },
-                                y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-                                rotate: { duration: 8, repeat: Infinity, ease: "easeInOut" }
-                            }}
                             viewport={{ once: true }}
-                            className="relative group h-[550px] md:h-[650px] bg-gradient-to-br from-white via-gray-50 to-[#5AA564]/5 rounded-[4rem] overflow-hidden border-[1.5px] border-gray-100 shadow-[0_50px_100px_rgba(0,0,0,0.08)] hover:shadow-[0_80px_150px_rgba(90,165,100,0.15)] transition-all duration-1000"
+                            className="relative group h-[550px] md:h-[650px] bg-gradient-to-br from-white via-gray-50 to-[#5AA564]/5 rounded-[4rem] overflow-hidden border-[1.5px] border-gray-100 shadow-[0_50px_100px_rgba(0,0,0,0.08)]"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-tr from-[#5AA564]/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-                            <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#5AA564]/5 blur-[100px] rounded-full animate-pulse" />
-                            
                             <AnimatePresence>
                                 {!show3D || is3DLoading ? (
                                     <motion.div
@@ -294,7 +251,7 @@ export default function LandingPage() {
                             {show3D && (
                                 <iframe
                                     src="/3viewer/index.html"
-                                    className="w-full h-full border-none relative z-10 scale-[1.02] origin-center transition-transform duration-700 group-hover:scale-105 pointer-events-none group-hover:pointer-events-auto"
+                                    className="w-full h-full border-none relative z-10"
                                     title="3D Sign Language Translator"
                                     scrolling="no"
                                     onLoad={() => setIs3DLoading(false)}
@@ -302,40 +259,27 @@ export default function LandingPage() {
                             )}
                         </motion.div>
 
-                        <div className="text-right flex flex-col justify-center">
-
+                        <div className="text-right">
                             <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter mb-10 leading-[1.1]">
-                                نرحب بكم في المشروع <br /> <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#5AA564] to-[#4A8F53]">الأول عالمياً</span> لترجمة <br /> القرآن بتقنية 3D
+                                نرحب بكم في المشروع <br /> <span className="text-[#5AA564]">الأول عالمياً</span> لترجمة <br /> القرآن بتقنية 3D
                             </h2>
-
-                            <div className="relative">
-                                <div className="absolute -right-6 top-0 w-1.5 h-full bg-gradient-to-b from-[#5AA564] via-[#5AA564]/20 to-transparent rounded-full shadow-[0_0_15px_rgba(90,165,100,0.2)]" />
-                                <p className="text-gray-500 font-bold text-xl mb-12 leading-relaxed max-w-xl pr-8">
-                                    ثورة في عالم التواصل الديني؛ نستخدم تقنيات "التقاط الحركة" المتقدمة لنقل أدق تفاصيل تعابير الوجه وحركات اليدين لتجسيد قدسية القرآن الكريم بلغة الإشارة بشكل حيّ وتفاعلي.
-                                </p>
-                            </div>
-
+                            <p className="text-gray-500 font-bold text-xl mb-12 leading-relaxed">
+                                ثورة في عالم التواصل الديني؛ نستخدم تقنيات التقاط الحركة المتقدمة لتجسيد قدسية القرآن الكريم بلغة الإشارة بشكل حيّ وتفاعلي.
+                            </p>
                             <div className="space-y-6">
                                 {[
                                     { title: 'ترجمة لغوية فورية', desc: 'تفسير دقيق لمعاني القرآن الكريم تم تحويله إلى لغة إشارة معتمدة.' },
-                                    { title: 'تفاعل حركي ذكي', desc: 'استخدام تقنيات الذكاء الاصطناعي لضمان سلاسة الربط بين الكلمات والإشارات.' },
-                                    { title: 'قاموس إشاري متكامل', desc: 'مكتبة ضخمة تغطي جميع المفردات القرآنية لخدمة مجتمع الصم.' }
+                                    { title: 'تفاعل حركي ذكي', desc: 'استخدام تقنيات الذكاء الاصطناعي لضمان سلاسة الحركات.' }
                                 ].map((item, i) => (
-                                    <motion.div 
-                                        key={i} 
-                                        initial={{ opacity: 0, x: 20 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: i * 0.1 }}
-                                        className="flex gap-5 items-start group/item"
-                                    >
+                                    <div key={i} className="flex gap-5 items-start">
                                         <div className="flex-1">
-                                            <h4 className="font-extrabold text-gray-900 text-lg mb-1 group-hover/item:text-[#5AA564] transition-colors">{item.title}</h4>
-                                            <p className="text-gray-400 font-medium text-sm leading-relaxed">{item.desc}</p>
+                                            <h4 className="font-extrabold text-gray-900 text-lg mb-1">{item.title}</h4>
+                                            <p className="text-gray-400 font-medium text-sm">{item.desc}</p>
                                         </div>
-                                        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#5AA564] shrink-0 border border-gray-100 group-hover/item:bg-[#5AA564] group-hover/item:text-white transition-all duration-500">
-                                            <CheckCircle2 size={22} strokeWidth={2.5} />
+                                        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#5AA564]">
+                                            <CheckCircle2 size={22} />
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -343,110 +287,48 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── Logos/Trusted By ── */}
-            <section className="bg-gray-50/50 py-10 border-y border-gray-100/50 flex flex-col items-center">
-                <div className="max-w-7xl mx-auto text-center px-6">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-10">شراكات استراتيجية موثوقة</p>
-                    <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-10 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
-                        {[
-                            { name: 'شركة السبابة الرقمية', role: 'الشريك التقني' },
-                            { name: 'مصحف تبيان', role: 'المحتوى العلمي' },
-                            { name: 'جمعية لأجلهم', role: 'شريك استراتيجي' }
-                        ].map((p, i) => (
-                            <motion.div 
-                                key={i}
-                                whileHover={{ scale: 1.1, opacity: 1 }}
-                                className="flex flex-col items-center gap-2 cursor-default group"
-                            >
-                                <span className="text-lg font-black text-gray-400 group-hover:text-[#5AA564] transition-colors">{p.name}</span>
-                                <span className="text-[9px] font-bold text-gray-300 group-hover:text-[#5AA564]/60 uppercase tracking-widest">{p.role}</span>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ── App Interface Showcase (Visual Mockups) ── */}
-            <section id="interface" className="relative py-32 bg-white overflow-hidden">
-                {/* Background Decor */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5AA564]/5 blur-[120px] rounded-full pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
-
+            {/* ── App Interface Showcase ── */}
+            <section id="interface" className="relative py-32 bg-white">
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="text-center mb-24">
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-full mb-6"
-                        >
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#5AA564] shadow-[0_0_8px_#5AA564]" />
-                            <span className="text-[10px] font-black text-[#5AA564] uppercase tracking-[0.2em]">واجهة التطبيق الذكية</span>
-                        </motion.div>
-                        <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter mb-8 leading-tight">تجربة رقمية فريدة <br /> <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#5AA564] to-[#4A8F53]">بين يديك دائماً</span></h2>
-                        <p className="text-gray-400 font-bold max-w-2xl mx-auto text-xl leading-relaxed">
-                            بنينا التطبيق ليعمل بسلاسة فائقة، مع واجهات تجمع بين الجمال البصري والسهولة المطلقة لمجتمع الصم.
-                        </p>
-                    </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[350px]">
-                        {/* Bento Box 1: Quran Main Translation (The Hero) */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             whileHover={{ y: -8 }}
                             viewport={{ once: true }}
-                            className="md:col-span-12 lg:col-span-7 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-slate-50 to-white rounded-[4rem] border border-gray-100 p-12 flex flex-col items-start text-right transition-all duration-700 hover:shadow-[0_50px_100px_rgba(0,0,0,0.08)]"
+                            className="md:col-span-12 lg:col-span-7 md:row-span-2 relative group overflow-hidden bg-slate-50 rounded-[4rem] border border-gray-100 p-12 flex flex-col items-start text-right transition-all duration-700 hover:shadow-[0_50px_100px_rgba(0,0,0,0.08)]"
                         >
                             <div className="relative z-10 max-w-sm">
                                 <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#5AA564] mb-8 border border-gray-50 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                                    <BookOpen size={28} strokeWidth={2.2} />
+                                    <BookOpen size={28} />
                                 </div>
                                 <h3 className="text-4xl font-black text-gray-900 mb-6 tracking-tight">القرآن بلغة الإشارة</h3>
-                                <p className="text-gray-400 font-bold text-lg leading-relaxed mb-8">أول مصحف تفاعلي يدمج النص القرآني مع ترجمة فورية لـ 114 سورة عبر مترجم 3D عالي الدقة، لضمان الفهم الصحيح لكل آية.</p>
-                                <div className="flex gap-4">
-                                    <div className="px-4 py-2 bg-emerald-50 text-[#5AA564] text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100">3D Technology</div>
-                                    <div className="px-4 py-2 bg-blue-50 text-blue-500 text-[10px] font-black uppercase tracking-widest rounded-xl border border-blue-100">114 Surahs</div>
-                                </div>
+                                <p className="text-gray-400 font-bold text-lg leading-relaxed mb-8">أول مصحف تفاعلي يدمج النص القرآني مع ترجمة فورية لـ 114 سورة عبر مترجم 3D عالي الدقة.</p>
                             </div>
-                            
-                            {/* Floating Mockup Image */}
-                            <motion.div 
-                                animate={{ y: [0, -20, 0] }}
-                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute bottom-[-100px] left-[-40px] w-full max-w-[420px] drop-shadow-[0_50px_100px_rgba(0,0,0,0.2)] md:block hidden"
-                            >
-                                <img src="/mockups/quran_main.png" alt="Quran Interface Mockup" className="w-full h-auto rounded-[3rem] group-hover:scale-105 transition-transform duration-1000" />
-                            </motion.div>
+                            <div className="absolute bottom-[-100px] left-[-40px] w-full max-w-[420px] md:block hidden">
+                                <img src="/mockups/quran_main.png" alt="Quran Interface" className="w-full h-auto rounded-[3rem]" />
+                            </div>
                         </motion.div>
 
-                        {/* Bento Box 2: Prayer Times & Qibla */}
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             whileHover={{ y: -8 }}
                             viewport={{ once: true }}
-                            className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-[#0A0D1A] rounded-[4rem] p-12 flex flex-col items-center text-center shadow-2xl shadow-gray-900/40"
+                            className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-[#0A0D1A] rounded-[4rem] p-12 flex flex-col items-center text-center shadow-2xl"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-[#5AA564]/40 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
-                            
                             <div className="relative z-10 w-full mb-10">
                                 <div className="w-16 h-16 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center text-white mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
-                                    <Compass size={32} strokeWidth={2.2} />
+                                    <Compass size={32} />
                                 </div>
                                 <h3 className="text-3xl font-black text-white mb-4 tracking-tight">القبلة ومواقيت الصلاة</h3>
-                                <p className="text-white/40 font-bold text-lg leading-relaxed">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي لضمان صلاتك في وقتها.</p>
+                                <p className="text-white/40 font-bold text-lg">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي.</p>
                             </div>
-
-                            <motion.div 
-                                whileHover={{ scale: 1.1, rotate: 2 }}
-                                className="relative w-full max-w-[280px] drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
-                            >
-                                <img src="/mockups/prayer.png" alt="Prayer Times Mockup" className="w-full h-auto rounded-[2.5rem]" />
-                            </motion.div>
+                            <div className="relative w-full max-w-[280px]">
+                                <img src="/mockups/prayer.png" alt="Prayer Times" className="w-full h-auto rounded-[2.5rem]" />
+                            </div>
                         </motion.div>
 
-                        {/* Bento Box 3: Adhkar (Wide Panel) */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -454,56 +336,55 @@ export default function LandingPage() {
                             viewport={{ once: true }}
                             className="md:col-span-6 lg:col-span-12 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-[#5AA564] to-[#4A8F53] rounded-[4rem] p-16 flex flex-col lg:flex-row items-center gap-16 shadow-2xl shadow-[#5AA564]/20"
                         >
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[100px] rounded-full pointer-events-none" />
-                            
                             <div className="relative z-10 flex-1 text-right">
                                 <div className="w-16 h-16 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl flex items-center justify-center text-white mb-8">
-                                    <Globe size={32} strokeWidth={2.2} />
+                                    <Globe size={32} />
                                 </div>
                                 <h3 className="text-4xl font-black text-white mb-6 tracking-tight">ترجمة كاملة للأذكار</h3>
-                                <p className="text-white/80 font-bold text-xl leading-relaxed mb-8 max-w-md">أذكار الصباح والمساء والتحصينات اليومية، مسجلة بلغة الإشارة بمقاطع فيديو ذات جودة فائقة لترافقك في يومك.</p>
-                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all cursor-pointer">
+                                <p className="text-white/80 font-bold text-xl leading-relaxed mb-8 max-w-md">أذكار الصباح والمساء والتحصينات اليومية، مسجلة بلغة الإشارة بمقاطع فيديو ذات جودة فائقة.</p>
+                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 border border-white/20 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all cursor-pointer hover:bg-white/20">
                                     <span>اكتشف المزيد من الخصائص</span>
                                     <ArrowLeft size={16} />
                                 </div>
                             </div>
-
-                            <motion.div 
-                                initial={{ x: 100, opacity: 0 }}
-                                whileInView={{ x: 0, opacity: 1 }}
-                                transition={{ duration: 0.8, delay: 0.2 }}
-                                className="relative w-full max-w-[320px] lg:max-w-[400px] drop-shadow-[0_40px_80px_rgba(0,0,0,0.3)]"
-                            >
-                                <img src="/mockups/adhkar.png" alt="Adhkar Interface Mockup" className="w-full h-auto rounded-[3rem]" />
-                            </motion.div>
+                            <div className="relative w-full max-w-[320px] lg:max-w-[400px]">
+                                <img src="/mockups/adhkar.png" alt="Adhkar Mockup" className="w-full h-auto rounded-[3rem]" />
+                            </div>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
+            {/* ── How It Works ── */}
+            <section id="process" className="py-32 bg-white relative">
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+                        <div>
+                            <span className="text-[10px] font-black text-[#5AA564] bg-[#5AA564]/10 border border-[#5AA564]/20 px-4 py-1.5 rounded-full inline-block mb-6 uppercase tracking-[0.2em]">كيف نبدأ؟</span>
+                            <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter mb-12 leading-tight">رحلة التعلم <br /> <span className="text-[#5AA564]">بسيطة جداً</span></h2>
 
-
-            {/* ── How It Works (Process) ── */}
-            <section id="process" className="py-16 bg-white border-y border-gray-100">
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    <div>
-                        <span className="text-sm font-extrabold text-[#5AA564] bg-[#5AA564]/10 px-4 py-1.5 rounded-full inline-block mb-4">الخطوات</span>
-                        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-8">عملية التعلم بسيطة جداً</h2>
-
-                        <div className="space-y-12 relative before:absolute before:inset-0 before:ml-[3.5rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent mt-12">
-                            <StepIndicator number="1" title="حمل التطبيق" desc="ابحث عن 'مصحف أنامل للصم' في متجر آبل أو جوجل بلاي وقم بتثبيته مجاناً." />
-                            <StepIndicator number="2" title="اختر الترجمة" desc="تصفح قائمة التراجم المنسقة بشكل رائع واختر الجزء الذي ترغب بقراءته أو حفظه." />
-                            <StepIndicator number="3" title="شاهد الآيات" desc="شاهد ترجمة كل آية بلغة الإشارة بشكل مرئي وعالي الدقة لتفهم المعنى الصحيح." />
+                            <div className="space-y-16 mt-12">
+                                <StepIndicator number="1" title="حمل التطبيق" desc="ابحث عن 'مصحف أنامل للصم' في متجر آبل أو جوجل بلاي وقم بتثبيته مجاناً لتبدأ رحلتك." />
+                                <StepIndicator number="2" title="اختر الترجمة" desc="تصفح قائمة الأجزاء والسور المنسقة بشكل احترافي، واختر المقطع الذي ترغب بمشاهدته." />
+                                <StepIndicator number="3" title="شاهد واستمتع" desc="استمتع بترجمة مرئية عالية الدقة بتقنية 3D تضمن لك فهم معاني القرآن بكل يسر." />
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="relative flex justify-center lg:justify-end mt-10 lg:mt-0">
-                        <div className="w-[300px] bg-white rounded-[2.5rem] p-2 shadow-2xl relative border-8 border-gray-900 overflow-hidden">
-                            <div className="absolute top-0 inset-x-0 h-6 flex justify-center">
-                                <div className="w-1/3 h-5 bg-gray-900 rounded-b-xl" />
+                        <div className="relative flex justify-center lg:justify-end">
+                            <div className="relative w-full max-w-[320px]">
+                                <img src="/mockups/app_steps.png" alt="App Steps" className="w-full h-auto rounded-[3.5rem] border-8 border-gray-900" />
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* ── Stats ── */}
+            <section className="bg-white py-16 border-y border-gray-100">
+                <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10">
+                    <StatBadge value="+10K" label="مستفيد نشط" icon={<Users size={24} />} />
+                    <StatBadge value="114" label="سورة تفاعلية" icon={<BookOpen size={24} />} />
+                    <StatBadge value="100%" label="دقة الترجمة" icon={<Shield size={24} />} />
+                    <StatBadge value="4.9" label="تقييم المتجر" icon={<Star size={24} />} />
                 </div>
             </section>
 
@@ -532,7 +413,7 @@ export default function LandingPage() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative">
                             {/* Decorative blocks to replace images, maintaining the SaaS aesthetic */}
-                            <motion.div 
+                            <motion.div
                                 whileHover={{ y: -10 }}
                                 className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-[2.5rem] p-10 flex flex-col justify-center items-center text-center shadow-2xl border border-white/5 hover:border-[#5AA564]/30 transition-all duration-500"
                             >
@@ -542,7 +423,7 @@ export default function LandingPage() {
                                 <h3 className="text-2xl font-black text-white mb-3 tracking-tight">مجتمع مترابط</h3>
                                 <p className="text-gray-400 font-medium text-sm leading-relaxed">شراكات ممتدة لخدمة المستفيدين في كل مكان.</p>
                             </motion.div>
-                            <motion.div 
+                            <motion.div
                                 whileHover={{ y: -10 }}
                                 className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-[2.5rem] p-10 flex flex-col justify-center items-center text-center shadow-2xl border border-white/5 hover:border-[#5AA564]/30 transition-all duration-500 transform sm:translate-y-12"
                             >
@@ -571,7 +452,7 @@ export default function LandingPage() {
                         { name: "سالم عبدالرحمن", role: "معلم لغة إشارة", char: "س", quote: "أفضل تطبيق رأيته يخدم الصم في العالم العربي، الألوان مريحة للعين وتقسيم السور رائع جداً." },
                         { name: "فاطمة علي", role: "مشرفة تعليمية", char: "ف", quote: "إمكانية تحميل الفيديوهات واستخدامها بدون إنترنت كانت ميزة غير متوقعة وأنقذتني في كثير من الأوقات.", active: true }
                     ].map((t, i) => (
-                        <motion.div 
+                        <motion.div
                             key={i}
                             whileHover={{ y: -10 }}
                             className="bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_40px_80px_rgba(0,0,0,0.06)] transition-all duration-500 relative group"
@@ -594,157 +475,50 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── Pricing & Plans (Entity Focus) ── */}
+            {/* ── Pricing & Plans ── */}
             <section id="pricing" className="py-16 bg-gray-50/50">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-full mb-6"
-                        >
-                            <Shield size={14} className="text-[#5AA564]" />
-                            <span className="text-[10px] font-black text-[#5AA564] uppercase tracking-[0.2em]">الخطط والاشتراكات</span>
-                        </motion.div>
                         <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">اختر الباقة المناسبة لك</h2>
-                        <p className="text-gray-400 font-bold max-w-2xl mx-auto text-lg">
-                            دعم مستمر وتطوير دائم لخدمة فئة غالية علينا. اختر باقتك وابدأ الرحلة اليوم.
-                        </p>
+                        <p className="text-gray-400 font-bold max-w-2xl mx-auto text-lg">بنينا المنصة لتكون متاحة للجميع بدعم مستمر وتطوير دائم.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-                        {/* Individual Plan */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            className="bg-white border border-gray-100 rounded-[3.5rem] p-12 shadow-[0_30px_60px_rgba(0,0,0,0.03)] relative overflow-hidden group hover:shadow-[0_50px_100px_rgba(0,0,0,0.08)] transition-all duration-700"
-                        >
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-gray-50 rounded-bl-[6rem] -z-10 group-hover:bg-[#5AA564]/5 transition-colors duration-700" />
-                            <div className="mb-10">
-                                <h3 className="text-3xl font-black text-gray-900 mb-2">باقة الأفراد</h3>
-                                <p className="text-gray-400 font-bold text-base">للاستخدام الشخصي على جهاز واحد</p>
-                            </div>
-
-                            <div className="flex items-baseline gap-3 mb-12 group-hover:scale-105 origin-right transition-transform">
+                        <div className="bg-white border border-gray-100 rounded-[3.5rem] p-12 shadow-sm">
+                            <h3 className="text-3xl font-black text-gray-900 mb-6">باقة الأفراد</h3>
+                            <div className="flex items-baseline gap-3 mb-12">
                                 <span className="text-7xl font-black text-gray-900 tracking-tighter">120</span>
                                 <span className="text-xl font-bold text-gray-400">ر.س / سنوياً</span>
                             </div>
-
                             <ul className="space-y-5 mb-14">
-                                {['وصول كامل لـ 114 سورة', 'ترجمة إشارة احترافية', 'أذكار ومواقيت صلاة', 'دعم فني مباشر'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-4 text-base font-bold text-gray-600 group-hover:translate-x-[-4px] transition-transform" style={{ transitionDelay: `${i * 50}ms` }}>
-                                        <div className="w-7 h-7 rounded-full bg-[#5AA564]/10 flex items-center justify-center text-[#5AA564]">
-                                            <Check size={16} strokeWidth={3} />
-                                        </div>
+                                {['وصول كامل لـ 114 سورة', 'ترجمة إشارة احترافية', 'أذكار ومواقيت صلاة'].map((item, i) => (
+                                    <li key={i} className="flex items-center gap-4 text-base font-bold text-gray-600">
+                                        <Check size={16} className="text-[#5AA564]" />
                                         {item}
                                     </li>
                                 ))}
                             </ul>
+                        </div>
 
-                            <div className="bg-gray-50 rounded-[2.5rem] p-8 text-center border border-dashed border-gray-200 group-hover:border-[#5AA564]/30 transition-colors">
-                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-relaxed">الاشتراك يتم من داخل التطبيق مباشرة عبر Apple Pay أو بطاقة مدى</p>
-                            </div>
-                        </motion.div>
-
-                        {/* Organization Plan */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            className="bg-gradient-to-br from-[#0A0D1A] to-[#141830] border-[8px] border-[#5AA564]/20 rounded-[3.5rem] p-12 shadow-[0_60px_120px_rgba(0,0,0,0.4)] relative overflow-hidden group transform md:-translate-y-8 hover:-translate-y-12 transition-all duration-700"
-                        >
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#5AA564]/20 to-transparent rounded-bl-[10rem] -z-10 group-hover:scale-110 transition-transform duration-700" />
-                            <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#5AA564] text-white text-[11px] font-black uppercase tracking-widest rounded-full mb-10 shadow-lg shadow-[#5AA564]/20 animate-pulse">
-                                <Star size={14} className="fill-white" />
-                                الأكثر توفيراً للجهات والجمعيات
-                            </div>
-                            <h3 className="text-3xl font-black text-white mb-2">باقة الجهات والمنظمات</h3>
-                            <p className="text-white/40 font-bold text-base mb-12">حلول متكاملة للجمعيات والمؤسسات التعليمية</p>
-
-                            <div className="flex items-baseline gap-3 mb-6 group-hover:scale-105 origin-right transition-transform">
-                                <span className="text-2xl font-bold text-white/20 line-through">120</span>
-                                <span className="text-7xl font-black text-[#5AA564] tracking-tighter drop-shadow-[0_0_30px_rgba(90,165,100,0.3)]">102</span>
+                        <div className="bg-[#0A0D1A] border-8 border-[#5AA564]/20 rounded-[3.5rem] p-12 shadow-2xl">
+                            <h3 className="text-3xl font-black text-white mb-6">باقة الجهات والمنظمات</h3>
+                            <div className="flex items-baseline gap-3 mb-12">
+                                <span className="text-7xl font-black text-[#5AA564] tracking-tighter">102</span>
                                 <span className="text-xl font-bold text-white/30">ر.س / للمستخدم</span>
                             </div>
-                            <div className="text-[11px] font-black text-[#5AA564] mb-12 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#5AA564] shadow-[0_0_8px_#5AA564]" />
-                                خصم خاص عند شراء 50 رخصة أو أكثر
-                            </div>
-
                             <ul className="space-y-6 mb-16">
-                                {['لوحة تحكم إدارية خاصة', 'توليد أكواد تفعيل فورية', 'إدارة المستخدمين والأجهزة', 'تقارير أداء ومتابعة'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-4 text-base font-bold text-white/80 group-hover:translate-x-[-4px] transition-transform" style={{ transitionDelay: `${i * 50}ms` }}>
-                                        <div className="w-7 h-7 rounded-full bg-[#5AA564] flex items-center justify-center text-white shadow-lg shadow-[#5AA564]/40">
-                                            <Check size={16} strokeWidth={3} />
-                                        </div>
+                                {['لوحة تحكم إدارية خاصة', 'توليد أكواد تفعيل فورية', 'إدارة المستخدمين والأجهزة'].map((item, i) => (
+                                    <li key={i} className="flex items-center gap-4 text-base font-bold text-white/80">
+                                        <Check size={16} className="text-[#5AA564]" />
                                         {item}
                                     </li>
                                 ))}
                             </ul>
-
-                            <Link href="/pay?type=org" className="group relative overflow-hidden flex items-center justify-center gap-4 w-full h-22 bg-[#5AA564] hover:bg-[#4A8F53] text-white font-black uppercase tracking-widest text-xs rounded-[2rem] transition-all shadow-2xl shadow-[#5AA564]/30 active:scale-95">
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine" />
-                                <span className="relative z-10 text-sm">شراء للجهات والمنظمات</span>
-                                <ArrowLeft size={20} className="relative z-10 group-hover:-translate-x-2 transition-transform" />
+                            <Link href="/pay?type=org" className="flex items-center justify-center gap-4 w-full h-16 bg-[#5AA564] text-white font-black rounded-2xl text-sm hover:scale-105 transition-transform">
+                                شراء للجهات والمنظمات
                             </Link>
-                        </motion.div>
+                        </div>
                     </div>
-
-                    {/* Bulk pricing note */}
-                    <div className="mt-12 text-center">
-                        <p className="text-gray-400 font-bold text-sm">
-                            تحتاج لأكثر من 1000 رخصة؟ <a href="mailto:sales@alsababah.com" className="text-[#5AA564] hover:underline">تواصل مع قسم المبيعات</a> للحصول على عرض سعر مخصص بخصم 15%.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── Features ── */}
-            <section id="features" className="py-20 bg-white relative overflow-hidden">
-                <div className="absolute top-1/2 left-0 w-96 h-96 bg-[#5AA564]/5 blur-[120px] rounded-full -translate-x-1/2" />
-                <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="text-center mb-24">
-                        <div className="inline-block px-4 py-1 bg-gray-50 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">المميزات الأساسية</div>
-                        <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter mb-8">تصميم يُركز على المضمون</h2>
-                        <p className="text-gray-500 font-bold max-w-2xl mx-auto text-xl leading-relaxed">
-                            ابتعدنا عن التعقيد، لنقدم تجربة سهلة وسريعة تمكنك من التركيز على حفظ وتلاوة كتاب الله بأحدث التقنيات.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        {[
-                            { icon: <HandMetal size={32} />, title: "لغة الإشارة المعتمدة", desc: "فيديوهات دقيقة تم مراجعتها لضمان ترجمة معاني الآيات بدقة متناهية وبأسلوب واضح." },
-                            { icon: <Video size={32} />, title: "مكتبة فيديو HD", desc: "أكثر من 6000 فيديو عالي الدقة (HD) تم تصويرها باحترافية لتجربة بصرية مريحة للعينين." },
-                            { icon: <Globe size={32} />, title: "بدون إنترنت", desc: "حمل المقاطع التي تود مشاهدتها واستخدم المنصة بالكامل أوفلاين كأنك متصل تماماً." }
-                        ].map((f, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className="group p-10 bg-white border border-gray-100 rounded-[2.5rem] hover:border-[#5AA564]/30 hover:shadow-[0_40px_80px_rgba(90,165,100,0.06)] transition-all duration-500 hover:-translate-y-2"
-                            >
-                                <div className="w-16 h-16 rounded-2xl bg-gray-50 text-[#5AA564] flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-[#5AA564] group-hover:text-white transition-all duration-500 group-hover:rotate-6 shadow-sm">
-                                    {f.icon}
-                                </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-4">{f.title}</h3>
-                                <p className="text-gray-400 font-bold text-base leading-relaxed">{f.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-
-            {/* ── Stats ── */}
-            <section className="bg-white py-16 border-y border-gray-100/50">
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10">
-                    <StatBadge value="+10K" label="مستفيد نشط" icon={<Users size={24} />} />
-                    <StatBadge value="114" label="سورة تفاعلية" icon={<BookOpen size={24} />} />
-                    <StatBadge value="100%" label="دقة الترجمة" icon={<Shield size={24} />} />
-                    <StatBadge value="4.9" label="تقييم المتجر" icon={<Star size={24} />} />
                 </div>
             </section>
 
@@ -788,7 +562,7 @@ export default function LandingPage() {
                 <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-[#5AA564]/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
                     <div className="w-24 h-24 bg-white shadow-xl shadow-gray-200/50 rounded-3xl flex items-center justify-center mx-auto mb-10 overflow-hidden">
-                        <img src="/logo/logo.png" alt="شعار التطبيق" className="w-14 h-14 object-contain hover:scale-110 transition-transform duration-500" />
+                        <img src="/logo/logo.png" alt="Logo" className="w-14 h-14 object-contain hover:scale-110 transition-transform duration-500" />
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">جاهز لاحتضان التغيير؟</h2>
                     <p className="text-xl text-gray-500 font-medium mb-12 max-w-2xl mx-auto">
@@ -809,7 +583,7 @@ export default function LandingPage() {
             <footer className="bg-white py-8 border-t border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
-                        <img src="/logo/logo.png" alt="شعار شركة السبابة الرقمية" className="w-10 h-10 object-contain" />
+                        <img src="/logo/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
                         <div className="flex flex-col">
                             <span className="text-lg font-extrabold text-gray-900">مصحف أنامل للصم</span>
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">إحدى مبادرات شركة السبابة الرقمية</span>

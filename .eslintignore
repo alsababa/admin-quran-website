@@ -1,0 +1,12 @@
+_next/
+node_modules/
+public/
+build/
+dist/
+.next/
+.gemini/
+out/
+*.min.js
+*.chunk.js
+turbopack-*.js
+ff1a16fafef87110.js

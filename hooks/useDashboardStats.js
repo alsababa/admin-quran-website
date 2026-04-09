@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { supabase } from '@/lib/supabase';
+import { getDashboardStatsAdmin } from '@/app/actions/userActions';
 
 export function useDashboardStats() {
     const [loading, setLoading] = useState(true);

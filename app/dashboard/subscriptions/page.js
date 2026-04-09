@@ -101,6 +101,21 @@ export default function SubscriptionsPage() {
         return matchesSearch && matchesPlatform && matchesType;
     });
 
+    const handleUpgradeFoundUser = async (user, type) => {
+        setIsProcessing(true);
+        try {
+            await upgradeUser(user, type);
+            showToast(`تم تفعيل العضوية المميزة (${type === 'entity' ? 'جهة' : 'فرد'}) بنجاح`);
+            setIsUpgradeModalOpen(false);
+            setSelectedUserForUpgrade(null);
+            setSearchUserEmail('');
+        } catch (err) {
+            showToast('فشل في تفعيل العضوية', 'error');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const handleRevoke = async (user) => {
         if (!confirm(`هل أنت متأكد من إلغاء اشتراك ${user.displayName || user.email}؟`)) return;
         setIsProcessing(true);
