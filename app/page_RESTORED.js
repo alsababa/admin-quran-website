@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HandMetal, Smartphone, Star, Users, Video, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote, Loader2 } from 'lucide-react';
 
 const StatBadge = ({ value, label, icon }) => (
-    <motion.div 
+    <motion.div
         whileHover={{ y: -8, scale: 1.05 }}
         className="text-center group p-8 bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_40px_80px_rgba(90,165,100,0.08)] transition-all duration-500 relative overflow-hidden"
     >
@@ -50,7 +50,7 @@ export default function LandingPage() {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setShow3D(true);
-                    observer.disconnect(); 
+                    observer.disconnect();
                 }
             },
             { threshold: 0.1 }
@@ -310,21 +310,15 @@ export default function LandingPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            whileHover={{ y: -8 }}
-                            viewport={{ once: true }}
-                            className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-white rounded-[4rem] p-12 flex flex-col items-center text-center shadow-[0_40px_100px_rgba(0,0,0,0.05)] border border-gray-100"
-                        >
+                        <Link href="/qibla" className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-white rounded-[4rem] p-12 flex flex-col items-center text-center shadow-[0_40px_100px_rgba(0,0,0,0.05)] border border-gray-100 hover:scale-[1.02] transition-all duration-500 cursor-pointer">
                             <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4AF37]/5 blur-3xl rounded-full -mr-20 -mt-20 group-hover:bg-[#D4AF37]/10 transition-colors duration-700" />
-                            
+
                             <div className="relative z-10 w-full mb-8">
-                                <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-[2rem] flex items-center justify-center text-[#D4AF37] mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 shadow-[0_15px_30px_rgba(212,175,55,0.1)]">
+                                <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37]/10 to-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-[2rem] flex items-center justify-center text-[#D4AF37] mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 shadow-[0_15px_30px_rgba(212,175,55,0.15)]">
                                     <Compass size={40} className="drop-shadow-sm" />
                                 </div>
                                 <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">القبلة ومواقيت الصلاة</h3>
-                                <p className="text-gray-400 font-bold text-lg leading-relaxed">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي بتصميم عصري.</p>
+                                <p className="text-gray-400 font-bold text-lg leading-relaxed">بوصلة ذهبية دقيقة وخدمة تحديد المواقيت حسب موقعك الجغرافي بتصميم عصري (اضغط هنا للاستكشاف).</p>
                             </div>
 
                             {/* Mini Prayer Times List Mockup inside the card */}
@@ -340,7 +334,7 @@ export default function LandingPage() {
                                     </div>
                                 ))}
                             </div>
-                        </motion.div>
+                        </Link>
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

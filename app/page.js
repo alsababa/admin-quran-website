@@ -259,10 +259,10 @@ export default function LandingPage() {
                                 <motion.div
                                     animate={{ y: [0, -20, 0] }}
                                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative bg-white p-3 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden"
+                                    className="relative bg-white/10 backdrop-blur-3xl p-4 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.1)] border border-white/20 overflow-hidden"
                                 >
-                                    <img src="/mockups/quran_main.png" alt="App Preview" className="w-[380px] h-auto rounded-[3.5rem]" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+                                    <img src="/mockups/quran_main.png" alt="App Preview" className="w-[450px] h-auto rounded-[3.5rem] brightness-110" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                                 </motion.div>
                                 
                                 {/* Floating Badges */}
@@ -306,6 +306,42 @@ export default function LandingPage() {
                             <span key={i} className="text-xl md:text-2xl font-black text-gray-400 cursor-default hover:text-[#5AA564] transition-colors whitespace-nowrap">{partner}</span>
                         ))}
                     </div>
+                </div>
+            </section>
+
+            {/* ── Infinite Scrolling Mockups Belt ── */}
+            <section className="py-20 bg-white overflow-hidden border-b border-gray-50">
+                <div className="relative flex overflow-hidden group">
+                    <motion.div 
+                        animate={{ x: ["0%", "-50%"] }}
+                        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                        className="flex gap-12 whitespace-nowrap min-w-full"
+                    >
+                        {[
+                            "/mockups/adhkar.png",
+                            "/mockups/prayer.png",
+                            "/mockups/app_steps.png",
+                            "/mockups/quran_main.png"
+                        ].map((src, i) => (
+                            <div key={i} className="w-[300px] h-[550px] flex-shrink-0 bg-white rounded-[3rem] p-3 shadow-2xl border border-gray-100 group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+                                <img src={src} alt={`Mockup ${i}`} className="w-full h-full object-cover rounded-[2.5rem]" />
+                            </div>
+                        ))}
+                        {/* Repeat for seamless loop */}
+                        {[
+                            "/mockups/adhkar.png",
+                            "/mockups/prayer.png",
+                            "/mockups/app_steps.png",
+                            "/mockups/quran_main.png"
+                        ].map((src, i) => (
+                            <div key={i + 10} className="w-[300px] h-[550px] flex-shrink-0 bg-white rounded-[3rem] p-3 shadow-2xl border border-gray-100 group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+                                <img src={src} alt={`Mockup Dupe ${i}`} className="w-full h-full object-cover rounded-[2.5rem]" />
+                            </div>
+                        ))}
+                    </motion.div>
+                </div>
+                <div className="max-w-7xl mx-auto px-6 mt-12 text-center">
+                    <p className="text-gray-400 font-bold text-lg">استكشف واجهات التطبيق المتعددة المصممة لراحتك</p>
                 </div>
             </section>
 
@@ -419,9 +455,8 @@ export default function LandingPage() {
                                 <div className="w-16 h-16 bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] flex items-center justify-center text-white mb-8">
                                     <Layers size={28} />
                                 </div>
-                                <h3 className="text-4xl font-black text-white mb-6 tracking-tight">ترجمة الأذكار والسنن</h3>
                                 <p className="text-white/50 font-bold text-xl leading-relaxed mb-10">مكتبة فيديو شاملة لكل ما يحتاجه المسلم في يومه، من أذكار الصباح والمساء إلى تعليم الصلاة.</p>
-                                <img src="/mockups/adhkar.png" alt="Adhkar" className="absolute -left-20 -bottom-20 w-[450px] rotate-6 group-hover:rotate-0 transition-transform duration-700 md:block hidden" />
+                                <img src="/mockups/adhkar.png" alt="Adhkar" className="absolute -left-20 -bottom-20 w-[480px] rotate-6 group-hover:rotate-0 transition-transform duration-700 md:block hidden drop-shadow-2xl" />
                             </div>
                         </motion.div>
 
@@ -477,13 +512,13 @@ export default function LandingPage() {
                             <StepIndicator number="03" title="مشاهدة الترجمة" desc="استمتع بالمعنى بكل جوارحك عبر ترجمة إشارة احترافية ترافق كل آية نطقاً وحركة." delay={0.3} />
                         </div>
                         <div className="relative flex justify-center lg:justify-end">
-                            <motion.div 
+                                <motion.div 
                                 initial={{ opacity: 0, rotate: -5 }}
                                 whileInView={{ opacity: 1, rotate: 0 }}
                                 viewport={{ once: true }}
-                                className="relative w-[340px] bg-gray-900 rounded-[3.5rem] p-3 shadow-[0_50px_100px_rgba(0,0,0,0.2)]"
+                                className="relative w-[380px] bg-white p-2 rounded-[4rem] shadow-[0_50px_100px_rgba(0,0,0,0.15)] border border-gray-100"
                             >
-                                <img src="/mockups/quran_main.png" alt="Process" className="w-full h-auto rounded-[3rem]" />
+                                <img src="/mockups/app_steps.png" alt="Process" className="w-full h-auto rounded-[3.5rem]" />
                                 <div className="absolute -right-12 top-1/4 w-24 h-24 bg-[#5AA564] flex items-center justify-center rounded-[2rem] shadow-xl animate-bounce">
                                     <Download className="text-white" size={32} />
                                 </div>
