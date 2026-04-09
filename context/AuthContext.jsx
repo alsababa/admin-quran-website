@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {mounted && (!loading ? children : null)}
+            {children}
         </AuthContext.Provider>
     );
 };

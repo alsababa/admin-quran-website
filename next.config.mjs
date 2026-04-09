@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'export',
+    // Temporarily disabled for debugging 500 error
+    // output: 'export',
     images: {
         unoptimized: true,
     },
-    // Required for static export on some subdirectories
-    trailingSlash: true,
 };
 
 export default nextConfig;
