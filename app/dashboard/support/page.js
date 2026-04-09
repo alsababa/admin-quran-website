@@ -12,8 +12,25 @@ import {
     Mail,
     Phone,
     Paperclip,
-    Send
+    Send,
+    ArrowLeft
 } from 'lucide-react';
+
+// ── Shared Header Component ──────────────────────────────
+const SectionHeader = ({ title, subtitle, accentColor = "#5AA564" }) => (
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+        <div className="text-right">
+            <h1 className="text-5xl font-black text-gray-900 tracking-tighter flex items-center justify-end gap-5">
+                {title}
+                <div 
+                    className="w-2 h-12 rounded-full shadow-lg"
+                    style={{ background: `linear-gradient(to bottom, ${accentColor}, transparent)` }} 
+                />
+            </h1>
+            <p className="text-[#5AA564] font-black text-[11px] mt-4 tracking-[0.4em] uppercase opacity-40">{subtitle}</p>
+        </div>
+    </div>
+);
 
 // بيانات وهمية مؤقتة حتى نربطها بقاعدة البيانات
 const initialTickets = [
@@ -74,121 +91,120 @@ export default function SupportPage() {
     };
 
     return (
-        <div className="space-y-10 pb-20 h-full flex flex-col">
+        <div className="space-y-12 pb-20 h-full flex flex-col">
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0">
-                <div className="text-right">
-                    <h3 className="text-4xl font-black text-white tracking-tighter">الدعم الفني</h3>
-                    <p className="text-[#5AA564]/40 font-bold text-sm mt-2">إدارة تذاكر الدعم والرد على استفسارات المستخدمين.</p>
-                </div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 shrink-0">
+                <SectionHeader 
+                    title="الدعم الفني" 
+                    subtitle="Technical Support Desk" 
+                />
 
-                <div className="flex gap-4 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-80 group">
-                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30" size={18} />
+                <div className="relative w-full md:w-96 group">
+                     <div className="absolute -inset-1 bg-gradient-to-r from-[#5AA564]/20 to-blue-400/20 rounded-[2rem] blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                     <div className="relative flex items-center bg-white border border-gray-100 rounded-[2rem] px-6 py-4 shadow-sm group-hover:border-[#5AA564]/30 transition-all">
+                        <Search className="text-gray-300 group-hover:text-[#5AA564] transition-colors" size={20} />
                         <input
                             type="text"
                             placeholder="رقم التذكرة، اسم المستخدم..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full h-14 glass-input rounded-2xl pr-14 pl-6 text-sm font-medium text-white placeholder:text-[#5AA564]/20 focus:border-[#5AA564]/40 transition-all"
+                            className="bg-transparent border-none outline-none text-gray-900 text-sm font-bold mr-4 w-full placeholder:text-gray-300"
                         />
                     </div>
                 </div>
             </div>
 
             {/* Support Desk Layout */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[600px]">
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 min-h-[700px]">
                 
                 {/* Tickets List */}
-                <div className="lg:col-span-5 xl:col-span-4 glass-panel border-[#5AA564]/10 rounded-[2.5rem] flex flex-col overflow-hidden">
-                    <div className="p-6 border-b border-[#5AA564]/5 flex justify-between items-center bg-[#5AA564]/5">
-                        <h4 className="font-black text-white flex items-center gap-3">
+                <div className="lg:col-span-5 xl:col-span-4 glass-panel border-gray-100 rounded-[3.5rem] flex flex-col overflow-hidden bg-white/50 backdrop-blur-xl shadow-2xl">
+                    <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                        <h4 className="font-black text-gray-900 text-sm flex items-center gap-3">
                             <MessageSquare className="text-[#5AA564]" size={20} />
                             التذاكر الواردة
                         </h4>
-                        <span className="bg-[#5AA564]/20 text-[#5AA564] px-3 py-1 text-[10px] font-black rounded-full border border-[#5AA564]/20">
-                            {filteredTickets.length} تذكرة
+                        <span className="bg-emerald-50 text-[#5AA564] px-4 py-1 text-[10px] font-black rounded-full border border-emerald-100 uppercase tracking-widest shadow-sm">
+                            {filteredTickets.length} ACTIVE
                         </span>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
                         {filteredTickets.map(ticket => (
-                            <div 
+                            <motion.div 
                                 key={ticket.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
                                 onClick={() => setSelectedTicket(ticket)}
-                                className={`p-5 rounded-2xl cursor-pointer transition-all border ${
+                                className={`p-6 rounded-[2rem] cursor-pointer transition-all border ${
                                     selectedTicket?.id === ticket.id 
-                                    ? 'bg-[#5AA564]/10 border-[#5AA564]/30 shadow-lg' 
-                                    : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-[#5AA564]/20'
-                                }`}
+                                    ? 'bg-white border-[#5AA564]/30 shadow-xl shadow-gray-200/50 scale-[1.02]' 
+                                    : 'bg-white/40 border-gray-50 hover:bg-white hover:border-gray-200 hover:shadow-lg'
+                                } group`}
                             >
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${ticket.status === 'open' ? 'bg-[#5AA564] animate-pulse shadow-[0_0_8px_rgba(90,165,100,0.8)]' : 'bg-gray-500'}`} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50">{ticket.id}</span>
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-2.5 h-2.5 rounded-full ${ticket.status === 'open' ? 'bg-[#5AA564] shadow-[0_0_12px_rgba(90,165,100,0.5)] animate-pulse' : 'bg-gray-200'}`} />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 group-hover:text-[#5AA564] transition-colors">{ticket.id}</span>
                                     </div>
-                                    <span className="text-[10px] text-[#5AA564]/40 font-bold">{ticket.date}</span>
+                                    <span className="text-[10px] text-gray-400 font-bold">{ticket.date}</span>
                                 </div>
-                                <h5 className="font-bold text-white text-sm mb-1">{ticket.subject}</h5>
-                                <p className="text-xs text-[#5AA564]/60 truncate">{ticket.user.name}</p>
-                            </div>
+                                <h5 className="font-black text-gray-900 text-base mb-1.5">{ticket.subject}</h5>
+                                <p className="text-xs font-bold text-gray-400 truncate">{ticket.user.name}</p>
+                            </motion.div>
                         ))}
-                        {filteredTickets.length === 0 && (
-                            <div className="text-center py-10 text-[#5AA564]/40 font-bold text-sm">
-                                لا توجد تذاكر متطابقة مع بحثك
-                            </div>
-                        )}
                     </div>
                 </div>
 
-                {/* Ticket Details & Chat */}
-                <div className="lg:col-span-7 xl:col-span-8 glass-panel border-[#5AA564]/10 rounded-[2.5rem] flex flex-col overflow-hidden relative shadow-3xl">
+                {/* Ticket Details & Chat Area */}
+                <div className="lg:col-span-7 xl:col-span-8 glass-panel border-gray-100 rounded-[3.5rem] flex flex-col overflow-hidden relative shadow-3xl bg-white/50 backdrop-blur-xl">
                     {selectedTicket ? (
                         <>
                             {/* Chat Header */}
-                            <div className="p-6 md:p-8 border-b border-[#5AA564]/5 bg-[#0D1510]/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div className="p-10 border-b border-gray-50 bg-white/70 backdrop-blur-md flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                                 <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <span className="px-3 py-1 bg-[#5AA564]/10 border border-[#5AA564]/20 text-[#5AA564] text-[10px] font-black rounded-lg uppercase tracking-widest">
+                                    <div className="flex items-center gap-4 mb-3">
+                                        <span className="px-4 py-1.5 bg-gray-50 border border-gray-100 text-gray-400 text-[10px] font-black rounded-lg uppercase tracking-[0.2em]">
                                             {selectedTicket.id}
                                         </span>
-                                        <h4 className="text-lg font-black text-white">{selectedTicket.subject}</h4>
+                                        <h4 className="text-2xl font-black text-gray-900 tracking-tight">{selectedTicket.subject}</h4>
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-[#5AA564]/50">
-                                        <span className="flex items-center gap-1.5"><User size={14} /> {selectedTicket.user.name}</span>
-                                        <span className="flex items-center gap-1.5"><Mail size={14} /> {selectedTicket.user.email}</span>
-                                        <span className="flex items-center gap-1.5"><Phone size={14} /> {selectedTicket.user.phone}</span>
+                                    <div className="flex flex-wrap items-center gap-6 text-xs font-bold text-gray-400">
+                                        <span className="flex items-center gap-2"><User size={14} className="opacity-40" /> {selectedTicket.user.name}</span>
+                                        <span className="flex items-center gap-2"><Mail size={14} className="opacity-40" /> {selectedTicket.user.email}</span>
+                                        <span className="flex items-center gap-2"><Phone size={14} className="opacity-40" /> {selectedTicket.user.phone}</span>
                                     </div>
                                 </div>
                                 
                                 <div className="flex items-center gap-3 shrink-0">
-                                    <button className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                    <button className={`h-12 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm ${
                                         selectedTicket.status === 'closed' 
-                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' 
-                                        : 'bg-[#5AA564]/10 text-[#5AA564] border-[#5AA564]/20 hover:bg-[#5AA564] hover:text-[#0D1510]'
+                                        ? 'bg-rose-50 text-rose-500 border-rose-100' 
+                                        : 'bg-[#5AA564] text-white border-[#5AA564] hover:bg-gray-900'
                                     }`}>
                                         {selectedTicket.status === 'open' ? 'إغلاق التذكرة' : 'مغلقة'}
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Chat Messages */}
-                            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 custom-scrollbar bg-gradient-to-b from-transparent to-[#5AA564]/5">
-                                {selectedTicket.messages.map((msg) => (
+                            {/* Chat History */}
+                            <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar bg-gradient-to-b from-transparent to-gray-50/30">
+                                {selectedTicket.messages.map((msg, idx) => (
                                     <motion.div 
                                         key={msg.id}
-                                        initial={{ opacity: 0, y: 10 }}
+                                        initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className={`flex flex-col max-w-[80%] ${msg.sender === 'admin' ? 'mr-auto items-end' : 'ml-auto items-start'}`}
+                                        transition={{ delay: idx * 0.1 }}
+                                        className={`flex flex-col max-w-[85%] ${msg.sender === 'admin' ? 'mr-auto items-end text-left' : 'ml-auto items-start text-right'}`}
                                     >
-                                        <div className="flex items-center gap-2 mb-2 px-1">
-                                            <span className="text-[10px] font-black text-[#5AA564]/40">{msg.sender === 'admin' ? 'الإدارة' : selectedTicket.user.name}</span>
-                                            <span className="text-[10px] text-[#5AA564]/30">{msg.time}</span>
+                                        <div className={`flex items-center gap-3 mb-2 px-2 uppercase tracking-widest font-black text-[9px] ${msg.sender === 'admin' ? 'flex-row' : 'flex-row-reverse'}`}>
+                                            <span className="text-gray-300">{msg.time}</span>
+                                            <span className={msg.sender === 'admin' ? 'text-[#5AA564]' : 'text-blue-400'}>{msg.sender === 'admin' ? 'ADMIN SUPPORT' : 'USER MESSAGE'}</span>
                                         </div>
-                                        <div className={`p-4 md:p-5 rounded-2xl text-sm leading-relaxed shadow-lg ${
+                                        <div className={`p-6 rounded-[2.5rem] text-sm font-bold leading-relaxed shadow-lg ${
                                             msg.sender === 'admin' 
-                                            ? 'bg-[#5AA564] text-[#0D1510] font-bold rounded-tl-none' 
-                                            : 'glass-card border-[#5AA564]/20 text-[#F5F2ED] rounded-tr-none'
+                                            ? 'bg-emerald-600 text-white shadow-emerald-500/10 rounded-tl-none' 
+                                            : 'bg-white border border-gray-100 text-gray-900 shadow-gray-200/50 rounded-tr-none'
                                         }`}>
                                             {msg.text}
                                         </div>
@@ -196,15 +212,15 @@ export default function SupportPage() {
                                 ))}
                             </div>
 
-                            {/* Chat Input */}
-                            <div className="p-6 bg-[#0D1510]/80 border-t border-[#5AA564]/10 backdrop-blur-xl">
-                                <form onSubmit={handleSendReply} className="flex items-end gap-3 relative">
-                                    <div className="flex-1 relative">
+                            {/* Chat Entry Area */}
+                            <div className="p-8 bg-white border-t border-gray-50 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+                                <form onSubmit={handleSendReply} className="flex items-end gap-5">
+                                    <div className="flex-1 relative group">
                                         <textarea 
-                                            placeholder="اكتب ردك هنا..."
+                                            placeholder="اكتب ردك الاحترافي هنا..."
                                             value={replyText}
                                             onChange={(e) => setReplyText(e.target.value)}
-                                            className="w-full glass-input rounded-2xl p-4 pr-12 min-h-[60px] max-h-[150px] resize-y text-sm font-medium text-white placeholder:text-[#5AA564]/30 focus:border-[#5AA564]/40 custom-scrollbar"
+                                            className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] p-5 pr-14 min-h-[70px] max-h-[200px] text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white transition-all shadow-sm custom-scrollbar"
                                             rows="2"
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -213,26 +229,30 @@ export default function SupportPage() {
                                                 }
                                             }}
                                         />
-                                        <button type="button" className="absolute top-4 right-4 text-[#5AA564]/40 hover:text-[#5AA564] transition-colors">
-                                            <Paperclip size={18} />
+                                        <button type="button" className="absolute top-5 right-6 text-gray-300 hover:text-[#5AA564] transition-colors">
+                                            <Paperclip size={20} />
                                         </button>
                                     </div>
                                     <button 
                                         type="submit"
                                         disabled={!replyText.trim()}
-                                        className="h-14 w-14 shrink-0 bg-[#5AA564] text-[#0D1510] rounded-2xl flex items-center justify-center hover:bg-white transition-all disabled:opacity-50 disabled:hover:bg-[#5AA564] shadow-xl shadow-[#5AA564]/20"
+                                        className="h-16 w-16 shrink-0 bg-[#5AA564] text-white rounded-[1.5rem] flex items-center justify-center hover:bg-gray-900 transition-all disabled:opacity-30 disabled:hover:bg-[#5AA564] shadow-xl shadow-[#5AA564]/20 active:scale-90"
                                     >
-                                        <Send size={20} className="mr-1 mt-1" />
+                                        <Send size={24} className="mr-0.5 mt-0.5" />
                                     </button>
                                 </form>
-                                <p className="text-center text-[10px] text-[#5AA564]/30 mt-3 font-bold">اضغط Enter للإرسال، Shift + Enter لسطر جديد</p>
+                                <p className="text-center text-[10px] text-gray-300 mt-4 font-black uppercase tracking-widest opacity-60">Press ENTER to send professional reply</p>
                             </div>
                         </>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-[#5AA564]/30 p-10 text-center">
-                            <MessageSquare size={64} className="mb-6 opacity-20" />
-                            <h4 className="text-xl font-black text-white mb-2">اختر تذكرة للبدء</h4>
-                            <p className="text-sm font-bold max-w-sm leading-relaxed">قم باختيار إحدى التذاكر من القائمة الجانبية لعرض تفاصيلها والرد على استفسار المستخدم.</p>
+                        <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
+                            <div className="h-32 w-32 bg-gray-50 rounded-[3rem] flex items-center justify-center mb-8 shadow-sm">
+                                <MessageSquare size={54} className="text-[#5AA564] opacity-20" />
+                            </div>
+                            <h4 className="text-3xl font-black text-gray-900 mb-4 tracking-tighter">اختر تذكرة للبدء</h4>
+                            <p className="text-sm font-bold text-gray-400 max-w-sm leading-relaxed">
+                                قم باختيار إحدى التذاكر النشطة من القائمة الجانبية لعرض تفاصيلها والرد على استفسار المستخدم وتطبيق "ثقافة العناية بالعميل".
+                            </p>
                         </div>
                     )}
                 </div>

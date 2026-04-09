@@ -5,9 +5,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Trash2, Shield, Mail, Calendar,
     ChevronDown, Filter, Edit3, X, Loader2,
-    CheckCircle2, AlertTriangle, User, Smartphone, Globe, Building2, Apple
+    CheckCircle2, AlertTriangle, User, Smartphone, Globe, Building2, Apple,
+    ArrowLeft
 } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
+
+// ── Shared Components ─────────────────────────────────────
+const SectionHeader = ({ title, subtitle, icon, accentColor = "#5AA564" }) => (
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+        <div className="text-right">
+            <h3 className="text-4xl font-black text-gray-900 tracking-tighter flex items-center gap-4 justify-end">
+                {title}
+                <div 
+                    className="w-1.5 h-10 rounded-full shadow-lg"
+                    style={{ background: `linear-gradient(to bottom, ${accentColor}, transparent)` }} 
+                />
+            </h3>
+            <p className="text-[#5AA564] font-black text-[10px] mt-3 tracking-[0.3em] uppercase opacity-40">{subtitle}</p>
+        </div>
+    </div>
+);
 
 // ── Toast Notification ────────────────────────────────────
 const Toast = ({ message, type, onClose }) => (
@@ -18,12 +35,21 @@ const Toast = ({ message, type, onClose }) => (
         className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border text-sm font-bold backdrop-blur-xl
             ${type === 'success'
                 ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'
-                : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
+                : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}
     >
         {type === 'success' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
         <span>{message}</span>
-        <button onClick={onClose} className="ml-2 opacity-60 hover:opacity-100"><X size={14} /></button>
+        <button onClick={onClose} className="ml-2 opacity-40 hover:opacity-100 transition-opacity"><X size={14} /></button>
     </motion.div>
+);
+
+// ── Modal Backdrop ────────────────────────────────────────
+const ModalBackdrop = ({ onClick }) => (
+    <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClick}
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+    />
 );
 
 // ── Edit User Modal ───────────────────────────────────────
@@ -38,50 +64,46 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={onClose}
-                className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
-            />
+            <ModalBackdrop onClick={onClose} />
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(201,168,76,0.1)]"
+                className="glass-panel w-full max-w-md rounded-[3rem] p-10 relative shadow-2xl bg-white/90 backdrop-blur-3xl"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#5AA564]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1.5px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 left-7 text-gray-300 hover:text-gray-900 transition-colors">
                     <X size={20} />
                 </button>
 
-                <div className="flex items-center gap-4 mb-8 text-right">
-                    <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center font-black text-[#5AA564] text-xl">
-                        {name?.charAt(0) || <User size={22} />}
+                <div className="flex items-center gap-4 mb-8 text-right justify-end">
+                    <div className="text-right">
+                        <h4 className="text-2xl font-black text-gray-900">تعديل المستخدم</h4>
+                        <p className="text-[#5AA564] text-[10px] font-black uppercase tracking-widest mt-1 opacity-40">تحديث معلومات الحساب</p>
                     </div>
-                    <div>
-                        <h4 className="text-2xl font-black text-white">تعديل المستخدم</h4>
-                        <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">تحديث معلومات الحساب</p>
+                    <div className="h-14 w-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center font-black text-[#5AA564] text-xl shadow-sm">
+                        {name?.charAt(0) || <User size={22} />}
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2 text-right">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-[#5AA564]/50">الاسم الكامل</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">الاسم الكامل</label>
                         <input
                             type="text"
-                            className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20"
+                            className="w-full h-13 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#5AA564]/30 transition-all"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="اسم المستخدم"
                         />
                     </div>
                     <div className="space-y-2 text-right">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-[#5AA564]/50">البريد الإلكتروني</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">البريد الإلكتروني</label>
                         <div className="relative">
-                            <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5AA564]/25" />
+                            <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" />
                             <input
                                 type="email"
-                                className="w-full h-13 glass-input rounded-xl pr-11 pl-5 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20"
+                                className="w-full h-13 bg-gray-50 border border-gray-100 rounded-2xl pr-11 pl-5 py-3.5 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#5AA564]/30 transition-all"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="user@example.com"
@@ -91,7 +113,7 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
                     <button
                         type="submit"
                         disabled={saving}
-                        className="w-full h-13 bg-[#5AA564] text-[#0A0D1A] font-black rounded-xl hover:bg-[#E8C97A] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                        className="w-full h-14 bg-[#5AA564] text-white font-black rounded-2xl hover:bg-gray-900 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-4 shadow-xl shadow-[#5AA564]/10"
                     >
                         {saving ? <Loader2 size={18} className="animate-spin" /> : 'حفظ التغييرات'}
                     </button>
@@ -104,38 +126,33 @@ const EditModal = ({ user, onSave, onClose, saving }) => {
 // ── Delete Confirm Modal ──────────────────────────────────
 const DeleteModal = ({ user, onConfirm, onClose, deleting }) => (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-        <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
-        />
+        <ModalBackdrop onClick={onClose} />
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="glass-panel w-full max-w-sm rounded-[2.5rem] p-10 relative text-center shadow-[0_0_60px_rgba(239,68,68,0.1)]"
-            style={{ border: '1px solid rgba(239,68,68,0.2)' }}
+            className="glass-panel w-full max-w-sm rounded-[3rem] p-12 relative text-center shadow-2xl bg-white/90 backdrop-blur-3xl"
         >
-            <div className="h-16 w-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-6">
-                <Trash2 size={28} />
+            <div className="h-20 w-20 rounded-[2rem] bg-rose-50 flex items-center justify-center text-rose-500 mx-auto mb-8 shadow-sm">
+                <Trash2 size={32} strokeWidth={1.5} />
             </div>
-            <h4 className="text-xl font-black text-white mb-2">حذف المستخدم؟</h4>
-            <p className="text-xs font-bold text-[#F5F0E8]/40 mb-8 leading-relaxed">
-                سيتم حذف حساب <span className="text-rose-400">{user.displayName || user.email}</span> بشكل نهائي ولا يمكن التراجع.
+            <h4 className="text-2xl font-black text-gray-900 mb-2">حذف المستخدم؟</h4>
+            <p className="text-[11px] font-bold text-gray-400 mb-10 leading-relaxed px-4">
+                سيتم حذف حساب <span className="text-rose-500">{user.displayName || user.email}</span> بشكل نهائي. هذا الإجراء لا يمكن التراجع عنه.
             </p>
-            <div className="flex gap-3">
-                <button
-                    onClick={onClose}
-                    className="flex-1 h-12 glass-card border-[#5AA564]/10 rounded-xl text-[#F5F0E8]/50 font-bold text-sm hover:text-white transition-all"
-                >
-                    إلغاء
-                </button>
+            <div className="flex flex-col gap-3">
                 <button
                     onClick={() => onConfirm(user)}
                     disabled={deleting}
-                    className="flex-1 h-12 bg-rose-500 text-white font-black rounded-xl hover:bg-rose-400 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full h-14 bg-rose-500 text-white font-black rounded-2xl hover:bg-rose-600 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shadow-xl shadow-rose-500/10"
                 >
-                    {deleting ? <Loader2 size={16} className="animate-spin" /> : 'تأكيد الحذف'}
+                    {deleting ? <Loader2 size={16} className="animate-spin" /> : 'تأكيد الحذف النهائي'}
+                </button>
+                <button
+                    onClick={onClose}
+                    className="w-full h-14 bg-gray-50 text-gray-400 font-bold text-xs hover:text-gray-900 hover:bg-gray-100 transition-all rounded-2xl"
+                >
+                    تراجع / إلغاء
                 </button>
             </div>
         </motion.div>
@@ -148,56 +165,52 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 text-right" dir="rtl">
-            <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={onClose}
-                className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
-            />
+            <ModalBackdrop onClick={onClose} />
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(90,165,100,0.15)]"
+                className="glass-panel w-full max-w-md rounded-[3rem] p-10 relative shadow-2xl bg-white/90 backdrop-blur-3xl"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#5AA564]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1.5px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 right-7 text-gray-300 hover:text-gray-900 transition-colors">
                     <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center text-[#5AA564]">
+                    <div className="h-14 w-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#5AA564] shadow-sm">
                         <Shield size={28} />
                     </div>
                     <div>
-                        <h4 className="text-2xl font-black text-white">ترقية الحساب</h4>
-                        <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">منح العضوية المميزة ✨</p>
+                        <h4 className="text-2xl font-black text-gray-900">ترقية الحساب</h4>
+                        <p className="text-[#5AA564] text-[10px] font-black uppercase tracking-widest mt-1 opacity-40">منح العضوية المميزة ✨</p>
                     </div>
                 </div>
 
-                <p className="text-sm font-bold text-white/60 mb-8 leading-relaxed">
+                <p className="text-sm font-bold text-gray-500 mb-8 leading-relaxed">
                     اختر نوع الحساب المميز لـ <span className="text-[#5AA564]">{user.displayName || user.email}</span>.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     <button
                         onClick={() => setType('individual')}
-                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
+                        className={`p-6 rounded-[2rem] border transition-all flex flex-col items-center gap-3 group
                             ${type === 'individual' 
-                                ? 'bg-[#5AA564]/10 border-[#5AA564]/40 text-white' 
-                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                                ? 'bg-emerald-50 border-[#5AA564]/30 text-gray-900 shadow-sm' 
+                                : 'bg-gray-50/50 border-gray-100 text-gray-400 hover:bg-gray-50'}`}
                     >
-                        <User size={24} className={type === 'individual' ? 'text-[#5AA564]' : 'text-white/20'} />
-                        <span className="text-sm font-black">حساب فردي</span>
+                        <User size={24} className={type === 'individual' ? 'text-[#5AA564]' : 'text-gray-200'} />
+                        <span className="text-xs font-black uppercase tracking-wider">حساب فردي</span>
                     </button>
                     <button
                         onClick={() => setType('entity')}
-                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 group
+                        className={`p-6 rounded-[2rem] border transition-all flex flex-col items-center gap-3 group
                             ${type === 'entity' 
-                                ? 'bg-[#5AA564]/10 border-[#5AA564]/40 text-white' 
-                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                                ? 'bg-blue-50 border-blue-200 text-gray-900 shadow-sm' 
+                                : 'bg-gray-50/50 border-gray-100 text-gray-400 hover:bg-gray-50'}`}
                     >
-                        <Building2 size={24} className={type === 'entity' ? 'text-[#5AA564]' : 'text-white/20'} />
-                        <span className="text-sm font-black">جهة / منظمة</span>
+                        <Building2 size={24} className={type === 'entity' ? 'text-blue-500' : 'text-gray-200'} />
+                        <span className="text-xs font-black uppercase tracking-wider">جهة / منظمة</span>
                     </button>
                 </div>
 
@@ -207,17 +220,17 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="space-y-2 mb-8 text-right overflow-hidden"
+                            className="space-y-3 mb-8 text-right overflow-hidden"
                         >
-                            <label className="text-[9px] font-black uppercase tracking-widest text-[#5AA564]/50">معرف المنظمة (Organization ID)</label>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">معرف المنظمة (Organization ID)</label>
                             <input
                                 id="org-id-input"
                                 type="text"
-                                className="w-full h-13 glass-input rounded-xl px-5 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20"
+                                className="w-full h-13 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-blue-200 transition-all"
                                 placeholder="مثلاً: org_123"
                                 required
                             />
-                            <p className="text-[10px] text-white/20">يستخدم هذا المعرف لربط المستخدم بمنظمته في تطبيق الجوال.</p>
+                            <p className="text-[10px] text-gray-300 font-medium">يستخدم هذا المعرف لربط المستخدم بمنظمته في تطبيق الجوال.</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -228,7 +241,7 @@ const UpgradeModal = ({ user, onConfirm, onClose, upgrading }) => {
                         onConfirm(user, type, orgId);
                     }}
                     disabled={upgrading}
-                    className="w-full h-14 bg-[#5AA564] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#4A8F53] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full h-14 bg-[#5AA564] text-white font-black rounded-2xl hover:bg-gray-900 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 shadow-xl shadow-[#5AA564]/10"
                 >
                     {upgrading ? <Loader2 size={20} className="animate-spin" /> : 'تأكيد الترقية الآن'}
                 </button>
@@ -243,80 +256,63 @@ const ChangeTypeModal = ({ user, onConfirm, onClose, saving }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 text-right" dir="rtl">
-            <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={onClose}
-                className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
-            />
+            <ModalBackdrop onClick={onClose} />
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="glass-panel w-full max-w-md rounded-[2.5rem] p-10 relative shadow-[0_0_60px_rgba(90,165,100,0.15)]"
+                className="glass-panel w-full max-w-md rounded-[3rem] p-10 relative shadow-2xl bg-white/90 backdrop-blur-3xl"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
-                <button onClick={onClose} className="absolute top-7 left-7 text-[#5AA564]/40 hover:text-white transition-colors">
+                <div className="absolute top-0 left-8 right-8 h-[1.5px] bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
+                <button onClick={onClose} className="absolute top-7 right-7 text-gray-300 hover:text-gray-900 transition-colors">
                     <X size={20} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="h-14 w-14 rounded-2xl bg-gold-gradient/10 border border-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
+                    <div className="h-14 w-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 shadow-sm">
                         <Building2 size={28} />
                     </div>
                     <div>
-                        <h4 className="text-2xl font-black text-white">تغيير نوع الحساب</h4>
-                        <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">تحديد طبيعة الحساب 🏢</p>
+                        <h4 className="text-2xl font-black text-gray-900">تغيير نوع الحساب</h4>
+                        <p className="text-blue-500 text-[10px] font-black uppercase tracking-widest mt-1 opacity-40">تحديد طبيعة الحساب 🏢</p>
                     </div>
                 </div>
 
-                <p className="text-sm font-bold text-white/60 mb-8 leading-relaxed">
-                    اختر نوع الحساب لـ <span className="text-[#5AA564]">{user.displayName || user.email}</span>.
-                    <br/><span className="text-[10px] text-white/30">لن يتأثر اشتراك المستخدم الحالي.</span>
+                <p className="text-sm font-bold text-gray-500 mb-8 leading-relaxed">
+                    اختر نوع الحساب لـ <span className="text-blue-500">{user.displayName || user.email}</span>.
+                    <br/><span className="text-[10px] text-gray-300">لن يتأثر اشتراك المستخدم الحالي بهذا التغيير.</span>
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-8">
                     <button
                         onClick={() => setType('individual')}
-                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3
+                        className={`p-6 rounded-[2.5rem] border transition-all flex flex-col items-center gap-3
                             ${type === 'individual'
-                                ? 'bg-[#5AA564]/10 border-[#5AA564]/40 text-white'
-                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                                ? 'bg-gray-50 border-[#5AA564]/20 text-gray-900 shadow-sm'
+                                : 'bg-white/50 border-gray-100 text-gray-400 hover:bg-gray-50'}`}
                     >
-                        <User size={24} className={type === 'individual' ? 'text-[#5AA564]' : 'text-white/20'} />
-                        <span className="text-sm font-black">حساب فردي</span>
-                        <span className="text-[10px] text-white/30">مستخدم واحد</span>
+                        <User size={24} className={type === 'individual' ? 'text-[#5AA564]' : 'text-gray-200'} />
+                        <span className="text-xs font-black uppercase tracking-wider">حساب فردي</span>
                     </button>
                     <button
                         onClick={() => setType('entity')}
-                        className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3
+                        className={`p-6 rounded-[2.5rem] border transition-all flex flex-col items-center gap-3
                             ${type === 'entity'
-                                ? 'bg-blue-500/10 border-blue-500/40 text-white'
-                                : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
+                                ? 'bg-blue-50 border-blue-200 text-gray-900 shadow-sm'
+                                : 'bg-white/50 border-gray-100 text-gray-400 hover:bg-gray-50'}`}
                     >
-                        <Building2 size={24} className={type === 'entity' ? 'text-blue-400' : 'text-white/20'} />
-                        <span className="text-sm font-black">جهة / منظمة</span>
-                        <span className="text-[10px] text-white/30">مؤسسة أو شركة</span>
+                        <Building2 size={24} className={type === 'entity' ? 'text-blue-500' : 'text-gray-200'} />
+                        <span className="text-xs font-black uppercase tracking-wider">جهة / منظمة</span>
                     </button>
-                </div>
-
-                {/* Current Status Indicator */}
-                <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-white/3 rounded-2xl border border-white/5">
-                    <div className="w-2 h-2 rounded-full bg-[#5AA564]" />
-                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                        النوع الحالي: {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
-                    </p>
                 </div>
 
                 <button
                     onClick={() => onConfirm(user, type)}
                     disabled={saving || type === user.accountType}
-                    className="w-full h-14 bg-blue-500 text-white font-black rounded-2xl hover:bg-blue-400 transition-all active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full h-15 bg-blue-600 text-white font-black rounded-2xl hover:bg-gray-900 transition-all active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2 shadow-xl shadow-blue-500/10"
                 >
-                    {saving ? <Loader2 size={20} className="animate-spin" /> : 'تغيير نوع الحساب'}
+                    {saving ? <Loader2 size={20} className="animate-spin" /> : 'تحديث نوع الحساب'}
                 </button>
-                {type === user.accountType && (
-                    <p className="text-center text-[10px] text-white/20 mt-3">لا يوجد تغيير — اختر نوعاً مختلفاً</p>
-                )}
             </motion.div>
         </div>
     );
@@ -384,21 +380,15 @@ export default function UsersPage() {
 
     const handleConfirmUpgrade = async (user, type, organizationId) => {
         setIsUpgrading(true);
-        console.log(`Upgrading user ${user.id} to ${type} (OrgID: ${organizationId})...`);
         try {
             await upgradeUser(user, type, organizationId);
             setUpgradingUser(null);
             showToast(`تمت ترقية ${user.displayName || user.email} كـ ${type === 'entity' ? 'جهة' : 'فرد'} للباقة المميزة ✨`);
         } catch (err) {
-            console.error("Critical: Upgrade failed:", err);
             showToast(`فشل تنفيذ الترقية: ${err.message || 'تحقق من الصلاحيات'}`, 'error');
         } finally {
             setIsUpgrading(false);
         }
-    };
-
-    const handleUpgradeClick = (user) => {
-        setUpgradingUser(user);
     };
 
     const handleConfirmChangeType = async (user, type) => {
@@ -415,167 +405,150 @@ export default function UsersPage() {
     };
 
     return (
-        <div className="space-y-10 pb-20">
+        <div className="space-y-12 pb-20">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
                 <div className="text-right">
-                    <h3 className="text-4xl font-black text-white tracking-tighter">قائمة المستخدمين</h3>
-                    <p className="text-[#5AA564]/40 font-bold text-sm mt-2">إدارة والتحكم في حسابات المستخدمين المسجلين.</p>
+                    <h1 className="text-5xl font-black text-gray-900 tracking-tighter flex items-center justify-end gap-5">
+                        قائمة المستخدمين
+                        <div className="w-2 h-12 bg-gradient-to-b from-[#5AA564] to-transparent rounded-full shadow-[0_10px_20px_rgba(90,165,100,0.2)]" />
+                    </h1>
+                    <p className="text-[#5AA564] font-black text-[11px] mt-4 tracking-[0.4em] uppercase opacity-40">User Management System</p>
                 </div>
                 <div className="flex flex-wrap gap-4 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-80 group">
-                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30 group-focus-within:text-[#5AA564] transition-colors" size={17} />
+                    <div className="relative flex-1 md:w-96 group">
+                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#5AA564] transition-colors" size={20} />
                         <input
                             type="text"
-                            placeholder="ابحث عن مستخدم..."
-                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20 focus:border-[#5AA564]/40 transition-all"
+                            placeholder="ابحث عن أي مستخدم ببريده أو اسمه..."
+                            className="w-full h-15 bg-white border border-gray-100 rounded-[2rem] pr-14 pl-6 py-3.5 text-sm font-bold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#5AA564]/30 shadow-sm transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="h-13 px-5 py-3.5 glass-panel border-[#5AA564]/10 rounded-2xl text-[#5AA564]/50 hover:text-[#5AA564] flex items-center gap-2.5 transition-all">
-                        <Filter size={16} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">تصفية</span>
-                        <ChevronDown size={13} />
+                    <button className="h-15 px-6 py-3.5 bg-white border border-gray-100 rounded-[2rem] text-gray-400 hover:text-[#5AA564] hover:border-[#5AA564]/20 flex items-center gap-3 transition-all shadow-sm">
+                        <Filter size={18} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">فرز متقدم</span>
+                        <ChevronDown size={14} />
                     </button>
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#5AA564]/10 shadow-2xl">
+            {/* Table Area */}
+            <div className="glass-panel rounded-[3.5rem] overflow-hidden border-gray-100 shadow-2xl bg-white/50 backdrop-blur-xl">
                 <div className="overflow-x-auto custom-scrollbar">
-                    <table className="w-full text-right">
+                    <table className="w-full text-right border-collapse">
                         <thead>
-                            <tr className="border-b border-[#5AA564]/8 bg-[#5AA564]/5">
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">المستخدم</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">نوع الحساب</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">الحالة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">المنصة</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">تاريخ التسجيل</th>
-                                <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-left">الإجراءات</th>
+                            <tr className="border-b border-gray-50 bg-gray-50/50">
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">ملف المستخدم</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-center">التصنيف</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-center">حالة الاشتراك</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-center">الجهاز الرسمي</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">التواجد</th>
+                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-left">التحكم</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#5AA564]/5">
+                        <tbody className="divide-y divide-gray-50">
                             <AnimatePresence>
                                 {loading ? (
-                                    [1, 2, 3, 4].map(i => (
+                                    [1, 2, 3, 4, 5].map(i => (
                                         <tr key={i} className="animate-pulse">
-                                            <td className="px-8 py-5"><div className="h-10 w-48 bg-[#1E2448]/60 rounded-xl" /></td>
-                                            <td className="px-8 py-5"><div className="h-8 w-24 bg-[#1E2448]/60 rounded-full mx-auto" /></td>
-                                            <td className="px-8 py-5"><div className="h-6 w-32 bg-[#1E2448]/60 rounded-lg" /></td>
-                                            <td className="px-8 py-5"><div className="h-10 w-36 bg-[#1E2448]/60 rounded-xl mr-auto" /></td>
+                                            <td className="px-10 py-7"><div className="h-12 w-64 bg-gray-50 rounded-2xl" /></td>
+                                            <td className="px-10 py-7"><div className="h-8 w-28 bg-gray-50 rounded-full mx-auto" /></td>
+                                            <td className="px-10 py-7"><div className="h-8 w-24 bg-gray-50 rounded-full mx-auto" /></td>
+                                            <td className="px-10 py-7"><div className="h-8 w-32 bg-gray-50 rounded-2xl mr-auto" /></td>
                                         </tr>
                                     ))
                                 ) : filteredUsers.map((user, idx) => (
                                     <motion.tr
                                         key={user.id}
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: idx * 0.04 }}
-                                        className="group hover:bg-[#5AA564]/3 transition-colors"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.03 }}
+                                        className="group hover:bg-[#5AA564]/5 transition-colors"
                                     >
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#5AA564]/20 to-[#4A8F53]/15 border border-[#5AA564]/20 flex items-center justify-center font-black text-[#5AA564] text-sm shrink-0">
+                                        <td className="px-10 py-6">
+                                            <div className="flex items-center gap-5">
+                                                <div className="h-12 w-12 rounded-[1.2rem] bg-gray-50 flex items-center justify-center font-black text-[#5AA564] text-sm overflow-hidden border border-gray-100 shadow-sm transition-transform group-hover:scale-105">
                                                     {user.displayName?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || '?'}
                                                 </div>
                                                 <div className="overflow-hidden">
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="font-extrabold text-white text-sm truncate">{user.displayName || 'مستخدم جديد'}</p>
+                                                    <div className="flex items-center gap-3">
+                                                        <p className="font-black text-gray-900 text-base">{user.displayName || 'بدون اسم'}</p>
                                                         {user.isOrgAdmin && (
-                                                            <div className="px-1.5 py-0.5 rounded-md bg-[#5AA564]/10 border border-[#5AA564]/20 text-[6px] font-black text-[#5AA564] uppercase">ADMIN</div>
+                                                            <div className="px-2 py-1 rounded-lg bg-blue-50 border border-blue-100 text-[7px] font-black text-blue-500 uppercase tracking-widest">MANAGER</div>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                                        <Mail size={11} className="text-[#5AA564]/30" />
-                                                        <p className="text-[10px] font-bold text-[#5AA564]/40 truncate max-w-[180px]">{user.email}</p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <p className="text-[11px] font-bold text-gray-400">{user.email}</p>
                                                     </div>
-                                                    {user.organizationId && (
-                                                        <div className="flex items-center gap-1 mt-1">
-                                                            <Building2 size={9} className="text-[#5AA564]/40" />
-                                                            <p className="text-[8px] font-black text-[#5AA564]/60 uppercase tracking-tighter">ID: {user.organizationId}</p>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
+                                        <td className="px-10 py-6">
                                             <div className="flex justify-center">
-                                                <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-[10px] font-bold
+                                                <div className={`flex items-center gap-2 px-4 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider
                                                     ${user.accountType === 'entity' 
-                                                        ? 'bg-[#5AA564]/20 border-[#5AA564]/30 text-[#5AA564]' 
-                                                        : 'bg-white/5 border-white/10 text-white/60'}`}>
+                                                        ? 'bg-blue-50 border-blue-100 text-blue-500' 
+                                                        : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
                                                     {user.accountType === 'entity' ? <Building2 size={12} /> : <User size={12} />}
-                                                    {user.accountType === 'entity' ? 'جهة / منظمة' : 'حساب فردي'}
+                                                    {user.accountType === 'entity' ? 'جهة / مؤسسة' : 'فرد'}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
+                                        <td className="px-10 py-6">
                                             <div className="flex justify-center">
-                                                <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest
+                                                <div className={`flex items-center gap-2.5 px-4 py-2 rounded-full border text-[10px] font-black uppercase tracking-[0.1em]
                                                     ${user.subscriptionStatus === 'active'
-                                                        ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'
-                                                        : 'bg-[#1E2448]/80 border-white/10 text-[#F5F0E8]/35'}`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-[#5AA564]' : 'bg-white/20'}`} />
+                                                        ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                                                        : 'bg-amber-50 border-amber-100 text-amber-600'}`}>
+                                                    <div className={`w-2 h-2 rounded-full ${user.subscriptionStatus === 'active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse' : 'bg-amber-400'}`} />
                                                     {user.subscriptionStatus === 'active' ? 'مميز' : 'مجاني'}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
+                                        <td className="px-10 py-6">
                                             <div className="flex justify-center">
-                                                <div className="flex items-center gap-2 text-[#5AA564]/60">
-                                                    {user.platform === 'ios' && <Apple size={14} />}
-                                                    {user.platform === 'android' && <Smartphone size={14} />}
-                                                    {user.platform === 'manual' && <Globe size={14} />}
-                                                    <span className="text-[10px] font-bold uppercase">{user.platform || 'غير محدد'}</span>
+                                                <div className="flex items-center gap-2 text-gray-400 font-bold text-[10px]">
+                                                    {user.platform === 'ios' && <Apple size={14} className="text-gray-900 opacity-60" />}
+                                                    {user.platform === 'android' && <Smartphone size={14} className="text-emerald-500 opacity-60" />}
+                                                    {(user.platform === 'manual' || !user.platform) && <Globe size={14} className="text-blue-500 opacity-60" />}
+                                                    <span className="uppercase">{user.platform || 'WEB'}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <p className="text-xs font-bold text-[#F5F0E8]/45">
-                                                    {user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ar-SA') : 'غير متوفر'}
-                                                </p>
-                                                <Calendar size={13} className="text-[#5AA564]/20" />
+                                        <td className="px-10 py-6">
+                                            <div className="flex items-center justify-end gap-3 text-gray-400 font-bold text-xs">
+                                                <span>{user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ar-SA') : 'N/A'}</span>
+                                                <Calendar size={14} />
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center justify-start gap-2">
-                                                {/* Edit */}
+                                        <td className="px-10 py-6">
+                                            <div className="flex items-center justify-start gap-2.5">
                                                 <button
                                                     onClick={() => setEditingUser(user)}
-                                                    className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-[#F5F0E8]/40 hover:text-white hover:bg-[#5AA564]/15 hover:border-[#5AA564]/25 transition-all"
-                                                    title="تعديل"
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-300 hover:text-[#5AA564] hover:shadow-md transition-all active:scale-90"
                                                 >
-                                                    <Edit3 size={15} />
+                                                    <Edit3 size={16} />
                                                 </button>
-                                                {/* Delete */}
                                                 <button
                                                     onClick={() => setDeletingUser(user)}
-                                                    className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-[#F5F0E8]/40 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all"
-                                                    title="حذف"
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-300 hover:text-rose-500 hover:shadow-md transition-all active:scale-90"
                                                 >
-                                                    <Trash2 size={15} />
+                                                    <Trash2 size={16} />
                                                 </button>
-                                                {/* Change Account Type */}
                                                 <button
                                                     onClick={() => setChangingTypeUser(user)}
-                                                    className={`p-2.5 border rounded-xl transition-all
-                                                        ${user.accountType === 'entity'
-                                                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white'
-                                                            : 'bg-white/4 border-white/5 text-[#F5F0E8]/40 hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/20'}`}
-                                                    title="تغيير نوع الحساب (فردي / جهة)"
+                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-300 hover:text-blue-500 hover:shadow-md transition-all active:scale-90"
                                                 >
-                                                    <Building2 size={15} />
+                                                    <Building2 size={16} />
                                                 </button>
-                                                {/* Upgrade */}
                                                 {user.subscriptionStatus !== 'active' && (
                                                     <button
-                                                        onClick={() => handleUpgradeClick(user)}
-                                                        className="h-10 px-4 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-xl text-[#5AA564] hover:bg-[#5AA564] hover:text-[#0A0D1A] font-black text-[9px] transition-all flex items-center gap-1.5"
-                                                        title="ترقية لمميز"
+                                                        onClick={() => setUpgradingUser(user)}
+                                                        className="h-10 px-5 bg-emerald-50 border border-emerald-100 text-[#5AA564] hover:bg-[#5AA564] hover:text-white font-black text-[10px] rounded-xl transition-all flex items-center gap-2 shadow-sm"
                                                     >
-                                                        <Shield size={13} strokeWidth={2.5} />
+                                                        <Shield size={14} strokeWidth={2.5} />
                                                         <span>ترقية</span>
                                                     </button>
                                                 )}
@@ -588,76 +561,26 @@ export default function UsersPage() {
                     </table>
                 </div>
 
-                {/* Footer */}
-                <div className="px-10 py-6 bg-[#5AA564]/3 border-t border-[#5AA564]/5 flex justify-between items-center">
-                    <p className="text-[9px] font-black text-[#5AA564]/40 uppercase tracking-widest">
-                        عرض {filteredUsers.length} من أصل {users.length} مستخدم
+                {/* Footer Controls */}
+                <div className="px-10 py-7 bg-gray-50/50 border-t border-gray-50 flex justify-between items-center">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        Total Users: {users.length} — Filtered: {filteredUsers.length}
                     </p>
                     <div className="flex gap-2">
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#5AA564] transition-all rotate-180"><ChevronDown size={13} /></button>
-                        <button className="px-4 py-2 bg-[#5AA564]/10 border border-[#5AA564]/20 rounded-lg text-[#5AA564] text-[9px] font-black">1</button>
-                        <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-[#F5F0E8]/40 hover:text-[#5AA564] transition-all"><ChevronDown size={13} /></button>
+                        <button className="h-10 w-10 flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gray-900 transition-all rotate-180"><ChevronDown size={14} /></button>
+                        <div className="h-10 px-5 flex items-center justify-center bg-white border border-[#5AA564]/30 rounded-xl text-[#5AA564] text-[11px] font-black shadow-sm">1</div>
+                        <button className="h-10 w-10 flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-gray-900 transition-all"><ChevronDown size={14} /></button>
                     </div>
                 </div>
             </div>
 
-            {/* Edit Modal */}
+            {/* Modal Components (Client-side Rendering Only) */}
             <AnimatePresence>
-                {editingUser && (
-                    <EditModal
-                        user={editingUser}
-                        onSave={handleSaveEdit}
-                        onClose={() => setEditingUser(null)}
-                        saving={isSaving}
-                    />
-                )}
-            </AnimatePresence>
-
-            {/* Delete Confirm Modal */}
-            <AnimatePresence>
-                {deletingUser && (
-                    <DeleteModal
-                        user={deletingUser}
-                        onConfirm={handleDelete}
-                        onClose={() => setDeletingUser(null)}
-                        deleting={isDeleting}
-                    />
-                )}
-            </AnimatePresence>
-
-            {/* Upgrade Modal */}
-            <AnimatePresence>
-                {upgradingUser && (
-                    <UpgradeModal
-                        user={upgradingUser}
-                        onConfirm={handleConfirmUpgrade}
-                        onClose={() => setUpgradingUser(null)}
-                        upgrading={isUpgrading}
-                    />
-                )}
-            </AnimatePresence>
-
-            {/* Change Account Type Modal */}
-            <AnimatePresence>
-                {changingTypeUser && (
-                    <ChangeTypeModal
-                        user={changingTypeUser}
-                        onConfirm={handleConfirmChangeType}
-                        onClose={() => setChangingTypeUser(null)}
-                        saving={isChangingType}
-                    />
-                )}
-            </AnimatePresence>
-
-            {/* Toast */}
-            <AnimatePresence>
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => setToast(null)}
-                    />
-                )}
+                {editingUser && <EditModal user={editingUser} onSave={handleSaveEdit} onClose={() => setEditingUser(null)} saving={isSaving} />}
+                {deletingUser && <DeleteModal user={deletingUser} onConfirm={handleDelete} onClose={() => setDeletingUser(null)} deleting={isDeleting} />}
+                {upgradingUser && <UpgradeModal user={upgradingUser} onConfirm={handleConfirmUpgrade} onClose={() => setUpgradingUser(null)} upgrading={isUpgrading} />}
+                {changingTypeUser && <ChangeTypeModal user={changingTypeUser} onConfirm={handleConfirmChangeType} onClose={() => setChangingTypeUser(null)} saving={isChangingType} />}
+                {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             </AnimatePresence>
         </div>
     );

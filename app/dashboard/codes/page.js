@@ -5,12 +5,28 @@ import {
     Ticket, Plus, Search, Filter, Trash2, 
     Download, Copy, CheckCircle2, AlertTriangle, 
     Loader2, X, Building2, User, Calendar, RefreshCcw,
-    ChevronDown, MoreVertical, ExternalLink
+    ChevronDown, MoreVertical, ExternalLink, ArrowLeft
 } from 'lucide-react';
 import { useActivationCodes } from '@/hooks/useActivationCodes';
 import { useUsers } from '@/hooks/useUsers';
 
-// ── Toast Notification ────────────────────────────────────
+// ── Shared Header Component ──────────────────────────────
+const SectionHeader = ({ title, subtitle, accentColor = "#5AA564" }) => (
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+        <div className="text-right">
+            <h1 className="text-5xl font-black text-gray-900 tracking-tighter flex items-center justify-end gap-5">
+                {title}
+                <div 
+                    className="w-2 h-12 rounded-full shadow-lg"
+                    style={{ background: `linear-gradient(to bottom, ${accentColor}, transparent)` }} 
+                />
+            </h1>
+            <p className="text-[#5AA564] font-black text-[11px] mt-4 tracking-[0.4em] uppercase opacity-40">{subtitle}</p>
+        </div>
+    </div>
+);
+
+// ── Shared Toast Component ────────────────────────────────
 const Toast = ({ message, type, onClose }) => (
     <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -19,12 +35,21 @@ const Toast = ({ message, type, onClose }) => (
         className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border text-sm font-bold backdrop-blur-xl
             ${type === 'success'
                 ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]'
-                : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}
+                : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}
     >
         {type === 'success' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
         <span>{message}</span>
-        <button onClick={onClose} className="ml-2 opacity-60 hover:opacity-100"><X size={14} /></button>
+        <button onClick={onClose} className="ml-2 opacity-40 hover:opacity-100 transition-opacity"><X size={14} /></button>
     </motion.div>
+);
+
+// ── Shared Modal Backdrop ─────────────────────────────────
+const ModalBackdrop = ({ onClick }) => (
+    <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClick}
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+    />
 );
 
 // ── Generate Modal ───────────────────────────────────────
@@ -41,47 +66,43 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
 
     return (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 text-right" dir="rtl">
-            <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={onClose}
-                className="absolute inset-0 bg-[#0A0D1A]/90 backdrop-blur-xl"
-            />
+            <ModalBackdrop onClick={onClose} />
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="glass-panel w-full max-w-lg rounded-[2.5rem] p-10 relative overflow-hidden shadow-2xl"
+                className="glass-panel w-full max-w-lg rounded-[3.5rem] p-12 relative overflow-hidden shadow-3xl bg-white/95 backdrop-blur-3xl"
             >
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
+                <div className="absolute top-0 left-10 right-10 h-[1.5px] bg-gradient-to-r from-transparent via-[#5AA564]/40 to-transparent" />
                 
-                <div className="flex items-center justify-between mb-8">
-                    <button onClick={onClose} className="text-[#5AA564]/40 hover:text-white transition-colors">
-                        <X size={20} />
+                <div className="flex items-center justify-between mb-10">
+                    <button onClick={onClose} className="text-gray-300 hover:text-gray-900 transition-colors">
+                        <X size={24} />
                     </button>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-5">
                         <div className="text-right">
-                            <h4 className="text-2xl font-black text-white">توليد أكواد جديدة</h4>
-                            <p className="text-[#5AA564]/40 text-xs font-bold mt-0.5">إنشاء مجموعة من الأكواد الفريدة</p>
+                            <h4 className="text-3xl font-black text-gray-900 tracking-tight">توليد أكواد جديدة</h4>
+                            <p className="text-[#5AA564] text-[10px] font-black uppercase tracking-widest mt-1 opacity-40">إنشاء حزمة مفاتيح دخول</p>
                         </div>
-                        <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center text-[#5AA564]">
-                            <Plus size={28} />
+                        <div className="h-16 w-16 rounded-[1.5rem] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#5AA564] shadow-sm">
+                            <Ticket size={32} strokeWidth={1.5} />
                         </div>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Organization Selection */}
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">الجهة / المنظمة</label>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">الجهة / المنظمة المستفيدة</label>
                         <select 
                             required
-                            className="w-full h-13 glass-input rounded-xl px-4 text-sm font-medium text-white appearance-none cursor-pointer"
+                            className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white transition-all shadow-sm appearance-none cursor-pointer"
                             value={orgId}
                             onChange={(e) => setOrgId(e.target.value)}
                         >
-                            <option value="" disabled className="bg-[#0A0D1A]">اختر الجهة المستفيدة...</option>
+                            <option value="" disabled>اختر الجهة المستهدفة من القائمة...</option>
                             {organizations.map(org => (
-                                <option key={org.id} value={org.rawId} className="bg-[#0A0D1A]">
+                                <option key={org.id} value={org.rawId}>
                                     {org.displayName || org.email}
                                 </option>
                             ))}
@@ -90,25 +111,21 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
 
                     <div className="grid grid-cols-2 gap-4">
                         {/* Count */}
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">عدد الأكواد (بحد أقصى 500)</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">عدد الأكواد (MAX 500)</label>
                             <input
-                                type="number"
-                                required
-                                min="1"
-                                max="500"
-                                className="w-full h-13 glass-input rounded-xl px-4 text-sm font-medium text-white"
+                                type="number" required min="1" max="500"
+                                className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white shadow-sm"
                                 value={count}
                                 onChange={(e) => setCount(e.target.value)}
                             />
                         </div>
                         {/* Prefix */}
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">بادئة الكود (Prefix)</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">بادئة التوليد (Prefix)</label>
                             <input
-                                type="text"
-                                maxLength="6"
-                                className="w-full h-13 glass-input rounded-xl px-4 text-sm font-medium text-white uppercase"
+                                type="text" maxLength="6"
+                                className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white shadow-sm uppercase"
                                 value={prefix}
                                 onChange={(e) => setPrefix(e.target.value)}
                             />
@@ -116,23 +133,23 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                     </div>
 
                     {/* Expiry */}
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-[#5AA564]/50 mr-2">تاريخ الانتهاء (اختياري)</label>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">تاريخ انتهاء الصلاحية (اختياري)</label>
                         <input
                             type="date"
-                            className="w-full h-13 glass-input rounded-xl px-4 text-sm font-medium text-white"
+                            className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white shadow-sm"
                             value={expiry}
                             onChange={(e) => setExpiry(e.target.value)}
                         />
                     </div>
 
-                    <div className="pt-4">
+                    <div className="pt-6">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-14 bg-[#5AA564] text-[#0A0D1A] font-black rounded-2xl hover:bg-[#4A8F53] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full h-16 bg-[#5AA564] text-white font-black rounded-2xl hover:bg-gray-900 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 text-lg shadow-xl shadow-[#5AA564]/10"
                         >
-                            {loading ? <Loader2 size={20} className="animate-spin" /> : 'توليد المجموعات الآن'}
+                            {loading ? <Loader2 size={24} className="animate-spin" /> : <><Plus size={24} strokeWidth={3} /> توليد المجموعة الآن</>}
                         </button>
                     </div>
                 </form>
@@ -148,22 +165,18 @@ export default function CodesPage() {
     
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('grouped'); // 'grouped' | 'list'
-    const [expandedGroups, setExpandedGroups] = useState({}); // Tracking accordion state
+    const [expandedGroups, setExpandedGroups] = useState({}); 
     const [isGenerateOpen, setIsGenerateOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [toast, setToast] = useState(null);
 
     const toggleGroup = (orgId) => {
-        setExpandedGroups(prev => ({
-            ...prev,
-            [orgId]: !prev[orgId]
-        }));
+        setExpandedGroups(prev => ({ ...prev, [orgId]: !prev[orgId] }));
     };
 
     const organizations = useMemo(() => {
-        // نفضل الجهات (entity) ولكن نظهر الجميع لتجنب فقدان البيانات عند التوليد
         const entities = users.filter(u => u.accountType === 'entity');
-        return entities.length > 0 ? entities : users.slice(0, 50); // Fallback to all profiles if no entities identified
+        return entities.length > 0 ? entities : users.slice(0, 50);
     }, [users]);
 
     const stats = useMemo(() => ({
@@ -181,7 +194,6 @@ export default function CodesPage() {
         setIsGenerating(true);
         const result = await generateBulkCodes(data);
         setIsGenerating(false);
-        
         if (result.success) {
             setIsGenerateOpen(false);
             showToast(`تم توليد ${data.count} كود بنجاح ✨`);
@@ -195,41 +207,19 @@ export default function CodesPage() {
         showToast('تم نسخ الكود للمحفظة');
     };
 
-    const exportToCSV = () => {
-        if (codes.length === 0) return;
-        
-        const headers = ["الكود,الحالة,الجهة,تاريخ الإنشاء,تاريخ الانتهاء"];
-        const rows = codes.map(c => 
-            `${c.code},${c.status},${c.org_id},${c.created_at},${c.expires_at || 'None'}`
-        );
-        
-        const blob = new Blob([headers.concat(rows).join('\n')], { type: 'text/csv;charset=utf8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", `codes_export_${new Date().toISOString().slice(0,10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast('جاري تحويل الملف للتحميل...');
-    };
-
     const enrichedCodes = useMemo(() => {
         return codes.map(code => {
-            // البحث عن المعرف في كافة الحقول المحتملة
             const cleanOrgId = (code.org_id || code.organization_id || code.organization)?.toString().trim();
-            
-            // البحث في قائمة المستخدمين الكاملة (بدون تصفية الـ entity لضمان ظهور الاسم حتى لو تغير النوع)
             const org = users.find(u => 
                 u.rawId?.toString() === cleanOrgId || 
                 u.id?.toString() === cleanOrgId ||
                 u.email?.toLowerCase() === cleanOrgId?.toLowerCase()
             );
-            
             return {
                 ...code,
                 organization: org || { 
-                    displayName: cleanOrgId || 'غير معروف',
-                    email: 'لم يتم العثور على سجل' 
+                    displayName: cleanOrgId || 'ENTITY UNKNOWN',
+                    email: 'No registry found' 
                 }
             };
         });
@@ -269,318 +259,266 @@ export default function CodesPage() {
     }, [filteredCodes]);
 
     return (
-        <div className="space-y-10 pb-20">
-            {/* Header & Stats */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-                <div className="text-right">
-                    <h3 className="text-4xl font-black text-white tracking-tighter">أكواد التفعيل (نسخة المطور - مُحدثة)</h3>
-                    <p className="text-[#5AA564]/40 font-bold text-sm mt-2">إدارة وتوليد مفاتيح الدخول المميزة للمنظمات.</p>
-                </div>
+        <div className="space-y-12 pb-20 text-right" dir="rtl">
+            {/* Header & High-Level Stats */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10">
+                <SectionHeader 
+                    title="أكواد التفعيل" 
+                    subtitle="Enterprise License Management" 
+                />
                 
-                <div className="grid grid-cols-3 gap-4 w-full lg:w-auto">
+                <div className="flex gap-6 w-full lg:w-auto overflow-x-auto pb-2 scrollbar-none">
                     {[
-                        { label: 'الإجمالي', val: stats.total, icon: <Ticket size={14} />, color: 'teal' },
-                        { label: 'متاح', val: stats.available, icon: <CheckCircle2 size={14} />, color: 'emerald' },
-                        { label: 'مستخدم', val: stats.used, icon: <RefreshCcw size={14} />, color: 'blue' },
+                        { label: 'إجمالي الأكواد', val: stats.total, icon: <Ticket size={18} /> },
+                        { label: 'الأكواد المتاحة', val: stats.available, icon: <CheckCircle2 size={18} className="text-[#5AA564]" /> },
+                        { label: 'تم استهلاكها', val: stats.used, icon: <RefreshCcw size={18} className="text-blue-400" /> },
                     ].map((s, i) => (
-                        <div key={i} className="glass-card px-6 py-4 rounded-2xl border-white/5 flex flex-col items-center gap-1 min-w-[120px]">
-                            <span className="text-[9px] font-black uppercase text-white/30 tracking-widest">{s.label}</span>
-                            <span className="text-xl font-black text-white">{s.val}</span>
+                        <div key={i} className="glass-card px-8 py-5 rounded-[2rem] border-gray-100 flex flex-col items-center gap-1.5 min-w-[160px] bg-white shadow-xl">
+                            <div className="opacity-40 mb-1">{s.icon}</div>
+                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{s.label}</span>
+                            <span className="text-2xl font-black text-gray-900">{s.val}</span>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Actions Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-6">
-                <div className="flex items-center gap-4 flex-1 min-w-[300px]">
-                    <div className="relative flex-1 max-w-md group">
-                        <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#5AA564]/30 group-focus-within:text-[#5AA564] transition-colors" size={17} />
+            {/* Actions & Filters Bar */}
+            <div className="flex flex-col xl:flex-row items-center justify-between gap-8">
+                <div className="flex items-center gap-5 w-full xl:max-w-2xl">
+                    <div className="relative flex-1 group">
+                        <Search className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#5AA564] transition-colors" size={20} />
                         <input
                             type="text"
-                            placeholder="ابحث عن كود أو جهة..."
-                            className="w-full h-13 glass-input rounded-2xl pr-14 pl-6 py-3.5 text-sm font-medium text-white placeholder:text-[#5AA564]/20 focus:border-[#5AA564]/40 transition-all"
+                            placeholder="ابحث عن كود ترخيص أو جهة مستفيدة..."
+                            className="w-full h-15 bg-white border border-gray-100 rounded-[2.5rem] pr-16 pl-8 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 shadow-sm transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="h-13 px-5 glass-panel border-[#5AA564]/10 rounded-2xl text-[#5AA564]/50 hover:text-[#5AA564] transition-all flex items-center gap-2">
-                        <Filter size={16} />
-                    </button>
                 </div>
 
-                <div className="flex gap-3">
-                    <div className="flex bg-[#141830] p-1 rounded-xl border border-[#5AA564]/10 mr-4">
+                <div className="flex flex-wrap items-center gap-5 w-full xl:w-auto justify-end">
+                    <div className="flex bg-gray-100 p-1 rounded-2xl border border-gray-100 shadow-inner">
                         <button 
                             onClick={() => setViewMode('grouped')}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-black transition-all ${viewMode === 'grouped' ? 'bg-[#5AA564] text-[#0A0D1A]' : 'text-[#5AA564]/40 hover:text-white'}`}
+                            className={`px-6 py-2.5 rounded-[1rem] text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'grouped' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                         >
-                            تبويب منظم
+                            Grouped view
                         </button>
                         <button 
                             onClick={() => setViewMode('list')}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-black transition-all ${viewMode === 'list' ? 'bg-[#5AA564] text-[#0A0D1A]' : 'text-[#5AA564]/40 hover:text-white'}`}
+                            className={`px-6 py-2.5 rounded-[1rem] text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                         >
-                            قائمة مسطحة
+                            List view
                         </button>
                     </div>
-                    <button 
-                        onClick={exportToCSV}
-                        className="h-13 px-6 glass-panel border-[#5AA564]/10 rounded-2xl text-white/60 hover:text-white hover:bg-[#5AA564]/10 transition-all flex items-center gap-2.5"
-                    >
-                        <Download size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">تصدير CSV</span>
-                    </button>
+                    
                     <button 
                         onClick={() => setIsGenerateOpen(true)}
-                        className="h-13 px-8 bg-[#5AA564] text-[#0A0D1A] rounded-2xl font-black text-xs hover:bg-[#4A8F53] shadow-lg shadow-[#5AA564]/10 transition-all active:scale-95 flex items-center gap-2.5"
+                        className="h-15 px-10 bg-[#5AA564] text-white rounded-[2.5rem] font-black text-sm hover:bg-gray-900 shadow-2xl shadow-[#5AA564]/10 transition-all active:scale-95 flex items-center gap-4 group"
                     >
-                        <Plus size={18} strokeWidth={3} />
-                        <span>توليد أكواد</span>
+                        <Plus size={22} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-500" />
+                        <span>توليد حزمة أكواد</span>
                     </button>
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="space-y-6">
-                {viewMode === 'grouped' ? (
-                    groupedCodes.map(([orgId, group], gIdx) => (
-                        <div key={orgId} className="glass-panel rounded-[2rem] overflow-hidden border-[#5AA564]/10 shadow-xl">
-                            {/* Group Header */}
-                            <button 
-                                onClick={() => toggleGroup(orgId)}
-                                className="w-full px-8 py-6 flex items-center justify-between bg-[#5AA564]/3 hover:bg-[#5AA564]/6 transition-all"
-                            >
-                                <div className="flex items-center gap-6">
-                                    <div className="h-14 w-14 rounded-2xl bg-[#5AA564]/10 border border-[#5AA564]/20 flex items-center justify-center text-[#5AA564] shadow-lg">
-                                        <Building2 size={24} />
-                                    </div>
-                                    <div className="text-right">
-                                        <h4 className="text-lg font-black text-white">{group.organization.displayName}</h4>
-                                        <div className="flex items-center gap-4 mt-1">
-                                            <span className="text-[10px] font-bold text-[#5AA564]/60 uppercase tracking-widest">{group.organization.email}</span>
-                                            <div className="h-1 w-1 rounded-full bg-white/10" />
-                                            <span className="text-[10px] font-black text-[#5AA564] bg-[#5AA564]/10 px-2 py-0.5 rounded-md uppercase tracking-tighter">
-                                                {group.codes.length} كود إجمالي
-                                            </span>
-                                            {group.soonestExpiry && (
-                                                <>
-                                                    <div className="h-1 w-1 rounded-full bg-white/10" />
-                                                    <span className="text-[10px] font-black text-amber-500/80 flex items-center gap-1.5 uppercase tracking-tighter">
-                                                        <Calendar size={12} />
-                                                        ينتهي قريباً: {group.soonestExpiry.toLocaleDateString('ar-SA')}
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-6">
-                                    <div className="hidden md:flex items-center gap-4">
-                                        <div className="flex flex-col items-center">
-                                            <span className="text-[9px] font-black text-emerald-400/50 uppercase tracking-widest">متاح</span>
-                                            <span className="text-sm font-black text-emerald-400">{group.availableCount}</span>
-                                        </div>
-                                        <div className="w-[1px] h-6 bg-white/5" />
-                                        <div className="flex flex-col items-center">
-                                            <span className="text-[9px] font-black text-rose-400/50 uppercase tracking-widest">مستخدم</span>
-                                            <span className="text-sm font-black text-rose-400">{group.consumedCount}</span>
-                                        </div>
-                                    </div>
-                                    <motion.div
-                                        animate={{ rotate: expandedGroups[orgId] ? 180 : 0 }}
-                                        className="p-2 rounded-full bg-white/5 text-white/20"
+            {/* Content Area */}
+            <div className="space-y-8">
+                <AnimatePresence mode="wait">
+                    {viewMode === 'grouped' ? (
+                        <div key="grouped" className="space-y-8">
+                            {groupedCodes.map(([orgId, group], idx) => (
+                                <motion.div 
+                                    key={orgId} 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className="glass-panel rounded-[3.5rem] overflow-hidden border-gray-100 shadow-2xl bg-white/50 backdrop-blur-xl group/org"
+                                >
+                                    {/* Group Trigger */}
+                                    <button 
+                                        onClick={() => toggleGroup(orgId)}
+                                        className="w-full px-10 py-8 flex items-center justify-between bg-white/40 hover:bg-white transition-all text-right"
                                     >
-                                        <ChevronDown size={20} />
-                                    </motion.div>
-                                </div>
-                            </button>
-
-                            {/* Group Content (Accordion) */}
-                            <AnimatePresence>
-                                {expandedGroups[orgId] && (
-                                    <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        className="border-t border-[#5AA564]/5"
-                                    >
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-right">
-                                                <thead>
-                                                    <tr className="border-b border-[#5AA564]/5 bg-white/1">
-                                                        <th className="px-10 py-3 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">الكود</th>
-                                                        <th className="px-10 py-3 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">الحالة</th>
-                                                        <th className="px-10 py-3 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">تاريخ الإنشاء</th>
-                                                        <th className="px-10 py-3 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">تاريخ الانتهاء</th>
-                                                        <th className="px-10 py-3 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]"></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-[#5AA564]/5">
-                                                    {group.codes.map((code) => {
-                                                        const isExpired = code.expires_at && new Date(code.expires_at) < new Date();
-                                                        return (
-                                                            <tr key={code.id} className="hover:bg-[#5AA564]/3 transition-colors">
-                                                                <td className="px-10 py-4">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className="font-mono text-xs font-black text-white/80">{code.code}</span>
-                                                                        <button 
-                                                                            onClick={() => copyToClipboard(code.code)}
-                                                                            className="p-1.5 rounded-lg bg-white/5 text-white/10 hover:text-[#5AA564] transition-all"
-                                                                        >
-                                                                            <Copy size={11} />
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-10 py-4">
-                                                                    <div className={`inline-block px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border
-                                                                        ${code.status === 'available' 
-                                                                            ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]' 
-                                                                            : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
-                                                                        {code.status === 'available' ? 'متوفر' : 'مستخدم'}
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-10 py-4">
-                                                                    <span className="text-[10px] font-bold text-white/20">
-                                                                        {new Date(code.created_at).toLocaleDateString('ar-SA')}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-10 py-4">
-                                                                    <div className="flex flex-col">
-                                                                        <span className={`text-[10px] font-black tracking-tighter ${isExpired ? 'text-rose-400' : 'text-white/40'}`}>
-                                                                            {code.expires_at ? new Date(code.expires_at).toLocaleDateString('ar-SA') : 'صلاحية مفتوحة'}
-                                                                        </span>
-                                                                        {isExpired && (
-                                                                            <span className="text-[7px] font-black text-rose-400/50 uppercase tracking-widest">منتهي الصلاحية</span>
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-10 py-4 text-left">
-                                                                    <button 
-                                                                        onClick={() => deleteCode(code.id)}
-                                                                        className="p-2 text-white/10 hover:text-rose-400 transition-all"
-                                                                    >
-                                                                        <Trash2 size={14} />
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    ))
-                ) : (
-                    <div className="glass-panel rounded-[2.5rem] overflow-hidden border-[#5AA564]/10 shadow-2xl">
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-right" dir="rtl">
-                                <thead>
-                                    <tr className="border-b border-[#5AA564]/8 bg-[#5AA564]/5">
-                                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">الكود</th>
-                                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-center">الحالة</th>
-                                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">الجهة المستفيدة</th>
-                                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50">تاريخ الانتهاء</th>
-                                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#5AA564]/50 text-left">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-[#5AA564]/5">
-                                    <AnimatePresence>
-                                        {loading && codes.length === 0 ? (
-                                            [1, 2, 3, 4].map(i => (
-                                                <tr key={i} className="animate-pulse">
-                                                    <td className="px-8 py-5"><div className="h-10 w-40 bg-white/5 rounded-xl" /></td>
-                                                    <td className="px-8 py-5"><div className="h-8 w-20 bg-white/5 rounded-full mx-auto" /></td>
-                                                    <td className="px-8 py-5"><div className="h-10 w-32 bg-white/5 rounded-xl" /></td>
-                                                    <td className="px-8 py-5"><div className="h-6 w-24 bg-white/5 rounded-lg" /></td>
-                                                    <td className="px-8 py-5"><div className="h-10 w-10 bg-white/5 rounded-xl mr-auto" /></td>
-                                                </tr>
-                                            ))
-                                        ) : filteredCodes.map((code, idx) => (
-                                            <motion.tr
-                                                key={code.id}
-                                                initial={{ opacity: 0, x: 20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: Math.min(idx * 0.03, 0.5) }}
-                                                className="group hover:bg-[#5AA564]/3 transition-colors"
-                                            >
-                                                <td className="px-8 py-5">
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="font-mono text-sm font-black text-white selection:bg-[#5AA564]">{code.code}</span>
-                                                        <button 
-                                                            onClick={() => copyToClipboard(code.code)}
-                                                            className="p-1.5 rounded-lg bg-white/5 text-white/20 hover:text-[#5AA564] hover:bg-[#5AA564]/10 transition-all opacity-0 group-hover:opacity-100"
-                                                        >
-                                                            <Copy size={12} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-5">
-                                                    <div className="flex justify-center">
-                                                        <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border
-                                                            ${code.status === 'available' 
-                                                                ? 'bg-[#5AA564]/10 border-[#5AA564]/20 text-[#5AA564]' 
-                                                                : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
-                                                            {code.status === 'available' ? 'متوفر' : 'مستخدم'}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-5">
-                                                    <div className="flex items-center gap-2.5">
-                                                        <Building2 size={13} className="text-[#5AA564]/30" />
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs font-bold text-white/60">
-                                                                {code.organization?.displayName || code.org_id || 'بيان مفقود'}
-                                                            </span>
-                                                            {code.organization?.email && (
-                                                                <span className="text-[8px] text-[#5AA564]/40 uppercase font-black">{code.organization.email}</span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-5">
-                                                    <div className="flex items-center gap-2.5">
-                                                        <Calendar size={13} className="text-[#5AA564]/30" />
-                                                        <span className="text-xs font-bold text-white/40">
-                                                            {code.expires_at ? new Date(code.expires_at).toLocaleDateString('ar-SA') : 'مفتوح'}
+                                        <div className="flex items-center gap-8">
+                                            <div className="h-16 w-16 rounded-[1.5rem] bg-gray-50 border border-gray-100 flex items-center justify-center text-[#5AA564] shadow-sm relative group-hover/org:bg-emerald-50 transition-colors">
+                                                <Building2 size={28} strokeWidth={1.5} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-2xl font-black text-gray-900 tracking-tight">{group.organization.displayName}</h4>
+                                                <div className="flex flex-wrap items-center gap-5 mt-1.5">
+                                                    <span className="text-[11px] font-bold text-gray-400 tracking-tight">{group.organization.email}</span>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-gray-100" />
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-black text-[#5AA564] bg-emerald-50 px-3 py-1 rounded-lg uppercase tracking-widest border border-emerald-100/50">
+                                                            {group.codes.length} TOTAL KEYS
                                                         </span>
                                                     </div>
-                                                </td>
-                                                <td className="px-8 py-5 text-left">
-                                                    <div className="flex items-center justify-start gap-2">
-                                                        <button 
-                                                            onClick={() => deleteCode(code.id)}
-                                                            className="p-2.5 bg-white/4 border border-white/5 rounded-xl text-white/20 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </motion.tr>
-                                        ))}
-                                    </AnimatePresence>
-                                </tbody>
-                            </table>
-                        </div>
+                                                    {group.soonestExpiry && (
+                                                        <div className="flex items-center gap-2 text-[10px] font-black text-amber-500/60 uppercase tracking-widest">
+                                                            <Calendar size={14} className="opacity-40" />
+                                                            Expiring soon: {group.soonestExpiry.toLocaleDateString('ar-SA')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        {/* Footer */}
-                        <div className="px-10 py-6 bg-[#5AA564]/3 border-t border-[#5AA564]/5 flex justify-between items-center text-right">
-                            <p className="text-[9px] font-black text-[#5AA564]/40 uppercase tracking-[0.2em]">
-                                عرض {filteredCodes.length} كود من أصل {codes.length}
-                            </p>
-                            <div className="flex gap-2">
-                                <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-white/30 hover:text-[#5AA564]"><ChevronDown size={14} className="rotate-90" /></button>
-                                <button className="p-2 bg-white/4 border border-white/5 rounded-lg text-white/30 hover:text-[#5AA564]"><ChevronDown size={14} className="-rotate-90" /></button>
-                            </div>
+                                        <div className="flex items-center gap-10">
+                                            <div className="hidden md:flex items-center gap-8">
+                                                <div className="text-center">
+                                                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1">Available</p>
+                                                    <p className="text-lg font-black text-[#5AA564]">{group.availableCount}</p>
+                                                </div>
+                                                <div className="w-px h-10 bg-gray-100" />
+                                                <div className="text-center">
+                                                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1">Consumed</p>
+                                                    <p className="text-lg font-black text-blue-400">{group.consumedCount}</p>
+                                                </div>
+                                            </div>
+                                            <motion.div
+                                                animate={{ rotate: expandedGroups[orgId] ? 180 : 0 }}
+                                                className="h-12 w-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-[#5AA564] group-hover:text-white transition-all shadow-sm"
+                                            >
+                                                <ChevronDown size={24} />
+                                            </motion.div>
+                                        </div>
+                                    </button>
+
+                                    {/* Accordion Content */}
+                                    <AnimatePresence>
+                                        {expandedGroups[orgId] && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="border-t border-gray-50"
+                                            >
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full text-right border-collapse">
+                                                        <thead>
+                                                            <tr className="bg-gray-50/30">
+                                                                <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">الرمز السري (LICENSE)</th>
+                                                                <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em] text-center">الحالة</th>
+                                                                <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">تاريخ الإصدار</th>
+                                                                <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">صلاحية المفتاح</th>
+                                                                <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-gray-50 bg-white/40">
+                                                            {group.codes.map((code) => {
+                                                                const isExpired = code.expires_at && new Date(code.expires_at) < new Date();
+                                                                return (
+                                                                    <tr key={code.id} className="hover:bg-gray-50/50 transition-colors">
+                                                                        <td className="px-10 py-5">
+                                                                            <div className="flex items-center gap-4">
+                                                                                <span className="font-mono text-base font-black text-gray-900 tracking-tighter">{code.code}</span>
+                                                                                <button 
+                                                                                    onClick={() => copyToClipboard(code.code)}
+                                                                                    className="p-2 rounded-xl bg-gray-50 text-gray-300 hover:text-[#5AA564] hover:bg-emerald-50 transition-all opacity-0 group-hover:opacity-100"
+                                                                                >
+                                                                                    <Copy size={14} />
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="px-10 py-5 text-center">
+                                                                            <div className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm
+                                                                                ${code.status === 'available' 
+                                                                                    ? 'bg-emerald-50 border-emerald-100 text-[#5AA564]' 
+                                                                                    : 'bg-blue-50 border-blue-100 text-blue-500'}`}>
+                                                                                {code.status === 'available' ? 'المفتاح جاهز' : 'تم تفعيله'}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="px-10 py-5">
+                                                                            <span className="text-xs font-bold text-gray-400">
+                                                                                {new Date(code.created_at).toLocaleDateString('ar-SA')}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td className="px-10 py-5">
+                                                                            <div className="flex flex-col">
+                                                                                <span className={`text-sm font-black tracking-tight ${isExpired ? 'text-rose-500' : 'text-gray-900 opacity-60'}`}>
+                                                                                    {code.expires_at ? new Date(code.expires_at).toLocaleDateString('ar-SA') : 'UNLIMITED'}
+                                                                                </span>
+                                                                                {isExpired && (
+                                                                                    <span className="text-[8px] font-black text-rose-300 uppercase tracking-widest mt-0.5">EXPIRED LICENSE</span>
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="px-10 py-5 text-left">
+                                                                            <button 
+                                                                                onClick={() => deleteCode(code.id)}
+                                                                                className="h-10 w-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-xl text-gray-300 hover:text-rose-500 hover:shadow-sm transition-all active:scale-95"
+                                                                            >
+                                                                                <Trash2 size={16} />
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
+                            ))}
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel rounded-[3.5rem] overflow-hidden border-gray-100 shadow-2xl bg-white/50 backdrop-blur-xl">
+                            <div className="overflow-x-auto custom-scrollbar">
+                                <table className="w-full text-right">
+                                    <thead>
+                                        <tr className="bg-gray-50/50">
+                                            <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">LICENSE KEY</th>
+                                            <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-center">STATUS</th>
+                                            <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">BENEFICIARY ENTITY</th>
+                                            <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">EXPIRY DATE</th>
+                                            <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-left">ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50 bg-white/30">
+                                        {filteredCodes.map((code, idx) => (
+                                            <tr key={code.id} className="hover:bg-gray-50/80 transition-all cursor-pointer group">
+                                                <td className="px-10 py-6">
+                                                   <div className="flex items-center gap-4 text-gray-900 font-mono text-base font-black">
+                                                       {code.code}
+                                                       <button onClick={() => copyToClipboard(code.code)} className="h-8 w-8 flex items-center justify-center bg-gray-50 rounded-lg text-gray-300 hover:text-[#5AA564] opacity-0 group-hover:opacity-100 transition-all"><Copy size={14} /></button>
+                                                   </div>
+                                                </td>
+                                                <td className="px-10 py-6 text-center">
+                                                    <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm
+                                                        ${code.status === 'available' ? 'bg-emerald-50 border-emerald-100 text-[#5AA564]' : 'bg-gray-100 border-gray-200 text-gray-400'}`}>
+                                                        {code.status === 'available' ? 'Active' : 'Consumed'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-10 py-6">
+                                                   <div className="flex items-center gap-4">
+                                                       <div className="h-10 w-10 flex items-center justify-center bg-gray-50 rounded-xl text-gray-300"><Building2 size={18} /></div>
+                                                       <div className="overflow-hidden">
+                                                            <p className="font-black text-gray-900 text-sm leading-tight mb-0.5 truncate">{code.organization?.displayName || 'SYSTEM ENTITY'}</p>
+                                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter truncate">{code.organization?.email || 'Global Registry'}</p>
+                                                       </div>
+                                                   </div>
+                                                </td>
+                                                <td className="px-10 py-6">
+                                                   <span className="text-sm font-black text-gray-900 opacity-60 italic">{code.expires_at ? new Date(code.expires_at).toLocaleDateString('ar-SA') : 'UNLIMITED'}</span>
+                                                </td>
+                                                <td className="px-10 py-6 text-left">
+                                                   <button onClick={() => deleteCode(code.id)} className="h-10 w-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-xl text-gray-300 hover:text-rose-500 transition-colors active:scale-95"><Trash2 size={18} /></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
-            {/* Modals & Toasts */}
+            {/* Modals & Toasts Overlay */}
             <AnimatePresence>
                 {isGenerateOpen && (
                     <GenerateModal
@@ -593,13 +531,7 @@ export default function CodesPage() {
             </AnimatePresence>
 
             <AnimatePresence>
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => setToast(null)}
-                    />
-                )}
+                {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             </AnimatePresence>
         </div>
     );

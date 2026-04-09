@@ -98,7 +98,7 @@ export default function LandingPage() {
                         >
                             <div className="absolute -inset-2 bg-gradient-to-tr from-[#5AA564]/30 to-blue-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition duration-500" />
                             <div className="relative p-1.5 bg-white border border-gray-100 shadow-sm rounded-xl transition-transform">
-                                <img src="/logo/logo.png" alt="مصحف أنامل للصم" className="w-10 h-10 object-contain" />
+                                <img src="/logo/logo.png" alt="شعار مصحف أنامل للصم" className="w-10 h-10 object-contain" />
                             </div>
                         </motion.div>
                         <div className="flex flex-col -space-y-1">
@@ -260,6 +260,7 @@ export default function LandingPage() {
                                 className="w-full h-full border-none relative z-10 scale-[1.02] origin-center transition-transform duration-700 group-hover:scale-105"
                                 title="3D Sign Language Translator"
                                 scrolling="no"
+                                loading="lazy"
                             />
                         </motion.div>
 
@@ -729,7 +730,7 @@ export default function LandingPage() {
                 <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-[#5AA564]/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
                     <div className="w-24 h-24 bg-white shadow-xl shadow-gray-200/50 rounded-3xl flex items-center justify-center mx-auto mb-10 overflow-hidden">
-                        <img src="/logo/logo.png" className="w-14 h-14 object-contain hover:scale-110 transition-transform duration-500" />
+                        <img src="/logo/logo.png" alt="شعار التطبيق" className="w-14 h-14 object-contain hover:scale-110 transition-transform duration-500" />
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">جاهز لاحتضان التغيير؟</h2>
                     <p className="text-xl text-gray-500 font-medium mb-12 max-w-2xl mx-auto">
@@ -750,7 +751,7 @@ export default function LandingPage() {
             <footer className="bg-white py-8 border-t border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
-                        <img src="/logo/logo.png" className="w-10 h-10 object-contain" />
+                        <img src="/logo/logo.png" alt="شعار شركة السبابة الرقمية" className="w-10 h-10 object-contain" />
                         <div className="flex flex-col">
                             <span className="text-lg font-extrabold text-gray-900">مصحف أنامل للصم</span>
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">إحدى مبادرات شركة السبابة الرقمية</span>

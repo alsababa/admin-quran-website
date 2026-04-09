@@ -5,15 +5,15 @@
   --color-gold:    #D4AF37;
   --color-gold-light: #E8C97A;
   --color-gold-dark:  #B48A2D;
-  --color-navy:    #0A0D1A;
-  --color-indigo:  #141830;
-  --color-indigo2: #1E2448;
-  --color-cream:   #F5F0E8;
+  --color-navy:    #F8FAFC;
+  --color-indigo:  #FFFFFF;
+  --color-indigo2: #F1F5F9;
+  --color-cream:   #0F172A;
 }
 
 :root {
-  --background: #0A0D1A;
-  --foreground: #F5F0E8;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
   --accent-primary: #5AA564;
 }
 
@@ -30,37 +30,63 @@ body {
   color: #5AA564;
 }
 
-/* Premium Glassmorphism Utilities (Gold/Indigo Tinted) */
+/* Premium Light Glassmorphism Utilities */
 @utility glass-panel {
-  background-color: rgba(10, 13, 26, 0.5);
+  background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(28px);
-  border: 1px solid rgba(212, 175, 55, 0.15);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.05),
+    0 4px 12px -2px rgba(0, 0, 0, 0.02);
 }
 
 @utility glass-card {
-  background-color: rgba(30, 36, 72, 0.25);
+  background-color: #FFFFFF;
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(212, 175, 55, 0.18);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 10px 30px -5px rgba(0, 0, 0, 0.03);
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility glass-card-hover {
-  border-color: rgba(212, 175, 55, 0.5);
-  background-color: rgba(212, 175, 55, 0.08);
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.12);
+  border-color: rgba(90, 165, 100, 0.2);
+  background-color: #FFFFFF;
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 
+    0 30px 60px -12px rgba(90, 165, 100, 0.12),
+    0 18px 36px -18px rgba(0, 0, 0, 0.08);
+}
+
+@utility premium-card {
+  background-color: #FFFFFF;
+  border: 1px solid #F1F5F9;
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.02),
+    0 20px 40px -15px rgba(0,0,0,0.03);
+}
+
+@utility mesh-gradient {
+  background-color: #FFFFFF;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(90, 165, 100, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(90, 165, 100, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(201, 168, 76, 0.05) 0px, transparent 50%);
 }
 
 @utility glass-input {
-  background-color: rgba(10, 13, 26, 0.7);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  transition: all 0.3s;
+  background-color: #F8FAFC;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
 }
 
 @utility glass-input-focus {
-  border-color: rgba(212, 175, 55, 0.6);
-  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+  border-color: rgba(90, 165, 100, 0.4);
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(90, 165, 100, 0.05), 0 10px 20px -5px rgba(0,0,0,0.02);
 }
 
 /* Custom Scrollbar (Gold) */

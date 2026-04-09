@@ -53,11 +53,20 @@
             let translationQueue = [];
             let isTranslating = false;
 
+            // Mapping for descriptive (two-handed/word-level) signs
+            const wordToAnim = {
+                "القرآن": "fatehaAnim", // Example fallback
+                "قرآن": "fatehaAnim",
+                "صلاة": "0635", // Example animation codes if known
+                "أذكار": "0630",
+                "تحميل": "062a",
+                "مصحف": "fatehaAnim",
+                "أنامل": "samba", // Placeholder for descriptive sign
+            };
+
             function playDeAnimation(anToPlay, source_letter = "", cross_time = 1, isFirstLetter = false) {                                                  
                 if (isFirstLetter) {
                     stopTranslation();
-                    anim_scene.stopAllAnimations();
-                    currentAnimation = null;
                 }
                 comm_delay = window.performance.now() - rn_call_time;                    
                 play_name(anToPlay, source_letter, cross_time);
@@ -72,12 +81,18 @@
             function processQueue() {
                 if (translationQueue.length === 0) {
                     isTranslating = false;
+                    // Play a neutral/idle pose at the end
+                    play_name('qafla', '', 1);
                     return;
                 }
                 isTranslating = true;
                 const next = translationQueue.shift();
-                play_name(next.anim, next.char, 1, () => {
-                    setTimeout(processQueue, 100); // Small gap between letters
+                
+                // Use a longer cross_time for descriptive signs to make them look more natural
+                const crossTime = next.isWord ? 2 : 1;
+                
+                play_name(next.anim, next.char, crossTime, () => {
+                    setTimeout(processQueue, 50); // Small gap
                 });
             }
 
@@ -92,20 +107,35 @@
                     if (!text) return;
                     
                     stopTranslation();
-                    // Clean text (basic)
-                    const cleanText = text.replace(/[^\u0600-\u06FF\s]/g, '').trim();
-                    for (let char of cleanText) {
-                        const hex = char.hexEncode();
-                        translationQueue.push({ anim: hex, char: char });
-                    }
-                    translationQueue.push({ anim: 'qafla', char: '' }); // End animation
+                    
+                    // Descriptive Translation Logic:
+                    // 1. Split text into words
+                    // 2. Check if a word exists in wordToAnim (Two-handed/Descriptive)
+                    // 3. Fallback to Fingerspelling (Letter by letter)
+                    
+                    const words = text.split(/\s+/);
+                    words.forEach(word => {
+                        const cleanWord = word.replace(/[^\u0600-\u06FF]/g, '');
+                        if (wordToAnim[cleanWord]) {
+                            // descriptive sign found! (Usually two-handed)
+                            translationQueue.push({ anim: wordToAnim[cleanWord], char: word, isWord: true });
+                        } else {
+                            // Fingerspell letter by letter
+                            for (let char of cleanWord) {
+                                const hex = char.hexEncode();
+                                translationQueue.push({ anim: hex, char: char, isWord: false });
+                            }
+                        }
+                    });
+                    
+                    translationQueue.push({ anim: 'qafla', char: '', isWord: false });
                     processQueue();
                 } else if (event.data.type === 'stop') {
                     stopTranslation();
                 }
             });
 
-            function play_name(name, source_letter, cross_time, onEnd){  
+            function play_name(name, source_letter, cross_time = 1, onEnd){  
                 const action = scene.getAnimationGroupByName(name);
                 if (!action) {
                     console.warn('Animation not found:', name);
@@ -116,11 +146,14 @@
                 currentAnimationName = name;
                 debugToRN(name);
                 
-                if (currentAnimation == null){    
-                    action.play();    
-                } else {                        
-                    action.syncAllAnimationsWith(currentAnimation.animatables[0]);
-                    action.play();    
+                // Stop current and play new with blending
+                if (currentAnimation && currentAnimation !== action) {
+                    // Smooth transition between signs
+                    action.play(false);
+                    action.stop(); // reset
+                    action.start(false, 1, action.from, action.to);
+                } else {
+                    action.play(false);
                 }
                 
                 action.onAnimationGroupEndObservable.addOnce(function (){
