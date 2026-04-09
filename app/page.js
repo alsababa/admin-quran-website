@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HandMetal, Smartphone, Accessibility, Star, Users, Video, ChevronLeft, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote, Loader2 } from 'lucide-react';
@@ -44,6 +44,9 @@ const StepIndicator = ({ number, title, desc }) => (
 export default function LandingPage() {
     const [isMounted, setIsMounted] = useState(false);
     const [runtimeError, setRuntimeError] = useState(null);
+    const [show3D, setShow3D] = useState(false);
+    const [is3DLoading, setIs3DLoading] = useState(true);
+    const section3DRef = useRef(null);
 
     useEffect(() => {
         try {
@@ -52,6 +55,23 @@ export default function LandingPage() {
             setRuntimeError(e);
         }
     }, []);
+
+    useEffect(() => {
+        if (!isMounted) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setShow3D(true);
+                    observer.disconnect(); // Load once and keep it
+                }
+            },
+            { threshold: 0.1 }
+        );
+        if (section3DRef.current) {
+            observer.observe(section3DRef.current);
+        }
+        return () => observer.disconnect();
+    }, [isMounted]);
 
     if (runtimeError) {
         return (
@@ -237,6 +257,7 @@ export default function LandingPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         {/* 3D Viewer Container */}
                         <motion.div
+                            ref={section3DRef}
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             whileHover={{ scale: 1.03, rotate: 0.5 }}
@@ -255,13 +276,30 @@ export default function LandingPage() {
                         >
                             <div className="absolute inset-0 bg-gradient-to-tr from-[#5AA564]/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
                             <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#5AA564]/5 blur-[100px] rounded-full animate-pulse" />
-                            <iframe
-                                src="/3viewer/index.html"
-                                className="w-full h-full border-none relative z-10 scale-[1.02] origin-center transition-transform duration-700 group-hover:scale-105"
-                                title="3D Sign Language Translator"
-                                scrolling="no"
-                                loading="lazy"
-                            />
+                            
+                            <AnimatePresence>
+                                {!show3D || is3DLoading ? (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gray-50/10 backdrop-blur-sm"
+                                    >
+                                        <div className="w-16 h-16 rounded-full border-4 border-[#5AA564]/20 border-t-[#5AA564] animate-spin mb-4" />
+                                        <p className="text-[10px] font-black text-[#5AA564] uppercase tracking-[0.2em]">جاري تشغيل المعالج الثلاثي الأبعاد...</p>
+                                    </motion.div>
+                                ) : null}
+                            </AnimatePresence>
+
+                            {show3D && (
+                                <iframe
+                                    src="/3viewer/index.html"
+                                    className="w-full h-full border-none relative z-10 scale-[1.02] origin-center transition-transform duration-700 group-hover:scale-105 pointer-events-none group-hover:pointer-events-auto"
+                                    title="3D Sign Language Translator"
+                                    scrolling="no"
+                                    onLoad={() => setIs3DLoading(false)}
+                                />
+                            )}
                         </motion.div>
 
                         <div className="text-right flex flex-col justify-center">
@@ -378,7 +416,7 @@ export default function LandingPage() {
                                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                                 className="absolute bottom-[-100px] left-[-40px] w-full max-w-[420px] drop-shadow-[0_50px_100px_rgba(0,0,0,0.2)] md:block hidden"
                             >
-                                <img src="/images/mockups/quran_main.png" alt="Quran Interface Mockup" className="w-full h-auto rounded-[3rem] group-hover:scale-105 transition-transform duration-1000" />
+                                <img src="/mockups/quran_main.png" alt="Quran Interface Mockup" className="w-full h-auto rounded-[3rem] group-hover:scale-105 transition-transform duration-1000" />
                             </motion.div>
                         </motion.div>
 
@@ -404,7 +442,7 @@ export default function LandingPage() {
                                 whileHover={{ scale: 1.1, rotate: 2 }}
                                 className="relative w-full max-w-[280px] drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
                             >
-                                <img src="/images/mockups/prayer.png" alt="Prayer Times Mockup" className="w-full h-auto rounded-[2.5rem]" />
+                                <img src="/mockups/prayer.png" alt="Prayer Times Mockup" className="w-full h-auto rounded-[2.5rem]" />
                             </motion.div>
                         </motion.div>
 
@@ -436,7 +474,7 @@ export default function LandingPage() {
                                 transition={{ duration: 0.8, delay: 0.2 }}
                                 className="relative w-full max-w-[320px] lg:max-w-[400px] drop-shadow-[0_40px_80px_rgba(0,0,0,0.3)]"
                             >
-                                <img src="/images/mockups/adhkar.png" alt="Adhkar Interface Mockup" className="w-full h-auto rounded-[3rem]" />
+                                <img src="/mockups/adhkar.png" alt="Adhkar Interface Mockup" className="w-full h-auto rounded-[3rem]" />
                             </motion.div>
                         </motion.div>
                     </div>
