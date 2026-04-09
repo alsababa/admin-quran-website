@@ -294,11 +294,12 @@ export default function LandingPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
+                            whileHover={{ y: -8 }}
                             viewport={{ once: true }}
-                            className="md:col-span-12 lg:col-span-7 md:row-span-2 relative group overflow-hidden bg-slate-50 rounded-[4rem] border border-gray-100 p-12 flex flex-col items-start text-right"
+                            className="md:col-span-12 lg:col-span-7 md:row-span-2 relative group overflow-hidden bg-slate-50 rounded-[4rem] border border-gray-100 p-12 flex flex-col items-start text-right transition-all duration-700 hover:shadow-[0_50px_100px_rgba(0,0,0,0.08)]"
                         >
                             <div className="relative z-10 max-w-sm">
-                                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#5AA564] mb-8">
+                                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#5AA564] mb-8 border border-gray-50 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
                                     <BookOpen size={28} />
                                 </div>
                                 <h3 className="text-4xl font-black text-gray-900 mb-6 tracking-tight">القرآن بلغة الإشارة</h3>
@@ -312,11 +313,12 @@ export default function LandingPage() {
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
+                            whileHover={{ y: -8 }}
                             viewport={{ once: true }}
                             className="md:col-span-6 lg:col-span-5 md:row-span-2 relative group overflow-hidden bg-[#0A0D1A] rounded-[4rem] p-12 flex flex-col items-center text-center shadow-2xl"
                         >
                             <div className="relative z-10 w-full mb-10">
-                                <div className="w-16 h-16 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center text-white mb-8 mx-auto">
+                                <div className="w-16 h-16 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl flex items-center justify-center text-white mb-8 mx-auto group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
                                     <Compass size={32} />
                                 </div>
                                 <h3 className="text-3xl font-black text-white mb-4 tracking-tight">القبلة ومواقيت الصلاة</h3>
@@ -330,6 +332,7 @@ export default function LandingPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
+                            whileHover={{ y: -8 }}
                             viewport={{ once: true }}
                             className="md:col-span-6 lg:col-span-12 md:row-span-2 relative group overflow-hidden bg-gradient-to-br from-[#5AA564] to-[#4A8F53] rounded-[4rem] p-16 flex flex-col lg:flex-row items-center gap-16 shadow-2xl shadow-[#5AA564]/20"
                         >
@@ -339,7 +342,7 @@ export default function LandingPage() {
                                 </div>
                                 <h3 className="text-4xl font-black text-white mb-6 tracking-tight">ترجمة كاملة للأذكار</h3>
                                 <p className="text-white/80 font-bold text-xl leading-relaxed mb-8 max-w-md">أذكار الصباح والمساء والتحصينات اليومية، مسجلة بلغة الإشارة بمقاطع فيديو ذات جودة فائقة.</p>
-                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 border border-white/20 rounded-2xl text-white font-black text-xs uppercase tracking-widest">
+                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 border border-white/20 rounded-2xl text-white font-black text-xs uppercase tracking-widest transition-all cursor-pointer hover:bg-white/20">
                                     <span>اكتشف المزيد من الخصائص</span>
                                     <ArrowLeft size={16} />
                                 </div>
@@ -385,6 +388,93 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* ── About The Initiative (Vision & Mission) ── */}
+            <section className="py-16 max-w-7xl mx-auto px-6 relative">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#5AA564]/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="bg-gray-900 text-white rounded-[3rem] p-12 md:p-20 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#5AA564] blur-[150px] opacity-30 rounded-full" />
+
+                    <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                        <div>
+                            <span className="text-sm font-extrabold text-[#5AA564] tracking-widest uppercase mb-4 block">عن المبادرة</span>
+                            <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">رؤيتنا لا تعرف حدوداً والصم في قلب الاهتمام</h2>
+                            <p className="text-gray-400 font-medium leading-relaxed mb-8 text-lg">
+                                بجهود دؤوبة، وتحت مظلة <strong className="text-white">"شركة السبابة الرقمية"</strong>، نسعى لبناء مجتمع رقمي شامل يعزز من قدرة الصم وضعاف السمع على الوصول إلى القرآن الكريم وفهمه بيسر وسهولة، معتمدين على أحدث تقنيات العرض المرئي وفريق متخصص لضمان دقة لغة الإشارة المعتمدة.
+                            </p>
+                            <div className="flex items-center gap-4 border-t border-gray-800 pt-8 mt-8">
+                                <div className="w-14 h-14 bg-[#5AA564]/20 rounded-2xl flex items-center justify-center text-[#5AA564]">
+                                    <Shield size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-white text-lg">محتوى موثوق ومراجع</h4>
+                                    <p className="text-gray-400 text-sm">من قبل نخبة من علماء الشريعة وخبراء الإشارة.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative">
+                            {/* Decorative blocks to replace images, maintaining the SaaS aesthetic */}
+                            <motion.div
+                                whileHover={{ y: -10 }}
+                                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-[2.5rem] p-10 flex flex-col justify-center items-center text-center shadow-2xl border border-white/5 hover:border-[#5AA564]/30 transition-all duration-500"
+                            >
+                                <div className="w-20 h-20 bg-[#5AA564]/10 rounded-3xl flex items-center justify-center text-[#5AA564] mb-6 shadow-inner">
+                                    <Users size={48} strokeWidth={1.5} />
+                                </div>
+                                <h3 className="text-2xl font-black text-white mb-3 tracking-tight">مجتمع مترابط</h3>
+                                <p className="text-gray-400 font-medium text-sm leading-relaxed">شراكات ممتدة لخدمة المستفيدين في كل مكان.</p>
+                            </motion.div>
+                            <motion.div
+                                whileHover={{ y: -10 }}
+                                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-[2.5rem] p-10 flex flex-col justify-center items-center text-center shadow-2xl border border-white/5 hover:border-[#5AA564]/30 transition-all duration-500 transform sm:translate-y-12"
+                            >
+                                <div className="w-20 h-20 bg-[#D4AF37]/10 rounded-3xl flex items-center justify-center text-[#D4AF37] mb-6 shadow-inner">
+                                    <Globe size={48} strokeWidth={1.5} />
+                                </div>
+                                <h3 className="text-2xl font-black text-white mb-3 tracking-tight">معايير عالمية</h3>
+                                <p className="text-gray-400 font-medium text-sm leading-relaxed">أداء يفوق التطلعات وشمولية رقمية بمعايير دولية.</p>
+                            </motion.div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Testimonials ── */}
+            <section className="py-16 max-w-7xl mx-auto px-6">
+                <div className="text-center mb-16">
+                    <MessageSquareQuote className="mx-auto text-[#5AA564] mb-4 opacity-50" size={48} />
+                    <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">رأي المستفيدين</h2>
+                    <p className="text-gray-500 font-medium max-w-2xl mx-auto text-lg">صُمم هذا العمل ليلمس قلوب فئة غالية علينا وتجاربهم تسرد النجاح.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    {[
+                        { name: "محمد عبدالله", role: "مستخدم منتظم", char: "م", quote: "التطبيق سهل عليّ فهم القرآن بطريقة لم أكن أتصورها من قبل. الترجمة دقيقة جداً والصورة واضحة." },
+                        { name: "سالم عبدالرحمن", role: "معلم لغة إشارة", char: "س", quote: "أفضل تطبيق رأيته يخدم الصم في العالم العربي، الألوان مريحة للعين وتقسيم السور رائع جداً." },
+                        { name: "فاطمة علي", role: "مشرفة تعليمية", char: "ف", quote: "إمكانية تحميل الفيديوهات واستخدامها بدون إنترنت كانت ميزة غير متوقعة وأنقذتني في كثير من الأوقات.", active: true }
+                    ].map((t, i) => (
+                        <motion.div
+                            key={i}
+                            whileHover={{ y: -10 }}
+                            className="bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_40px_80px_rgba(0,0,0,0.06)] transition-all duration-500 relative group"
+                        >
+                            <div className="flex gap-1 text-[#5AA564] mb-6 opacity-60 group-hover:opacity-100 transition-opacity">
+                                {[1, 2, 3, 4, 5].map(j => <Star key={j} size={14} fill="currentColor" />)}
+                            </div>
+                            <p className="text-gray-600 font-medium leading-relaxed mb-8 text-lg">"{t.quote}"</p>
+                            <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 ${t.active ? 'bg-[#5AA564]/10 text-[#5AA564]' : 'bg-gray-100 text-gray-400'} rounded-full flex items-center justify-center font-black text-lg`}>
+                                    {t.char}
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-gray-900 text-base">{t.name}</h4>
+                                    <p className="text-xs text-gray-400 font-bold">{t.role}</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </section>
+
             {/* ── Pricing & Plans ── */}
             <section id="pricing" className="py-16 bg-gray-50/50">
                 <div className="max-w-7xl mx-auto px-6">
@@ -424,10 +514,67 @@ export default function LandingPage() {
                                     </li>
                                 ))}
                             </ul>
-                            <Link href="/pay?type=org" className="flex items-center justify-center gap-4 w-full h-16 bg-[#5AA564] text-white font-black rounded-2xl text-sm">
+                            <Link href="/pay?type=org" className="flex items-center justify-center gap-4 w-full h-16 bg-[#5AA564] text-white font-black rounded-2xl text-sm hover:scale-105 transition-transform">
                                 شراء للجهات والمنظمات
                             </Link>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── FAQ ── */}
+            <section className="py-16 max-w-4xl mx-auto px-6">
+                <div className="text-center mb-16">
+                    <Lightbulb className="mx-auto text-[#5AA564] mb-4 opacity-50" size={40} />
+                    <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4">الأسئلة الشائعة</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                        { icon: <Users size={22} />, q: "هل التطبيق موجه فقط للصم وضعاف السمع؟", a: "نعم، تم تصميمه خصيصاً ليناسب احتياجات لغة الإشارة الخاصة بالصم وضعاف السمع، ولكن يمكن لأي شخص راغب في تعلم لغة الإشارة للقرآن استخدامه." },
+                        { icon: <Globe size={22} />, q: "هل أحتاج إلى الاتصال بالإنترنت دائماً؟", a: "في البداية نعم لتحميل الفيديوهات والسور، ولكن بإمكانك حفظها في جهازك ومشاهدتها في أي وقت وأي مكان دون إنترنت." }
+                    ].map((f, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1 }}
+                            className="bg-white border border-gray-100 p-8 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all flex gap-6 items-start group"
+                        >
+                            <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#5AA564] shrink-0 group-hover:bg-[#5AA564] group-hover:text-white transition-all duration-500">
+                                {f.icon}
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-gray-900 mb-3">{f.q}</h3>
+                                <p className="text-gray-500 font-bold text-sm leading-relaxed">{f.a}</p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+                <div className="mt-12 text-center">
+                    <p className="text-gray-400 font-bold text-sm">لم تجد إجابة لسؤالك؟ <a href="mailto:support@alsababah.com" className="text-[#5AA564] hover:underline">تحدث معنا مباشرة</a></p>
+                </div>
+            </section>
+
+            {/* ── Clean CTA ── */}
+            <section id="download" className="py-16 relative overflow-hidden bg-gray-50">
+                <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-[#5AA564]/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+                    <div className="w-24 h-24 bg-white shadow-xl shadow-gray-200/50 rounded-3xl flex items-center justify-center mx-auto mb-10 overflow-hidden">
+                        <img src="/logo/logo.png" alt="Logo" className="w-14 h-14 object-contain hover:scale-110 transition-transform duration-500" />
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">جاهز لاحتضان التغيير؟</h2>
+                    <p className="text-xl text-gray-500 font-medium mb-12 max-w-2xl mx-auto">
+                        قم بتحميل تطبيق مصحف أنامل للصم الآن، متوفر على المتاجر الرسمية لأجهزة آيفون وأندرويد وانضم لمجتمعنا الكبير.
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                        <a href="#" className="w-full sm:w-auto h-16 px-12 bg-gray-900 hover:bg-black text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-lg">
+                            App Store
+                        </a>
+                        <a href="#" className="w-full sm:w-auto h-16 px-12 bg-gray-900 hover:bg-black text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-lg">
+                            Google Play
+                        </a>
                     </div>
                 </div>
             </section>
@@ -436,15 +583,25 @@ export default function LandingPage() {
             <footer className="bg-white py-8 border-t border-gray-100">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
-                        <img src="/logo/logo.png" alt="Logo" className="w-10 h-10" />
-                        <span className="text-lg font-extrabold text-gray-900">مصحف أنامل للصم</span>
+                        <img src="/logo/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+                        <div className="flex flex-col">
+                            <span className="text-lg font-extrabold text-gray-900">مصحف أنامل للصم</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">إحدى مبادرات شركة السبابة الرقمية</span>
+                        </div>
                     </div>
-                    <p className="text-sm font-medium text-gray-500">© 2026 مصحف أنامل للصم — جميع الحقوق محفوظة.</p>
-                    <Link href="/login" className="text-sm font-bold text-gray-400 flex items-center gap-2 group">
-                        بوابة الإدارة <ArrowLeft size={16} className="group-hover:-translate-x-1" />
+                    <p className="text-sm font-medium text-gray-500 text-center">
+                        © 2026 مصحف أنامل للصم — التابع لشركة السبابة الرقمية. جميع الحقوق محفوظة لخدمة الصم وضعاف السمع.
+                    </p>
+                    <Link href="/login" className="text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-2 group bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-full">
+                        بوابة إدارة المنصة <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </footer>
+            {/* ── Floating Support Button ── */}
+            <a href="#" className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#5AA564] hover:bg-[#4A8F53] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 hover:-translate-y-1 transition-all group">
+                <span className="absolute right-full mr-4 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">تواصل معنا</span>
+                <Users size={24} />
+            </a>
         </div>
     );
 }

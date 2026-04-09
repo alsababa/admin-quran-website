@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HandMetal, Smartphone, Star, Users, Video, Play, Globe, Shield, CheckCircle2, BookOpen, Compass, Check, ArrowLeft, Lightbulb, MessageSquareQuote, Loader2 } from 'lucide-react';
 
 const StatBadge = ({ value, label, icon }) => (
-    <motion.div
+    <motion.div 
         whileHover={{ y: -8, scale: 1.05 }}
         className="text-center group p-8 bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_40px_80px_rgba(90,165,100,0.08)] transition-all duration-500 relative overflow-hidden"
     >
@@ -50,7 +50,7 @@ export default function LandingPage() {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setShow3D(true);
-                    observer.disconnect();
+                    observer.disconnect(); 
                 }
             },
             { threshold: 0.1 }
@@ -605,10 +605,3 @@ export default function LandingPage() {
         </div>
     );
 }
-
-// Dummy Component definition just in case
-const Settings2 = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-        <path d="M20 7h-9" /><path d="M14 17H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" />
-    </svg>
-);
