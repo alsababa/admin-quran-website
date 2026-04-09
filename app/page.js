@@ -43,8 +43,8 @@ export default function LandingPage() {
     const section3DRef = useRef(null);
 
     useEffect(() => {
-        const frame = requestAnimationFrame(() => setIsMounted(true));
-        return () => cancelAnimationFrame(frame);
+        const timer = setTimeout(() => setIsMounted(true), 0);
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
