@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    Smartphone, Star, Users, Video, Play, Globe, Shield, 
-    CheckCircle2, BookOpen, Compass, Check, ArrowLeft, 
-    Lightbulb, MessageSquareQuote, Loader2, Download, Layers, Mail, MapPin, Instagram, Twitter, Youtube 
+    Smartphone, Star, Users, Play, Globe, Shield, 
+    CheckCircle2, BookOpen, Compass, ArrowLeft, 
+    MessageSquareQuote, Loader2, Layers, Mail, MapPin, Instagram, Twitter, Youtube 
 } from 'lucide-react';
 
 const Ornament = ({ className }) => {
@@ -306,7 +306,7 @@ export default function LandingPage() {
                             "adhkar.png", "quran_main.png", "prayer.png", "app_steps.png"
                         ].map((img, i) => (
                             <div key={i} className="w-[300px] h-[600px] flex-shrink-0 bg-white rounded-[3.5rem] p-3 shadow-2xl overflow-hidden relative group">
-                                <img src={`/mockups/${img}`} className="w-full h-full object-cover rounded-[3rem] group-hover:scale-110 transition-all duration-1000" />
+                                <img src={`/mockups/${img}`} alt={`App Screenshot ${i + 1}`} className="w-full h-full object-cover rounded-[3rem] group-hover:scale-110 transition-all duration-1000" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-[#5AA564] scale-0 group-hover:scale-100 transition-transform duration-500">
                                          <Smartphone size={32} />
@@ -397,7 +397,7 @@ export default function LandingPage() {
                                 <div className="text-[11px] font-bold text-gray-400 tracking-widest uppercase">إحدى مبادرات شركة السبابة الرقمية</div>
                             </div>
                             <div className="p-3 bg-gray-50 rounded-2xl">
-                                <img src="/logo/logo.png" className="w-16 h-16 object-contain" />
+                                <img src="/logo/logo.png" alt="Anaml Quran Logo" className="w-16 h-16 object-contain" />
                             </div>
                         </div>
                         <p className="text-gray-400 font-bold text-lg mb-10 leading-relaxed max-w-xl ml-auto">
