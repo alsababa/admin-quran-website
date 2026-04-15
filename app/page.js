@@ -2,10 +2,10 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Smartphone, Star, Users, Play, Globe, Shield, 
-    CheckCircle2, BookOpen, Compass, ArrowLeft, 
-    MessageSquareQuote, Loader2, Layers, Mail, MapPin, Instagram, Twitter, Youtube 
+import {
+    Smartphone, Star, Users, Play, Globe, Shield,
+    CheckCircle2, BookOpen, Compass, ArrowLeft,
+    MessageSquareQuote, Loader2, Layers, Mail, MapPin, Instagram, Twitter, Youtube
 } from 'lucide-react';
 
 const Ornament = ({ className }) => {
@@ -13,8 +13,8 @@ const Ornament = ({ className }) => {
     useEffect(() => setMounted(true), []);
     if (!mounted) return null;
     return (
-        <motion.div 
-            animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
+        <motion.div
+            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
             className={`pointer-events-none opacity-10 ${className}`}
         >
@@ -99,7 +99,6 @@ export default function LandingPage() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-gray-900 font-sans selection:bg-[#5AA564]/30 overflow-x-hidden" dir="rtl">
-            
             <Ornament className="fixed top-40 left-[-50px] text-[#5AA564] z-50" />
             <Ornament className="fixed bottom-40 right-[-50px] text-[#D4AF37] z-50" />
 
@@ -302,14 +301,14 @@ export default function LandingPage() {
                 <div className="relative flex overflow-hidden py-10">
                     <div className="flex gap-12 whitespace-nowrap min-w-full px-12 animate-infinite-scroll">
                         {[
-                            "adhkar.png", "quran_main.png", "prayer.png", "app_steps.png", 
+                            "adhkar.png", "quran_main.png", "prayer.png", "app_steps.png",
                             "adhkar.png", "quran_main.png", "prayer.png", "app_steps.png"
                         ].map((img, i) => (
                             <div key={i} className="w-[300px] h-[600px] flex-shrink-0 bg-white rounded-[3.5rem] p-3 shadow-2xl overflow-hidden relative group">
                                 <img src={`/mockups/${img}`} alt={`App Screenshot ${i + 1}`} className="w-full h-full object-cover rounded-[3rem] group-hover:scale-110 transition-all duration-1000" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-[#5AA564] scale-0 group-hover:scale-100 transition-transform duration-500">
-                                         <Smartphone size={32} />
+                                        <Smartphone size={32} />
                                     </div>
                                 </div>
                             </div>
@@ -370,8 +369,8 @@ export default function LandingPage() {
                     <h2 className="text-4xl font-black text-gray-900 mb-16">أصوات من القلب</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         {[
-                            { n: "محمد عبدالله", q: "المصحف غيّر حياتي وفهمي للقرآن." }, 
-                            { n: "فاطمة أحمد", q: "أفضل تطبيق لخدمة الصم على الإطلاق." }, 
+                            { n: "محمد عبدالله", q: "المصحف غيّر حياتي وفهمي للقرآن." },
+                            { n: "فاطمة أحمد", q: "أفضل تطبيق لخدمة الصم على الإطلاق." },
                             { n: "يوسف خالد", q: "دقة لغة الإشارة والرسومات مذهلة." }
                         ].map((t, i) => (
                             <div key={i} className="p-12 bg-white border border-gray-100 rounded-[3.5rem] text-right shadow-sm hover:shadow-2xl transition-all group">
@@ -435,10 +434,10 @@ export default function LandingPage() {
                     </div>
                 </div>
             </footer>
-            
+
             {/* Floating Contact */}
-            <motion.a 
-                href="https://wa.me/yournumber" 
+            <motion.a
+                href="https://wa.me/yournumber"
                 whileHover={{ scale: 1.1, y: -5 }}
                 className="fixed bottom-10 left-10 z-[2000] w-16 h-16 bg-[#5AA564] text-white rounded-full flex items-center justify-center shadow-2xl transition-all"
             >
