@@ -121,7 +121,7 @@ export default function PrivacyPage() {
                                     <p className="text-sm text-gray-400 mb-1">البريد الإلكتروني للدعم</p>
                                     <p className="text-xl font-black text-gray-900">info@alsababah.com</p>
                                 </div>
-                                <a href="mailto:info@alsababah.com" className="px-8 py-3 bg-primary text-white font-black rounded-xl hover:bg-primary-dark transition-colors">
+                                <a href="mailto:info@alsababah.com" className="px-8 py-3 bg-primary text-white font-black rounded-xl hover:bg-primary/90 transition-colors">
                                     ارسل رسالة
                                 </a>
                             </div>
