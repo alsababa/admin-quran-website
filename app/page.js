@@ -386,7 +386,22 @@ export default function LandingPage() {
                 </section>
             </Reveal>
 
-            {/* ── Final Footer ── */}
+            {/* ── Download Section ── */}
+            <section id="download" className="py-28 relative overflow-hidden bg-gray-50">
+                <div className="absolute left-1/2 -top-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-[#5AA564]/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+                    <div className="w-24 h-24 bg-white shadow-xl shadow-gray-200/50 rounded-3xl flex items-center justify-center mx-auto mb-10 overflow-hidden">
+                        <img src="/logo/logo.png" className="w-14 h-14 object-contain hover:scale-110 transition-transform duration-500" />
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">جاهز لاحتضان التغيير؟</h2>
+                    <p className="text-xl text-gray-500 font-medium mb-12 max-w-2xl mx-auto">قم بتحميل تطبيق مصحف أنامل للصم الآن، متوفر على المتاجر الرسمية لأجهزة آيفون وأندرويد وانضم لمجتمعنا الكبير.</p>
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                        <a href="#" className="w-full sm:w-auto h-16 px-12 bg-gray-900 hover:bg-black text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-lg">App Store</a>
+                        <a href="https://play.google.com/store/apps/details?id=quran.alsababah.com" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto h-16 px-12 bg-gray-900 hover:bg-black text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-all hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-lg">Google Play</a>
+                    </div>
+                </div>
+            </section>
+
             <footer className="py-24 bg-white border-t border-gray-100 relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16">
                     <div className="md:col-span-2 text-right">
