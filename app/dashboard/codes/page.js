@@ -57,11 +57,36 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
     const [count, setCount] = useState(50);
     const [orgId, setOrgId] = useState('');
     const [prefix, setPrefix] = useState('ANML');
-    const [expiry, setExpiry] = useState('');
+    const [countryCode, setCountryCode] = useState('+966');
+    const [duration, setDuration] = useState('1'); // Years
+
+    const countries = [
+        { name: 'المملكة العربية السعودية', code: '+966' },
+        { name: 'اليمن', code: '+967' },
+        { name: 'مصر', code: '+20' },
+        { name: 'الإمارات', code: '+971' },
+        { name: 'الكويت', code: '+965' },
+        { name: 'قطر', code: '+974' },
+        { name: 'عمان', code: '+968' },
+        { name: 'البحرين', code: '+973' },
+        { name: 'الأردن', code: '+962' },
+        { name: 'أخرى', code: 'Global' },
+    ];
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onGenerate({ count, orgId, prefix, expiresAt: expiry || null });
+        
+        // Calculate expiry date based on duration
+        const expiryDate = new Date();
+        expiryDate.setFullYear(expiryDate.getFullYear() + parseInt(duration));
+        
+        onGenerate({ 
+            count, 
+            orgId, 
+            prefix, 
+            countryCode,
+            expiresAt: expiryDate.toISOString() 
+        });
     };
 
     return (
@@ -82,7 +107,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                     <div className="flex items-center gap-5">
                         <div className="text-right">
                             <h4 className="text-3xl font-black text-gray-900 tracking-tight">توليد أكواد جديدة</h4>
-                            <p className="text-[#5AA564] text-[10px] font-black uppercase tracking-widest mt-1 opacity-40">إنشاء حزمة مفاتيح دخول</p>
+                            <p className="text-[#5AA564] text-[10px] font-black uppercase tracking-widest mt-1 opacity-40">إنشاء حزمة مفاتيح دخول طبقاً لبلد المستخدم</p>
                         </div>
                         <div className="h-16 w-16 rounded-[1.5rem] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#5AA564] shadow-sm">
                             <Ticket size={32} strokeWidth={1.5} />
@@ -90,7 +115,7 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Organization Selection */}
                     <div className="space-y-3">
                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">الجهة / المنظمة المستفيدة</label>
@@ -107,6 +132,41 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                                 </option>
                             ))}
                         </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Country Selection */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">مفتاح الدولة</label>
+                            <select 
+                                required
+                                className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white transition-all shadow-sm appearance-none cursor-pointer"
+                                value={countryCode}
+                                onChange={(e) => setCountryCode(e.target.value)}
+                            >
+                                {countries.map(c => (
+                                    <option key={c.code} value={c.code}>
+                                        {c.name} ({c.code})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        {/* Duration */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">مدة الصلاحية</label>
+                            <select 
+                                required
+                                className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white transition-all shadow-sm appearance-none cursor-pointer"
+                                value={duration}
+                                onChange={(e) => setDuration(e.target.value)}
+                            >
+                                <option value="1">سنة واحدة</option>
+                                <option value="2">سنتان</option>
+                                <option value="3">3 سنوات</option>
+                                <option value="5">5 سنوات</option>
+                                <option value="10">10 سنوات</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -130,17 +190,6 @@ const GenerateModal = ({ onGenerate, onClose, loading, organizations }) => {
                                 onChange={(e) => setPrefix(e.target.value)}
                             />
                         </div>
-                    </div>
-
-                    {/* Expiry */}
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mr-1">تاريخ انتهاء الصلاحية (اختياري)</label>
-                        <input
-                            type="date"
-                            className="w-full h-15 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-bold text-gray-900 focus:outline-none focus:border-[#5AA564]/30 focus:bg-white shadow-sm"
-                            value={expiry}
-                            onChange={(e) => setExpiry(e.target.value)}
-                        />
                     </div>
 
                     <div className="pt-6">
@@ -400,6 +449,7 @@ export default function CodesPage() {
                                                         <thead>
                                                             <tr className="bg-gray-50/30">
                                                                 <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">الرمز السري (LICENSE)</th>
+                                                                <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em] text-center">الدولة</th>
                                                                 <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em] text-center">الحالة</th>
                                                                 <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">تاريخ الإصدار</th>
                                                                 <th className="px-10 py-5 text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">صلاحية المفتاح</th>
@@ -421,6 +471,11 @@ export default function CodesPage() {
                                                                                     <Copy size={14} />
                                                                                 </button>
                                                                             </div>
+                                                                        </td>
+                                                                        <td className="px-10 py-5 text-center">
+                                                                            <span className="text-[11px] font-black text-gray-500 bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
+                                                                                {code.country_code || 'Global'}
+                                                                            </span>
                                                                         </td>
                                                                         <td className="px-10 py-5 text-center">
                                                                             <div className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm
@@ -472,6 +527,7 @@ export default function CodesPage() {
                                     <thead>
                                         <tr className="bg-gray-50/50">
                                             <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">LICENSE KEY</th>
+                                            <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-center">COUNTRY</th>
                                             <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 text-center">STATUS</th>
                                             <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">BENEFICIARY ENTITY</th>
                                             <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">EXPIRY DATE</th>
@@ -486,6 +542,11 @@ export default function CodesPage() {
                                                        {code.code}
                                                        <button onClick={() => copyToClipboard(code.code)} className="h-8 w-8 flex items-center justify-center bg-gray-50 rounded-lg text-gray-300 hover:text-[#5AA564] opacity-0 group-hover:opacity-100 transition-all"><Copy size={14} /></button>
                                                    </div>
+                                                </td>
+                                                <td className="px-10 py-6 text-center">
+                                                    <span className="text-[10px] font-black text-gray-500 bg-gray-100 px-3 py-1 rounded-lg border border-gray-200">
+                                                        {code.country_code || 'Global'}
+                                                    </span>
                                                 </td>
                                                 <td className="px-10 py-6 text-center">
                                                     <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm

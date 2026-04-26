@@ -35,7 +35,7 @@ export function useActivationCodes() {
     }, [fetchCodes]);
 
     // ── Generate Bulk Codes ───────────────────────────────────
-    const generateBulkCodes = async ({ count, orgId, prefix = 'ANML', expiresAt = null }) => {
+    const generateBulkCodes = async ({ count, orgId, prefix = 'ANML', countryCode = '', expiresAt = null }) => {
         try {
             const batchId = crypto.randomUUID();
             const newCodes = [];
@@ -48,6 +48,7 @@ export function useActivationCodes() {
                     code: codeString,
                     batch_id: batchId,
                     org_id: orgId,
+                    country_code: countryCode, // New field
                     expires_at: expiresAt,
                     status: 'available'
                 });
