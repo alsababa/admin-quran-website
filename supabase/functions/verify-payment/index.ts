@@ -332,6 +332,7 @@ Deno.serve(async (req) => {
 
       const orgId = orgData?.id || verifiedUid || adminEmail || 'unknown_org'
       const expiryDate = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString()
+      const countryCode = metadata?.countryCode || metadata?.country_code || '+966'
 
       await syncToFirebaseCollection('organizations', orgId, {
         name: orgName,
@@ -340,6 +341,7 @@ Deno.serve(async (req) => {
         adminEmail: adminEmail?.toLowerCase(),
         adminUserId: verifiedUid || null,
         maxUsers: userCount,
+        countryCode: countryCode,
         updatedAt: now.toISOString()
       })
 
@@ -354,6 +356,7 @@ Deno.serve(async (req) => {
           code,
           status: 'available',
           org_id: orgData?.id || verifiedUid || adminEmail,
+          country_code: countryCode,
           created_at: now.toISOString(),
           expires_at: expiresAt
         })
@@ -362,6 +365,7 @@ Deno.serve(async (req) => {
           code: { stringValue: code },
           status: { stringValue: 'available' },
           orgId: { stringValue: orgId },
+          countryCode: { stringValue: countryCode },
           createdAt: { stringValue: now.toISOString() },
           expiresAt: { stringValue: expiresAt }
         })
@@ -380,7 +384,7 @@ Deno.serve(async (req) => {
       activationResult = {
         success: true,
         type: 'organization',
-        message: `تم تفعيل حساب الجهة وتوليد ${userCount} كود بنجاح. سيتم تفعيلها في التطبيق خلال لحظات.`
+        message: `تم تفعيل حساب الجهة وتوليد ${userCount} كود بنجاح (دولة: ${countryCode}). سيتم تفعيلها في التطبيق خلال لحظات.`
       }
     } else {
       // ── INDIVIDUAL FLOW (Activate User) ──
