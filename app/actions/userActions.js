@@ -59,8 +59,8 @@ export async function generateCodesAdmin(newCodes) {
 /**
  * حذف كود تفعيل محدد باستخدام صلاحيات المشرف
  */
-export async function deleteCodeAdmin(codeId) {
-    return await callAdminApi('delete-code', { id: codeId });
+export async function deleteCodeAdmin(codeId, codeString) {
+    return await callAdminApi('delete-code', { id: codeId, codeString });
 }
 
 /**

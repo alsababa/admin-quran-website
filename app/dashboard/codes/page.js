@@ -502,7 +502,7 @@ export default function CodesPage() {
                                                                         </td>
                                                                         <td className="px-10 py-5 text-left">
                                                                             <button 
-                                                                                onClick={() => deleteCode(code.id)}
+                                                                                onClick={() => deleteCode(code.id, code.code)}
                                                                                 className="h-10 w-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-xl text-gray-300 hover:text-rose-500 hover:shadow-sm transition-all active:scale-95"
                                                                             >
                                                                                 <Trash2 size={16} />
@@ -567,7 +567,7 @@ export default function CodesPage() {
                                                    <span className="text-sm font-black text-gray-900 opacity-60 italic">{code.expires_at ? new Date(code.expires_at).toLocaleDateString('ar-SA') : 'UNLIMITED'}</span>
                                                 </td>
                                                 <td className="px-10 py-6 text-left">
-                                                   <button onClick={() => deleteCode(code.id)} className="h-10 w-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-xl text-gray-300 hover:text-rose-500 transition-colors active:scale-95"><Trash2 size={18} /></button>
+                                                   <button onClick={() => deleteCode(code.id, code.code)} className="h-10 w-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded-xl text-gray-300 hover:text-rose-500 transition-colors active:scale-95"><Trash2 size={18} /></button>
                                                 </td>
                                             </tr>
                                         ))}

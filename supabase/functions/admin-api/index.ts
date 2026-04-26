@@ -3,11 +3,32 @@
 // Compatible with Static Export (no Server Actions needed)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { initializeApp, cert, getApp, getApps } from 'https://esm.sh/firebase-admin@12/app'
+import { getFirestore } from 'https://esm.sh/firebase-admin@12/firestore'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
+// ── Firebase Initialization Helper ───────────────────────────
+function getFirebaseDb() {
+  try {
+    if (getApps().length === 0) {
+      const serviceAccountStr = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_B64');
+      if (!serviceAccountStr) throw new Error('Missing FIREBASE_SERVICE_ACCOUNT_B64 secret');
+      
+      const serviceAccount = JSON.parse(atob(serviceAccountStr));
+      initializeApp({
+        credential: cert(serviceAccount)
+      });
+    }
+    return getFirestore();
+  } catch (err) {
+    console.error('[Firebase Init Error]', err.message);
+    return null;
+  }
 }
 
 Deno.serve(async (req) => {
@@ -31,24 +52,54 @@ Deno.serve(async (req) => {
     switch (action) {
       case 'generate-codes': {
         const { codes } = payload
+        
+        // A. Insert into Supabase
         const { data, error } = await supabaseAdmin
           .from('activation_codes')
           .insert(codes)
           .select()
         
         if (error) throw error
+
+        // B. Sync to Firebase Firestore
+        const firestore = getFirebaseDb();
+        if (firestore) {
+          const batch = firestore.batch();
+          codes.forEach((item: any) => {
+            const docRef = firestore.collection('activation_codes').doc(item.code);
+            batch.set(docRef, {
+              ...item,
+              platform: 'web-admin',
+              syncedAt: new Date().toISOString()
+            });
+          });
+          await batch.commit();
+          console.log(`[AdminAPI] Successfully synced ${codes.length} codes to Firestore`);
+        } else {
+          console.warn('[AdminAPI] Firebase Sync skipped: Firestore not initialized');
+        }
+
         result = { success: true, data, error: null }
         break
       }
 
       case 'delete-code': {
-        const { id } = payload
+        const { id, codeString } = payload
         const { error } = await supabaseAdmin
           .from('activation_codes')
           .delete()
           .eq('id', id)
         
         if (error) throw error
+
+        // Optional: Sync delete to Firebase
+        if (codeString) {
+            const firestore = getFirebaseDb();
+            if (firestore) {
+                await firestore.collection('activation_codes').doc(codeString).delete();
+            }
+        }
+
         result = { success: true, data: null, error: null }
         break
       }
@@ -61,6 +112,16 @@ Deno.serve(async (req) => {
           .eq('batch_id', batchId)
         
         if (error) throw error
+        
+        // Note: Batch deletion in Firebase requires querying by batch_id
+        const firestore = getFirebaseDb();
+        if (firestore) {
+            const snapshot = await firestore.collection('activation_codes').where('batch_id', '==', batchId).get();
+            const batch = firestore.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+        }
+
         result = { success: true, data: null, error: null }
         break
       }

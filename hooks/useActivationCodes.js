@@ -66,12 +66,14 @@ export function useActivationCodes() {
         }
     };
 
-    // ── Delete Specific Code ──────────────────────────────────
-    const deleteCode = async (id) => {
+    // ── Delete Individual Code ──────────────────────────────
+    const deleteCode = async (id, codeString) => {
         try {
-            const result = await deleteCodeAdmin(id);
+            const result = await deleteCodeAdmin(id, codeString);
             if (!result.success) throw new Error(result.error);
-            setCodes(prev => prev.filter(c => c.id !== id));
+            
+            // Refresh
+            await fetchCodes();
             return { success: true };
         } catch (err) {
             console.error("Error deleting code:", err);
