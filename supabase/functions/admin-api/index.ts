@@ -2,9 +2,9 @@
 // Handles administrative operations for the Quran Admin Dashboard
 // Compatible with Static Export (no Server Actions needed)
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { initializeApp, cert, getApp, getApps } from 'https://esm.sh/firebase-admin@12/app'
-import { getFirestore } from 'https://esm.sh/firebase-admin@12/firestore'
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import { initializeApp, cert, getApp, getApps } from 'npm:firebase-admin@12/app'
+import { getFirestore } from 'npm:firebase-admin@12/firestore'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -53,13 +53,41 @@ Deno.serve(async (req) => {
       case 'generate-codes': {
         const { codes } = payload
         
+        console.log('[AdminAPI] SUPABASE_URL:', supabaseUrl)
+
+        // Normalize keys + whitelist only real DB columns
+        const normalizedCodes = (codes || []).map((item: any) => ({
+          code: item.code,
+          country_code: item.country_code ?? item.countryCode ?? '+966',
+          duration_years: item.duration_years ?? item.durationYears ?? 1,
+          status: item.status ?? 'available',
+          org_id: item.org_id ?? item.orgId ?? null,
+          batch_id: item.batch_id ?? item.batchId ?? null,
+          expires_at: item.expires_at ?? item.expiresAt ?? null,
+          used_at: item.used_at ?? item.usedAt ?? null,
+          used_by: item.used_by ?? item.usedBy ?? null,
+        }))
+
         // A. Insert into Supabase
-        const { data, error } = await supabaseAdmin
+        let { data, error } = await supabaseAdmin
           .from('activation_codes')
-          .insert(codes)
+          .insert(normalizedCodes)
           .select()
         
-        if (error) throw error
+        // If it fails with "column not found" / "schema cache" error, try without the new columns
+        if (error && (error.message.includes('column') || error.code === 'PGRST204')) {
+          console.warn('[AdminAPI] Some columns missing in schema, retrying with minimum fields...');
+          const safeCodes = normalizedCodes.map(({ country_code, duration_years, ...rest }: any) => rest);
+          const retry = await supabaseAdmin
+            .from('activation_codes')
+            .insert(safeCodes)
+            .select()
+          
+          data = retry.data;
+          error = retry.error;
+        }
+
+        if (error) throw error;
 
         // B. Sync to Firebase Firestore
         const firestore = getFirebaseDb();

@@ -15,13 +15,27 @@ export function useActivationCodes() {
             // NOTE: auth.users is NOT accessible from the client anon key.
             // We only fetch the codes. If you need organization details, 
             // you must use a public profiles table.
+            // Try to fetch all columns including country_code
             const { data, error } = await supabase
                 .from('activation_codes')
-                .select('*') 
+                .select('id, code, status, created_at, expires_at, org_id, batch_id, country_code') 
                 .order('created_at', { ascending: false });
-
-            if (error) throw error;
-            setCodes(data || []);
+            
+            // If it fails because country_code is actually missing, fallback to known columns
+            if (error && (error.message.includes('country_code') || error.code === 'PGRST204')) {
+                console.warn('[Supabase] country_code missing in production schema cache. Falling back...');
+                const { data: fallbackData, error: fallbackError } = await supabase
+                    .from('activation_codes')
+                    .select('id, code, status, created_at, expires_at, org_id, batch_id')
+                    .order('created_at', { ascending: false });
+                
+                if (fallbackError) throw fallbackError;
+                setCodes(fallbackData || []);
+            } else if (error) {
+                throw error;
+            } else {
+                setCodes(data || []);
+            }
         } catch (err) {
             console.error("Error fetching codes:", err);
             setError(err.message);
