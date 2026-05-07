@@ -1,7 +1,8 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, Suspense } from 'react';
-import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
+import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle, Globe } from 'lucide-react';
+import { getPriceByCountry } from '@/lib/pricing';
 
 /* ────────────────────────────────────────────────────────
  * Plan Definitions (must match mobile app plans)
@@ -61,6 +62,7 @@ function PayPageInner() {
     // Org specific state
     const [orgName, setOrgName] = useState('');
     const [userCount, setUserCount] = useState(10); // Default 10 for orgs
+    const [countryCode, setCountryCode] = useState('+966');
 
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [errorMsg, setErrorMsg] = useState('');
@@ -91,6 +93,10 @@ function PayPageInner() {
             setEmail(searchParams.get('email') || '');
             setName(searchParams.get('name') || '');
             setPlanId(searchParams.get('plan') || DEFAULT_PLAN_ID);
+            
+            // Extract country code
+            const urlCountry = searchParams.get('country') || searchParams.get('country_code') || '+966';
+            setCountryCode(urlCountry);
         } catch (e) {
             console.error('[Diagnostic] Search params sync error:', e);
             setRuntimeError(e);
@@ -154,9 +160,17 @@ function PayPageInner() {
 
     const calculatePrice = () => {
         try {
-            if (!isOrg) return PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
+            const basePrice = getPriceByCountry(countryCode);
 
-            const basePrice = 120;
+            if (!isOrg) {
+                const plan = PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
+                return {
+                    ...plan,
+                    price: basePrice,
+                    priceHalalas: Math.round(basePrice * 100)
+                };
+            }
+
             let discount = 0;
             if (userCount >= 1000) discount = 0.15;
             else if (userCount >= 50) discount = 0.10;
@@ -170,7 +184,7 @@ function PayPageInner() {
                 priceHalalas: Math.round(total * 100),
                 perUser: perUser,
                 discountPercent: Math.round(discount * 100),
-                description: `توليد ${userCount} كود تفعيل خاص بـ ${orgName || 'الجهة'}`,
+                description: `توليد ${userCount} كود تفعيل خاصة بـ ${orgName || 'الجهة'} (دولة: ${countryCode})`,
                 features: [
                     `عدد ${userCount} رخصة استخدام`,
                     'لوحة تحكم إدارية',
@@ -249,6 +263,7 @@ function PayPageInner() {
                                     type: isOrg ? 'organization' : 'individual',
                                     userCount: isOrg ? userCount : 1,
                                     orgName: orgName,
+                                    countryCode: countryCode,
                                     order_id: `quran_admin_${Date.now()}_${uid.substring(0, 5)}`,
                                     platform: 'admin_dashboard'
                                 },

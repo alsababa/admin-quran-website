@@ -1,7 +1,8 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef, Suspense } from 'react';
-import { CheckCircle2, XCircle, Loader2, ArrowLeft, Smartphone, RefreshCw } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, ArrowLeft, Smartphone, RefreshCw, Globe } from 'lucide-react';
+import { getPriceByCountry } from '@/lib/pricing';
 import { db } from '@/lib/firebase';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { supabase } from '@/lib/supabase';
@@ -44,6 +45,7 @@ function CallbackInner() {
     const email = searchParams.get('email') || '';
     const name = searchParams.get('name') || '';
     const planId = searchParams.get('plan') || 'annual-pro';
+    const countryCode = searchParams.get('country') || searchParams.get('country_code') || '+966';
 
     // Extract UID from token if missing
     if (!uid && token) {
@@ -55,7 +57,11 @@ function CallbackInner() {
         }
     }
 
-    const plan = PLANS[planId] || PLANS['annual-pro'];
+    const basePrice = getPriceByCountry(countryCode);
+    const plan = {
+        ...(PLANS[planId] || PLANS['annual-pro']),
+        price: basePrice
+    };
 
     const [status, setStatus] = useState('processing'); // processing | success | failed | error
     const [message, setMessage] = useState('جاري التحقق من عملية الدفع...');
@@ -104,7 +110,8 @@ function CallbackInner() {
                         metadata: {
                             type: searchParams.get('type') === 'org' ? 'organization' : 'individual',
                             userCount: searchParams.get('userCount'),
-                            orgName: searchParams.get('orgName')
+                            orgName: searchParams.get('orgName'),
+                            countryCode: countryCode
                         }
                     }),
                 });
@@ -255,7 +262,7 @@ function CallbackInner() {
                 user_id: userId,
                 email: userEmail,
                 plan_id: userPlanId,
-                amount: plan.price * 100,
+                amount: basePrice * 100,
                 currency: 'SAR',
                 status: pStatus,
                 platform: 'moyasar',
@@ -454,7 +461,7 @@ function CallbackInner() {
                             <h2 style={{ fontSize: 22, fontWeight: 900, color: '#111', marginBottom: 12 }}>فشل الدفع</h2>
                             <p style={{ fontSize: 14, color: '#777', fontWeight: 600, marginBottom: 28, lineHeight: 1.7 }}>{message}</p>
 
-                            <a href={`/pay/?uid=${uid}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${planId}`}
+                            <a href={`/pay/?uid=${uid}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${planId}&country=${countryCode}`}
                                 style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                                     width: '100%', height: 52, borderRadius: 16,

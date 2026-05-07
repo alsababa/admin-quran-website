@@ -22,6 +22,44 @@ const PLANS: Record<string, { extensionDays: number, tier: string }> = {
   'organization_bulk': { extensionDays: 365, tier: 'premium' },
 }
 
+// ── Regional Pricing Map (must match lib/pricing.js) ──
+const REGIONAL_PRICES: Record<string, number> = {
+    '+966': 120, // Saudi Arabia
+    '+971': 120, // UAE
+    '+974': 120, // Qatar
+    '+965': 120, // Kuwait
+    '+973': 79,  // Bahrain
+    '+968': 73,  // Oman
+    '+967': 7,   // Yemen
+    '+962': 37,  // Jordan
+    '+218': 32,  // Libya
+    '+964': 32,  // Iraq
+    '+216': 20,  // Tunisia
+    '+213': 24,  // Algeria
+    '+212': 23,  // Morocco
+    '+20': 16,   // Egypt
+    '+970': 17,  // Palestine
+    '+963': 6,   // Syria
+    '+249': 7,   // Sudan
+    '+222': 7,   // Mauritania
+    '+961': 19,  // Lebanon
+    '+90': 46,   // Turkey
+    '+60': 44,   // Malaysia
+    '+98': 26,   // Iran
+    '+62': 18,   // Indonesia
+    '+92': 12,   // Pakistan
+    '+880': 8,   // Bangladesh
+    '+234': 8,   // Nigeria
+    'Global': 50 // Default
+};
+
+function getPriceByCountry(countryCode: string) {
+    if (!countryCode) return 120;
+    let normalized = countryCode.trim();
+    if (/^\d+$/.test(normalized)) normalized = '+' + normalized;
+    return REGIONAL_PRICES[normalized] || REGIONAL_PRICES['Global'] || 120;
+}
+
 /**
  * Generate a random activation code (e.g., ANML-XXXX-XXXX)
  */
@@ -299,6 +337,37 @@ Deno.serve(async (req) => {
       }
     } else {
       console.warn('Warning: MOYASAR_SECRET_KEY is NOT set. Skipping server-side verification.')
+    }
+
+    // ── 5.1 Secure Price Validation ──
+    if (paymentVerified && paymentData) {
+        const countryCode = metadata?.countryCode || metadata?.country_code || '+966';
+        const basePrice = getPriceByCountry(countryCode);
+        const isOrg = metadata?.type === 'organization' || plan_id === 'organization_bulk';
+        const userCount = isOrg ? parseInt(metadata?.userCount || '10') : 1;
+        
+        let expectedPrice = basePrice;
+        if (isOrg) {
+            let discount = 0;
+            if (userCount >= 1000) discount = 0.15;
+            else if (userCount >= 50) discount = 0.10;
+            expectedPrice = (basePrice * (1 - discount)) * userCount;
+        }
+
+        const paidAmountSAR = paymentData.amount / 100;
+        // Allow for minor rounding differences (0.5 SAR)
+        if (paidAmountSAR < (expectedPrice - 0.5)) {
+            console.error(`[Security] Price mismatch! Expected: ${expectedPrice}, Paid: ${paidAmountSAR}, Country: ${countryCode}`);
+            return new Response(
+                JSON.stringify({ 
+                    success: false, 
+                    error: `قيمة العملية غير مطابقة للسعر الإقليمي (${expectedPrice} ريال). يرجى التواصل مع الدعم.`,
+                    expected: expectedPrice,
+                    paid: paidAmountSAR
+                }),
+                { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+        }
     }
 
     // ── 6. Determine Type (Individual vs Organization) ──
