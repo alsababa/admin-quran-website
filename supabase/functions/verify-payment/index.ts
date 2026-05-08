@@ -341,7 +341,22 @@ Deno.serve(async (req) => {
 
     // ── 5.1 Secure Price Validation ──
     if (paymentVerified && paymentData) {
-        const countryCode = metadata?.countryCode || metadata?.country_code || '+966';
+        let countryCode = metadata?.countryCode || metadata?.country_code || '+966';
+        
+        // Security: Fetch country code from DB if we have a verified user to prevent metadata spoofing
+        if (verifiedUid) {
+            const { data: userProfile } = await supabaseAdmin
+                .from('users')
+                .select('country_code')
+                .eq('id', verifiedUid)
+                .maybeSingle();
+            
+            if (userProfile?.country_code) {
+                console.log(`[Security] Using DB country_code: ${userProfile.country_code} instead of metadata: ${countryCode}`);
+                countryCode = userProfile.country_code;
+            }
+        }
+
         const basePrice = getPriceByCountry(countryCode);
         const isOrg = metadata?.type === 'organization' || plan_id === 'organization_bulk';
         const userCount = isOrg ? parseInt(metadata?.userCount || '10') : 1;

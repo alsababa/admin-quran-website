@@ -3,6 +3,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle, Globe } from 'lucide-react';
 import { getPriceByCountry } from '@/lib/pricing';
+import { supabase } from '@/lib/supabase';
 
 /* ────────────────────────────────────────────────────────
  * Plan Definitions (must match mobile app plans)
@@ -102,6 +103,32 @@ function PayPageInner() {
             setRuntimeError(e);
         }
     }, [searchParams]);
+
+    /* Fetch User Data from Database (Truth Source) */
+    useEffect(() => {
+        if (!uid || uid === 'web-user' || isOrg) return;
+
+        async function fetchUserProfile() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('full_name, email, country_code')
+                    .eq('id', uid)
+                    .single();
+
+                if (data && !error) {
+                    console.log('[Database] User profile found:', data);
+                    if (data.country_code) setCountryCode(data.country_code);
+                    if (data.full_name && !name) setName(data.full_name);
+                    if (data.email && !email) setEmail(data.email);
+                }
+            } catch (err) {
+                console.warn('[Database] Failed to fetch user profile:', err);
+            }
+        }
+
+        fetchUserProfile();
+    }, [uid, isOrg]);
 
     /* Load Moyasar SDK with Retry Logic */
     const loadMoyasarSDK = useCallback((retries = 3) => {
