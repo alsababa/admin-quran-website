@@ -80,11 +80,10 @@ function PayPageInner() {
     /* Handle Search Params on Mount */
     useEffect(() => {
         try {
-            queueMicrotask(() => {
-                setIsMounted(true);
-                setIsOrg(searchParams.get('type') === 'org');
-            });
-
+            setIsMounted(true);
+            const type = searchParams.get('type');
+            setIsOrg(type === 'org');
+            
             const urlToken = searchParams.get('token') || '';
             setToken(urlToken);
 
@@ -250,8 +249,9 @@ function PayPageInner() {
     useEffect(() => {
         if (!isMounted) return;
 
-        if (isOrg && !orgName && status !== 'ready' && status !== 'error') {
+        if (isOrg && !orgName) {
             setStatus('ready');
+            return;
         }
 
         if (!uid && !isOrg && !token) {
@@ -332,7 +332,7 @@ function PayPageInner() {
             });
 
         return () => { mounted = false; };
-    }, [uid, token, email, name, planId, plan.priceHalalas, isOrg, orgName, userCount, loadMoyasarSDK, isMounted]);
+    }, [uid, token, isOrg, orgName, plan.priceHalalas, loadMoyasarSDK, isMounted]);
 
     if (runtimeError) {
         return (
