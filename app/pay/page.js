@@ -118,7 +118,17 @@ function PayPageInner() {
 
                 if (data && !error) {
                     console.log('[Database] User profile found:', data);
-                    if (data.country_code) setCountryCode(data.country_code);
+                    
+                    // Prioritize URL parameter if it exists, otherwise use DB
+                    const urlCountry = searchParams.get('country') || searchParams.get('country_code');
+                    if (urlCountry) {
+                        console.log('[Pricing] Using URL country code:', urlCountry);
+                        setCountryCode(urlCountry);
+                    } else if (data.country_code) {
+                        console.log('[Pricing] Using DB country code:', data.country_code);
+                        setCountryCode(data.country_code);
+                    }
+
                     if (data.full_name && !name) setName(data.full_name);
                     if (data.email && !email) setEmail(data.email);
                 }

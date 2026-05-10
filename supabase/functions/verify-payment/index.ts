@@ -341,9 +341,11 @@ Deno.serve(async (req) => {
 
     // ── 5.1 Secure Price Validation ──
     if (paymentVerified && paymentData) {
+        // Secure Price Validation: Use the country code that was used to calculate the price
+        // Priority: Metadata (from URL/App) > DB (fallback)
         let countryCode = metadata?.countryCode || metadata?.country_code || '+966';
+        let dbCountryCode = null;
         
-        // Security: Fetch country code from DB if we have a verified user to prevent metadata spoofing
         if (verifiedUid) {
             const { data: userProfile } = await supabaseAdmin
                 .from('users')
@@ -351,10 +353,14 @@ Deno.serve(async (req) => {
                 .eq('id', verifiedUid)
                 .maybeSingle();
             
-            if (userProfile?.country_code) {
-                console.log(`[Security] Using DB country_code: ${userProfile.country_code} instead of metadata: ${countryCode}`);
-                countryCode = userProfile.country_code;
+            dbCountryCode = userProfile?.country_code;
+            
+            // If DB has a country code and metadata doesn't, use DB
+            if (dbCountryCode && !metadata?.countryCode && !metadata?.country_code) {
+                countryCode = dbCountryCode;
             }
+            
+            console.log(`[Pricing] Price validation using country: ${countryCode} (DB had: ${dbCountryCode})`);
         }
 
         const basePrice = getPriceByCountry(countryCode);
@@ -516,6 +522,7 @@ Deno.serve(async (req) => {
           subscription_type: 'individual',
           subscription_platform: 'moyasar',
           subscription_end_date: finalEndDate,
+          country_code: metadata?.countryCode || metadata?.country_code, // Sync country code from payment context
           updated_at: now.toISOString()
         })
 
@@ -524,6 +531,7 @@ Deno.serve(async (req) => {
           subscriptionTier: plan.tier,
           subscriptionType: 'individual',
           endDate: finalEndDate,
+          countryCode: metadata?.countryCode || metadata?.country_code, // Sync country code to Firebase too
           lastPaymentId: payment_id
         })
       }
