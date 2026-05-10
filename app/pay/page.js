@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useEffect, useState, useCallback, Suspense, useMemo } from 'react';
 import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle, Globe } from 'lucide-react';
 import { getPriceByCountry } from '@/lib/pricing';
 import { supabase } from '@/lib/supabase';
@@ -204,14 +204,16 @@ function PayPageInner() {
         });
     }, []);
 
-    const calculatePrice = () => {
+    // Memoize the plan details to avoid unnecessary re-renders and ensure it reacts to state
+    const plan = useMemo(() => {
         try {
             const basePrice = getPriceByCountry(countryCode);
-
+            console.log(`[Pricing] Calculating price for ${countryCode}: ${basePrice} SAR`);
+            
             if (!isOrg) {
-                const plan = PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
+                const selectedPlan = PLANS[planId] || PLANS[DEFAULT_PLAN_ID];
                 return {
-                    ...plan,
+                    ...selectedPlan,
                     price: basePrice,
                     priceHalalas: Math.round(basePrice * 100)
                 };
@@ -239,13 +241,10 @@ function PayPageInner() {
                 ]
             };
         } catch (e) {
-            console.error('[Diagnostic] calculatePrice error:', e);
-            setRuntimeError(e);
+            console.error('[Diagnostic] plan memo error:', e);
             return PLANS[DEFAULT_PLAN_ID];
         }
-    };
-
-    const plan = calculatePrice();
+    }, [countryCode, planId, isOrg, orgName, userCount]);
 
     /* Initialize Moyasar Form */
     useEffect(() => {
