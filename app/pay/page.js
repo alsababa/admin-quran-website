@@ -63,7 +63,16 @@ function PayPageInner() {
     // Org specific state
     const [orgName, setOrgName] = useState('');
     const [userCount, setUserCount] = useState(10); // Default 10 for orgs
-    const [countryCode, setCountryCode] = useState('+966');
+    const [countryCode, setCountryCode] = useState(() => {
+        // Initialize from URL directly to avoid flash of wrong price
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('country') || params.get('country_code') || '+966';
+            console.log('[Pricing] Initial country detection:', code);
+            return code;
+        }
+        return '+966';
+    });
 
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [errorMsg, setErrorMsg] = useState('');
