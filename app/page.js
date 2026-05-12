@@ -136,8 +136,9 @@ export default function LandingPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Link href="/login" className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors border-l border-gray-100 pr-0 pl-6 hidden sm:block">
-                            دخول
+                        {/* Admin login hidden from view but remains in DOM for those who know its location */}
+                        <Link href="/login" className="text-[2px] opacity-0 cursor-default select-none pointer-events-auto">
+                            .
                         </Link>
                         <a href="#download" className="inline-flex items-center gap-2 px-6 h-11 bg-gray-900 hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5">
                             تحميل التطبيق

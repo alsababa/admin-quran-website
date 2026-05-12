@@ -285,33 +285,33 @@ function PayPageInner() {
     // The payment form itself will show a local spinner while loading on the client
 
     return (
-        <div dir="rtl" className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', 'Tajawal', sans-serif", background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%)' }}>
+        <div dir="rtl" className="min-h-screen flex flex-col" style={{ fontFamily: "'Tajawal', sans-serif", background: 'linear-gradient(180deg, #FDFDFD 0%, #F1F5F9 100%)' }}>
 
             {/* ── Navbar ── */}
             <nav style={{
                 position: 'sticky', top: 0, zIndex: 100,
-                background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(0,0,0,0.05)',
-                padding: '0 24px', height: 72,
+                background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(16px)',
+                borderBottom: '1px solid rgba(0,0,0,0.04)',
+                padding: '0 24px', height: 80,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{
-                        width: 42, height: 42, borderRadius: 12,
+                        width: 48, height: 48, borderRadius: 14,
                         background: '#fff', border: '1px solid #f0f0f0',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                     }}>
-                        <img src="/logo/logo.png" alt="مصحف أنامل" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                        <img src="/logo/logo.png" alt="مصحف أنامل" style={{ width: 32, height: 32, objectFit: 'contain' }} />
                     </div>
                     <div>
-                        <div style={{ fontWeight: 900, fontSize: 16, color: '#111' }}>مصحف أنامل</div>
-                        <div style={{ fontSize: 9, fontWeight: 800, color: '#5AA564', letterSpacing: '0.15em', textTransform: 'uppercase' }}>الدفع الآمن</div>
+                        <div style={{ fontWeight: 900, fontSize: 18, color: '#0F172A', letterSpacing: '-0.02em' }}>مصحف أنامل</div>
+                        <div style={{ fontSize: 10, fontWeight: 800, color: '#5AA564', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>بوابة الدفع الآمنة</div>
                     </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#5AA564', fontSize: 12, fontWeight: 700 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#5AA564', background: '#5AA56410', padding: '6px 12px', borderRadius: 100, fontSize: 12, fontWeight: 800 }}>
                     <Shield size={16} />
-                    <span>دفع مشفّر وآمن</span>
+                    <span>تشفير SSL آمن</span>
                 </div>
             </nav>
 
@@ -324,35 +324,38 @@ function PayPageInner() {
                 {/* Plan Summary Card */}
                 <div style={{
                     background: '#fff',
-                    border: isOrg ? '2px solid #5AA564' : '1px solid #eee',
-                    borderRadius: 24, padding: '28px 24px',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    borderRadius: 32, padding: '32px',
                     marginBottom: 28,
-                    boxShadow: isOrg ? '0 8px 32px rgba(90,165,100,0.12)' : '0 4px 20px rgba(0,0,0,0.04)',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.03)',
                     position: 'relative', overflow: 'hidden',
                 }}>
+                    {/* Glass gradient background */}
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #5AA564 0%, #86EFAC 100%)' }} />
+
                     {/* Toggle */}
                     <div style={{
-                        display: 'flex', background: '#F8FAFC', padding: 4, borderRadius: 12, marginBottom: 24,
-                        border: '1px solid #eee'
+                        display: 'flex', background: '#F1F5F9', padding: 5, borderRadius: 16, marginBottom: 32,
+                        border: '1px solid #E2E8F0'
                     }}>
                         <button
                             onClick={() => setIsOrg(false)}
                             style={{
-                                flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                                flex: 1, padding: '10px 0', borderRadius: 12, fontSize: 14, fontWeight: 800,
                                 background: !isOrg ? '#fff' : 'transparent',
-                                color: !isOrg ? '#5AA564' : '#999',
-                                boxShadow: !isOrg ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
-                                transition: 'all 0.2s'
+                                color: !isOrg ? '#0F172A' : '#64748B',
+                                boxShadow: !isOrg ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
                         >أفراد</button>
                         <button
                             onClick={() => setIsOrg(true)}
                             style={{
-                                flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                                flex: 1, padding: '10px 0', borderRadius: 12, fontSize: 14, fontWeight: 800,
                                 background: isOrg ? '#fff' : 'transparent',
-                                color: isOrg ? '#5AA564' : '#999',
-                                boxShadow: isOrg ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
-                                transition: 'all 0.2s'
+                                color: isOrg ? '#0F172A' : '#64748B',
+                                boxShadow: isOrg ? '0 4px 12px rgba(0,0,0,0.08)' : 'none',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
                         >جهات / منظمات</button>
                     </div>
@@ -445,16 +448,23 @@ function PayPageInner() {
 
                 {/* Payment Form Container */}
                 <div style={{
-                    background: '#fff', borderRadius: 24, padding: '28px 24px',
-                    border: '1px solid #eee',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                    background: '#fff', borderRadius: 32, padding: '32px',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.03)',
                     marginBottom: 24,
                     position: 'relative',
                 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 900, color: '#111', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <CreditCard size={18} style={{ color: '#5AA564' }} />
-                        طريقة الدفع
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <CreditCard size={20} style={{ color: '#5AA564' }} />
+                            تفاصيل الدفع
+                        </h3>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                            {['visa', 'mastercard', 'mada'].map(brand => (
+                                <div key={brand} style={{ height: 20, width: 32, background: '#f8fafc', borderRadius: 4, border: '1px solid #eee' }} />
+                            ))}
+                        </div>
+                    </div>
 
                     {status === 'loading' && (
                         <div style={{ textAlign: 'center', padding: '40px 0' }}>
