@@ -1,6 +1,7 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, Suspense, useMemo } from 'react';
+import { useEffect, useState, useCallback, Suspense, useMemo, useRef } from 'react';
+import Script from 'next/script';
 import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle, Globe } from 'lucide-react';
 import { getPriceByCountry } from '@/lib/pricing';
 import { supabase } from '@/lib/supabase';
@@ -50,67 +51,54 @@ function PayPageInner() {
     const [runtimeError, setRuntimeError] = useState(null);
 
     // Use state for search-dependent values to avoid hydration mismatch
-    const [isOrg, setIsOrg] = useState(false);
-    const [token, setToken] = useState('');
-    const [uid, setUid] = useState('');
-    const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
-    const [planId, setPlanId] = useState(DEFAULT_PLAN_ID);
+    const [isOrg, setIsOrg] = useState(() => searchParams.get('type') === 'org');
+    const [token, setToken] = useState(() => searchParams.get('token') || '');
+    const [uid, setUid] = useState(() => {
+        const urlUid = searchParams.get('uid');
+        if (urlUid) return urlUid;
+        const urlToken = searchParams.get('token');
+        if (urlToken) {
+            try {
+                // Try to extract UID from token payload if UID not provided directly
+                const base64Payload = urlToken.split('.')[1];
+                const decodedPayload = typeof window !== 'undefined' 
+                    ? atob(base64Payload) 
+                    : Buffer.from(base64Payload, 'base64').toString();
+                const payload = JSON.parse(decodedPayload);
+                return payload.user_id || payload.sub || 'web-user';
+            } catch (e) {
+                return 'web-user';
+            }
+        }
+        return 'web-user';
+    });
+    const [email, setEmail] = useState(() => searchParams.get('email') || '');
+    const [name, setName] = useState(() => searchParams.get('name') || '');
+    const [planId, setPlanId] = useState(() => searchParams.get('plan') || DEFAULT_PLAN_ID);
 
-    // Initial mount flag to ensure search params are only processed on client
+    // Initial mount flag to ensure browser-only APIs are handled correctly
     const [isMounted, setIsMounted] = useState(false);
+    const [isSdkLoaded, setIsSdkLoaded] = useState(false);
+    const formRef = useRef(null);
 
     // Org specific state
-    const [orgName, setOrgName] = useState('');
-    const [userCount, setUserCount] = useState(10); // Default 10 for orgs
+    const [orgName, setOrgName] = useState(() => searchParams.get('orgName') || '');
+    const [userCount, setUserCount] = useState(() => {
+        const count = parseInt(searchParams.get('userCount'));
+        return isNaN(count) ? 10 : count;
+    });
     const [countryCode, setCountryCode] = useState(() => {
-        // Initialize from URL directly to avoid flash of wrong price
-        if (typeof window !== 'undefined') {
-            const params = new URLSearchParams(window.location.search);
-            const code = params.get('country') || params.get('country_code') || '+966';
-            console.log('[Pricing] Initial country detection:', code);
-            return code;
-        }
-        return '+966';
+        return searchParams.get('country') || searchParams.get('country_code') || '+966';
     });
 
     const [status, setStatus] = useState('loading'); // loading | ready | error
     const [errorMsg, setErrorMsg] = useState('');
 
-    /* Handle Search Params on Mount */
+    /* Sync logic for Search Params */
     useEffect(() => {
-        try {
-            setIsMounted(true);
-            const type = searchParams.get('type');
-            setIsOrg(type === 'org');
-            
-            const urlToken = searchParams.get('token') || '';
-            setToken(urlToken);
-
-            // If we have a token, we can extract UID from it for UI purposes (insecure yet, verified later)
-            let urlUid = searchParams.get('uid') || '';
-            if (!urlUid && urlToken) {
-                try {
-                    const payload = JSON.parse(atob(urlToken.split('.')[1]));
-                    urlUid = payload.user_id || payload.sub || '';
-                } catch (e) {
-                    console.warn('Failed to parse token payload for UI:', e);
-                }
-            }
-
-            setUid(urlUid || 'web-user');
-            setEmail(searchParams.get('email') || '');
-            setName(searchParams.get('name') || '');
-            setPlanId(searchParams.get('plan') || DEFAULT_PLAN_ID);
-            
-            // Extract country code
-            const urlCountry = searchParams.get('country') || searchParams.get('country_code') || '+966';
-            setCountryCode(urlCountry);
-        } catch (e) {
-            console.error('[Diagnostic] Search params sync error:', e);
-            setRuntimeError(e);
-        }
-    }, [searchParams]);
+        setIsMounted(true);
+        console.log('[PayPage] Mounted and synchronized with search params');
+    }, []);
 
     /* Fetch User Data from Database (Truth Source) */
     useEffect(() => {
@@ -148,60 +136,16 @@ function PayPageInner() {
         fetchUserProfile();
     }, [uid, isOrg]);
 
-    /* Load Moyasar SDK with Retry Logic */
-    const loadMoyasarSDK = useCallback((retries = 3) => {
-        return new Promise((resolve, reject) => {
-            const loadHandler = () => {
-                if (typeof window !== 'undefined' && window.Moyasar) {
-                    resolve();
-                    return true;
-                }
-                return false;
-            };
-
-            if (loadHandler()) return;
-
-            const attemptLoad = (remaining) => {
-                try {
-                    if (!document.querySelector(`link[href="${MOYASAR_CSS_URL}"]`)) {
-                        const link = document.createElement('link');
-                        link.rel = 'stylesheet';
-                        link.href = MOYASAR_CSS_URL;
-                        document.head.appendChild(link);
-                    }
-
-                    const script = document.createElement('script');
-                    script.src = `${MOYASAR_JS_URL}?t=${Date.now()}`;
-                    script.async = true;
-
-                    script.onload = () => {
-                        if (loadHandler()) {
-                            script.setAttribute('data-loaded', 'true');
-                        } else {
-                            handleError(remaining);
-                        }
-                    };
-
-                    script.onerror = () => handleError(remaining);
-
-                    const handleError = (rem) => {
-                        if (script.parentNode) document.head.removeChild(script);
-                        if (rem > 1) {
-                            setTimeout(() => attemptLoad(rem - 1), 1500);
-                        } else {
-                            reject(new Error('فشل تحميل مكاتب الدفع من الخادم. يرجى التأكد من اتصال الإنترنت أو المحاولة لاحقاً.'));
-                        }
-                    };
-
-                    document.head.appendChild(script);
-                } catch (e) {
-                    reject(e);
-                }
-            };
-
-            attemptLoad(retries);
-        });
-    }, []);
+    /* Load Moyasar SDK CSS */
+    useEffect(() => {
+        if (!isMounted) return;
+        if (!document.querySelector(`link[href="${MOYASAR_CSS_URL}"]`)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = MOYASAR_CSS_URL;
+            document.head.appendChild(link);
+        }
+    }, [isMounted]);
 
     // Memoize the plan details to avoid unnecessary re-renders and ensure it reacts to state
     const plan = useMemo(() => {
@@ -247,92 +191,73 @@ function PayPageInner() {
 
     /* Initialize Moyasar Form */
     useEffect(() => {
-        if (!isMounted) return;
+        if (!isMounted || !isSdkLoaded || !window.Moyasar) return;
 
+        // Validation checks
         if (isOrg && !orgName) {
-            setStatus('ready');
+            setStatus('ready'); // Waiting for org name
             return;
         }
 
-        if (!uid && !isOrg && !token) {
+        if (!token && !uid) {
             setStatus('error');
-            setErrorMsg('بيانات المستخدم غير موجودة. يرجى المحاولة من التطبيق.');
+            setErrorMsg('بيانات المستخدم غير مكتملة. يرجى المحاولة من التطبيق.');
             return;
         }
+
         if (!MOYASAR_PK) {
             setStatus('error');
-            setErrorMsg('مفتاح الدفع غير مضبوط. يرجى التواصل مع الدعم.');
+            setErrorMsg('مفتاح الدفع غير مضبوط.');
             return;
         }
 
-        let mounted = true;
+        try {
+            const currentPath = window.location.href.split('?')[0].split('#')[0];
+            const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
+            const callbackUrl = `${payBase}callback/?token=${encodeURIComponent(token)}&uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
 
-        loadMoyasarSDK()
-            .then(() => {
-                if (!mounted) return;
+            console.log('[Moyasar] Initializing form for:', uid);
+            
+            // Clean container
+            if (formRef.current) {
+                formRef.current.innerHTML = '';
+            }
 
-                try {
-                    const currentPath = window.location.href.split('?')[0].split('#')[0];
-                    const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
-                    const callbackUrl = `${payBase}callback/?token=${encodeURIComponent(token)}&uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
-
-                    const container = document.querySelector('.mysr-form');
-                    if (container) container.innerHTML = '';
-
-                    setTimeout(() => {
-                        if (!window.Moyasar || !mounted) return;
-
-                        try {
-                            window.Moyasar.init({
-                                element: '.mysr-form',
-                                amount: plan.priceHalalas,
-                                currency: 'SAR',
-                                description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
-                                publishable_api_key: MOYASAR_PK,
-                                callback_url: callbackUrl,
-                                language: 'ar',
-                                methods: ['creditcard', 'stcpay', 'applepay'],
-                                apple_pay: {
-                                    label: 'مصحف أنامل',
-                                    validate_merchant_url: 'https://efwffwyslgidrzumarqf.supabase.co/functions/v1/applepay-merchant-validation',
-                                    country: 'SA',
-                                },
-                                metadata: {
-                                    token: token,
-                                    userId: uid,
-                                    user_id: uid, // Support both formats
-                                    email: email,
-                                    source: 'website',
-                                    planId: planId,
-                                    plan_id: planId, // Support both formats
-                                    type: isOrg ? 'organization' : 'individual',
-                                    userCount: isOrg ? userCount : 1,
-                                    orgName: orgName,
-                                    countryCode: countryCode,
-                                    order_id: `quran_admin_${Date.now()}_${uid.substring(0, 5)}`,
-                                    platform: 'admin_dashboard'
-                                },
-                            });
-                            setStatus('ready');
-                        } catch (initErr) {
-                            console.error('[Moyasar] Init error:', initErr);
-                            setStatus('error');
-                            setErrorMsg('حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني');
-                        }
-                    }, 100);
-                } catch (e) {
-                    setRuntimeError(e);
-                }
-            })
-            .catch((err) => {
-                if (!mounted) return;
-                console.error('[Moyasar] load error:', err);
-                setStatus('error');
-                setErrorMsg(err.message || 'فشل تحميل نموذج الدفع');
+            window.Moyasar.init({
+                element: '.mysr-form',
+                amount: plan.priceHalalas,
+                currency: 'SAR',
+                description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
+                publishable_api_key: MOYASAR_PK,
+                callback_url: callbackUrl,
+                language: 'ar',
+                methods: ['creditcard', 'stcpay', 'applepay'],
+                apple_pay: {
+                    label: 'مصحف أنامل',
+                    validate_merchant_url: 'https://efwffwyslgidrzumarqf.supabase.co/functions/v1/applepay-merchant-validation',
+                    country: 'SA',
+                },
+                metadata: {
+                    token: token,
+                    userId: uid,
+                    email: email,
+                    planId: planId,
+                    type: isOrg ? 'organization' : 'individual',
+                    userCount: isOrg ? userCount : 1,
+                    orgName: orgName,
+                    countryCode: countryCode,
+                    order_id: `quran_admin_${Date.now()}_${uid.substring(0, 5)}`,
+                    platform: 'admin_dashboard'
+                },
             });
-
-        return () => { mounted = false; };
-    }, [uid, token, isOrg, orgName, plan.priceHalalas, loadMoyasarSDK, isMounted]);
+            
+            setStatus('ready');
+        } catch (initErr) {
+            console.error('[Moyasar] Init error:', initErr);
+            setStatus('error');
+            setErrorMsg('حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني');
+        }
+    }, [isMounted, isSdkLoaded, uid, token, isOrg, orgName, plan.priceHalalas, planId, countryCode, userCount, email, name]);
 
     if (runtimeError) {
         return (
@@ -355,14 +280,9 @@ function PayPageInner() {
         );
     }
 
-    if (!isMounted) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite' }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            </div>
-        );
-    }
+    // We no longer return a full-screen spinner if !isMounted
+    // This allows the layout to render immediately (SSR)
+    // The payment form itself will show a local spinner while loading on the client
 
     return (
         <div dir="rtl" className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', 'Tajawal', sans-serif", background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F7 100%)' }}>
@@ -555,8 +475,28 @@ function PayPageInner() {
                         </div>
                     )}
 
-                    {/* Moyasar Container */}
-                    <div dangerouslySetInnerHTML={{ __html: '<div class="mysr-form" dir="rtl"></div>' }} />
+                    {/* Moyasar Container - Stable version */}
+                    <div 
+                        ref={formRef}
+                        className="mysr-form" 
+                        dir="rtl" 
+                        style={{ minHeight: 200 }}
+                    ></div>
+
+                    {/* SDK Loader */}
+                    <Script 
+                        src={MOYASAR_JS_URL}
+                        strategy="afterInteractive"
+                        onLoad={() => {
+                            console.log('[Moyasar] Script loaded via next/script');
+                            setIsSdkLoaded(true);
+                        }}
+                        onError={(e) => {
+                            console.error('[Moyasar] Script failed to load', e);
+                            setStatus('error');
+                            setErrorMsg('فشل تحميل مكاتب الدفع. يرجى التأكد من اتصال الإنترنت.');
+                        }}
+                    />
                 </div>
 
                 {/* Security badges */}
