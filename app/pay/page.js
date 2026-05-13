@@ -128,8 +128,7 @@ function PayPageInner() {
     const [countryCode, setCountryCode] = useState(() => {
         return searchParams.get('country') || searchParams.get('country_code') || '+966';
     });
-    const [dbCountryCode, setDbCountryCode] = useState(null);
-    const [isSelectingCountry, setIsSelectingCountry] = useState(false);
+
 
 
 
@@ -157,11 +156,10 @@ function PayPageInner() {
                 if (data && !error) {
                     console.log('[Database] User profile found:', data);
                     
-                    // Store the source of truth from DB
+                    // Sync country from DB if available
                     if (data.country_code) {
                         console.log('[Pricing] Using DB country code:', data.country_code);
                         setCountryCode(data.country_code);
-                        setDbCountryCode(data.country_code);
                     } else {
                         const urlCountry = searchParams.get('country') || searchParams.get('country_code');
                         if (urlCountry) {
@@ -254,12 +252,6 @@ function PayPageInner() {
             return;
         }
 
-        // Security Check: If DB has a country code, ensure it matches
-        if (dbCountryCode && countryCode !== dbCountryCode) {
-            setStatus('error');
-            setErrorMsg(`يجب إتمام الدفع باستخدام دولة الحساب المسجلة (${dbCountryCode}). لا يمكن تغيير الدولة لتخفيض السعر.`);
-            return;
-        }
 
         if (!MOYASAR_PK) {
             setStatus('error');
@@ -509,69 +501,10 @@ function PayPageInner() {
                             {email && <span>📧 البريد: {email}</span>}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                                 <span>🌍 الدولة: {countryCode}</span>
-                                {!dbCountryCode ? (
-                                    <button 
-                                        onClick={() => setIsSelectingCountry(true)}
-                                        style={{ background: 'none', border: 'none', color: '#5AA564', fontSize: 11, fontWeight: 800, cursor: 'pointer', textDecoration: 'underline' }}
-                                    >تغيير</button>
-                                ) : (
-                                    <span style={{ fontSize: 10, color: '#94A3B8', fontWeight: 700 }}>(موثقة من الحساب)</span>
-                                )}
                             </div>
                         </div>
                     )}
                 </div>
-
-
-                {/* Country Selector Modal */}
-                <AnimatePresence>
-                    {isSelectingCountry && (
-                        <motion.div 
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            style={{
-                                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                                background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)',
-                                zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                padding: 20
-                            }}
-                            onClick={() => setIsSelectingCountry(false)}
-                        >
-                            <motion.div 
-                                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-                                style={{
-                                    background: '#fff', borderRadius: 24, width: '100%', maxWidth: 400,
-                                    padding: 24, boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-                                    maxHeight: '80vh', overflowY: 'auto'
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 16, textAlign: 'center' }}>اختر الدولة</h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                    {Object.keys(REGIONAL_PRICES).map((code) => (
-                                        <button 
-                                            key={code}
-                                            onClick={() => {
-                                                setCountryCode(code);
-                                                setIsSelectingCountry(false);
-                                            }}
-                                            style={{
-                                                padding: '12px 16px', borderRadius: 12, border: '1px solid #eee',
-                                                background: countryCode === code ? '#F0FDF4' : '#fff',
-                                                borderColor: countryCode === code ? '#5AA564' : '#eee',
-                                                textAlign: 'right', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                                                display: 'flex', justifyContent: 'space-between'
-                                            }}
-                                        >
-                                            <span>{code === 'Global' ? 'دولي' : code}</span>
-                                            {countryCode === code && <CheckCircle2 size={16} style={{ color: '#5AA564' }} />}
-                                        </button>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
 
                 {/* Payment Form Container / Auth Guard */}
                 <div style={{
