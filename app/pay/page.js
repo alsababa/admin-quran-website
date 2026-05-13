@@ -128,7 +128,9 @@ function PayPageInner() {
     const [countryCode, setCountryCode] = useState(() => {
         return searchParams.get('country') || searchParams.get('country_code') || '+966';
     });
+    const [dbCountryCode, setDbCountryCode] = useState(null);
     const [isSelectingCountry, setIsSelectingCountry] = useState(false);
+
 
 
     const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -155,10 +157,11 @@ function PayPageInner() {
                 if (data && !error) {
                     console.log('[Database] User profile found:', data);
                     
-                    // Prioritize Database country code if it exists, otherwise use URL parameter
+                    // Store the source of truth from DB
                     if (data.country_code) {
                         console.log('[Pricing] Using DB country code:', data.country_code);
                         setCountryCode(data.country_code);
+                        setDbCountryCode(data.country_code);
                     } else {
                         const urlCountry = searchParams.get('country') || searchParams.get('country_code');
                         if (urlCountry) {
@@ -248,6 +251,13 @@ function PayPageInner() {
         if (!uid) {
             setStatus('error');
             setErrorMsg('بيانات المستخدم غير مكتملة.');
+            return;
+        }
+
+        // Security Check: If DB has a country code, ensure it matches
+        if (dbCountryCode && countryCode !== dbCountryCode) {
+            setStatus('error');
+            setErrorMsg(`يجب إتمام الدفع باستخدام دولة الحساب المسجلة (${dbCountryCode}). لا يمكن تغيير الدولة لتخفيض السعر.`);
             return;
         }
 
@@ -499,14 +509,19 @@ function PayPageInner() {
                             {email && <span>📧 البريد: {email}</span>}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                                 <span>🌍 الدولة: {countryCode}</span>
-                                <button 
-                                    onClick={() => setIsSelectingCountry(true)}
-                                    style={{ background: 'none', border: 'none', color: '#5AA564', fontSize: 11, fontWeight: 800, cursor: 'pointer', textDecoration: 'underline' }}
-                                >تغيير</button>
+                                {!dbCountryCode ? (
+                                    <button 
+                                        onClick={() => setIsSelectingCountry(true)}
+                                        style={{ background: 'none', border: 'none', color: '#5AA564', fontSize: 11, fontWeight: 800, cursor: 'pointer', textDecoration: 'underline' }}
+                                    >تغيير</button>
+                                ) : (
+                                    <span style={{ fontSize: 10, color: '#94A3B8', fontWeight: 700 }}>(موثقة من الحساب)</span>
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
+
 
                 {/* Country Selector Modal */}
                 <AnimatePresence>
