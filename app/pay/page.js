@@ -237,11 +237,10 @@ function PayPageInner() {
 
         // Validation checks
         if (isOrg && !orgName) {
-            setStatus('ready'); // Waiting for org name
+            setStatus('ready');
             return;
         }
 
-        // Ensure we have the user identification
         if (!uid) {
             setStatus('error');
             setErrorMsg('بيانات المستخدم غير مكتملة.');
@@ -254,52 +253,61 @@ function PayPageInner() {
             return;
         }
 
-        try {
-            const currentPath = window.location.href.split('?')[0].split('#')[0];
-            const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
-            const callbackUrl = `${payBase}callback/?token=${encodeURIComponent(token)}&uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
+        // Delay to ensure DOM is ready (especially with animations)
+        const timer = setTimeout(() => {
+            try {
+                // Ensure the container exists
+                const container = document.querySelector('.mysr-form');
+                if (!container) {
+                    console.warn('[Moyasar] Form container not found yet, retrying...');
+                    return; 
+                }
 
-            console.log('[Moyasar] Initializing form for:', uid);
-            
-            // Clean container
-            if (formRef.current) {
-                formRef.current.innerHTML = '';
+                const currentPath = window.location.href.split('?')[0].split('#')[0];
+                const payBase = currentPath.endsWith('/') ? currentPath : currentPath + '/';
+                const callbackUrl = `${payBase}callback/?token=${encodeURIComponent(token)}&uid=${encodeURIComponent(uid)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}&plan=${encodeURIComponent(planId)}&type=${isOrg ? 'org' : 'ind'}&userCount=${userCount}&orgName=${encodeURIComponent(orgName)}`;
+
+                console.log('[Moyasar] Initializing form for:', uid);
+                
+                container.innerHTML = '';
+
+                window.Moyasar.init({
+                    element: '.mysr-form',
+                    amount: plan.priceHalalas,
+                    currency: 'SAR',
+                    description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
+                    publishable_api_key: MOYASAR_PK,
+                    callback_url: callbackUrl,
+                    language: 'ar',
+                    methods: ['creditcard', 'stcpay', 'applepay'],
+                    apple_pay: {
+                        label: 'مصحف أنامل',
+                        validate_merchant_url: 'https://efwffwyslgidrzumarqf.supabase.co/functions/v1/applepay-merchant-validation',
+                        country: 'SA',
+                    },
+                    metadata: {
+                        token: token,
+                        userId: uid,
+                        email: email,
+                        planId: planId,
+                        type: isOrg ? 'organization' : 'individual',
+                        userCount: isOrg ? userCount : 1,
+                        orgName: orgName,
+                        countryCode: countryCode,
+                        order_id: `quran_admin_${Date.now()}_${uid.substring(0, 5)}`,
+                        platform: 'admin_dashboard'
+                    },
+                });
+                
+                setStatus('ready');
+            } catch (initErr) {
+                console.error('[Moyasar] Init error:', initErr);
+                setStatus('error');
+                setErrorMsg(`حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني: ${initErr.message}`);
             }
+        }, 100);
 
-            window.Moyasar.init({
-                element: '.mysr-form',
-                amount: plan.priceHalalas,
-                currency: 'SAR',
-                description: isOrg ? `اشتراك جهة: ${orgName}` : `مصحف أنامل - ${plan.title}`,
-                publishable_api_key: MOYASAR_PK,
-                callback_url: callbackUrl,
-                language: 'ar',
-                methods: ['creditcard', 'stcpay', 'applepay'],
-                apple_pay: {
-                    label: 'مصحف أنامل',
-                    validate_merchant_url: 'https://efwffwyslgidrzumarqf.supabase.co/functions/v1/applepay-merchant-validation',
-                    country: 'SA',
-                },
-                metadata: {
-                    token: token,
-                    userId: uid,
-                    email: email,
-                    planId: planId,
-                    type: isOrg ? 'organization' : 'individual',
-                    userCount: isOrg ? userCount : 1,
-                    orgName: orgName,
-                    countryCode: countryCode,
-                    order_id: `quran_admin_${Date.now()}_${uid.substring(0, 5)}`,
-                    platform: 'admin_dashboard'
-                },
-            });
-            
-            setStatus('ready');
-        } catch (initErr) {
-            console.error('[Moyasar] Init error:', initErr);
-            setStatus('error');
-            setErrorMsg('حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني');
-        }
+        return () => clearTimeout(timer);
     }, [isMounted, isSdkLoaded, authUser, authLoading, uid, token, isOrg, orgName, plan.priceHalalas, planId, countryCode, userCount, email, name]);
 
     if (runtimeError) {
