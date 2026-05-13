@@ -1,10 +1,12 @@
 "use client";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback, Suspense, useMemo, useRef } from 'react';
 import Script from 'next/script';
-import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle, Globe } from 'lucide-react';
+import { Shield, CreditCard, CheckCircle2, ArrowLeft, Loader2, AlertTriangle, Globe, Mail, Lock, User as UserIcon, LogIn } from 'lucide-react';
 import { getPriceByCountry } from '@/lib/pricing';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /* ────────────────────────────────────────────────────────
  * Plan Definitions (must match mobile app plans)
@@ -53,27 +55,63 @@ function PayPageInner() {
     // Use state for search-dependent values to avoid hydration mismatch
     const [isOrg, setIsOrg] = useState(() => searchParams.get('type') === 'org');
     const [token, setToken] = useState(() => searchParams.get('token') || '');
-    const [uid, setUid] = useState(() => {
-        const urlUid = searchParams.get('uid');
-        if (urlUid) return urlUid;
-        const urlToken = searchParams.get('token');
-        if (urlToken) {
-            try {
-                // Try to extract UID from token payload if UID not provided directly
-                const base64Payload = urlToken.split('.')[1];
-                const decodedPayload = typeof window !== 'undefined' 
-                    ? atob(base64Payload) 
-                    : Buffer.from(base64Payload, 'base64').toString();
-                const payload = JSON.parse(decodedPayload);
-                return payload.user_id || payload.sub || 'web-user';
-            } catch (e) {
-                return 'web-user';
-            }
-        }
-        return 'web-user';
-    });
+    const { user: authUser, loading: authLoading, login, signUp } = useAuth();
+    const router = useRouter();
+
+    const [uid, setUid] = useState(() => searchParams.get('uid') || '');
     const [email, setEmail] = useState(() => searchParams.get('email') || '');
     const [name, setName] = useState(() => searchParams.get('name') || '');
+    
+    // Auth Form State
+    const [authMode, setAuthMode] = useState('login'); // login | signup
+    const [authEmail, setAuthEmail] = useState('');
+    const [authPassword, setAuthPassword] = useState('');
+    const [authError, setAuthError] = useState('');
+    const [isAuthProcessing, setIsAuthProcessing] = useState(false);
+
+    // Initial effect to sync with search params and auth user
+    useEffect(() => {
+        if (!authLoading && authUser) {
+            setUid(authUser.uid);
+            setEmail(authUser.email || '');
+            setName(authUser.displayName || '');
+            
+            // Sync token if available
+            authUser.getIdToken().then(t => setToken(t));
+
+            // Still check search params for context (plan, etc)
+            const urlPlan = searchParams.get('plan');
+            if (urlPlan) setPlanId(urlPlan);
+            
+            const urlType = searchParams.get('type');
+            if (urlType === 'org') setIsOrg(true);
+        } else if (!authLoading && !authUser) {
+            // If not logged in, we might still want to know which plan they were looking at
+            const urlPlan = searchParams.get('plan');
+            if (urlPlan) setPlanId(urlPlan);
+            const urlType = searchParams.get('type');
+            if (urlType === 'org') setIsOrg(true);
+        }
+    }, [authUser, authLoading, searchParams]);
+
+    const handleAuth = async (e) => {
+        e.preventDefault();
+        setAuthError('');
+        setIsAuthProcessing(true);
+        try {
+            if (authMode === 'login') {
+                await login(authEmail, authPassword);
+            } else {
+                await signUp(authEmail, authPassword);
+            }
+        } catch (err) {
+            console.error('Auth Error:', err);
+            setAuthError('فشل التحقق من البيانات. يرجى التأكد من البريد وكلمة المرور.');
+        } finally {
+            setIsAuthProcessing(false);
+        }
+    };
+
     const [planId, setPlanId] = useState(() => searchParams.get('plan') || DEFAULT_PLAN_ID);
 
     // Initial mount flag to ensure browser-only APIs are handled correctly
@@ -192,6 +230,10 @@ function PayPageInner() {
     /* Initialize Moyasar Form */
     useEffect(() => {
         if (!isMounted || !isSdkLoaded || !window.Moyasar) return;
+        
+        // Wait for authentication to be complete
+        if (authLoading) return;
+        if (!authUser) return; // UI handles the login form
 
         // Validation checks
         if (isOrg && !orgName) {
@@ -199,9 +241,10 @@ function PayPageInner() {
             return;
         }
 
-        if (!token && !uid) {
+        // Ensure we have the user identification
+        if (!uid) {
             setStatus('error');
-            setErrorMsg('بيانات المستخدم غير مكتملة. يرجى المحاولة من التطبيق.');
+            setErrorMsg('بيانات المستخدم غير مكتملة.');
             return;
         }
 
@@ -257,7 +300,7 @@ function PayPageInner() {
             setStatus('error');
             setErrorMsg('حدث خطأ أثناء تشغيل نظام الدفع الإلكتروني');
         }
-    }, [isMounted, isSdkLoaded, uid, token, isOrg, orgName, plan.priceHalalas, planId, countryCode, userCount, email, name]);
+    }, [isMounted, isSdkLoaded, authUser, authLoading, uid, token, isOrg, orgName, plan.priceHalalas, planId, countryCode, userCount, email, name]);
 
     if (runtimeError) {
         return (
@@ -446,52 +489,166 @@ function PayPageInner() {
                     )}
                 </div>
 
-                {/* Payment Form Container */}
+                {/* Payment Form Container / Auth Guard */}
                 <div style={{
                     background: '#fff', borderRadius: 32, padding: '32px',
                     border: '1px solid rgba(0,0,0,0.05)',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.03)',
                     marginBottom: 24,
                     position: 'relative',
+                    overflow: 'hidden'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <CreditCard size={20} style={{ color: '#5AA564' }} />
-                            تفاصيل الدفع
-                        </h3>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                            {['visa', 'mastercard', 'mada'].map(brand => (
-                                <div key={brand} style={{ height: 20, width: 32, background: '#f8fafc', borderRadius: 4, border: '1px solid #eee' }} />
-                            ))}
-                        </div>
-                    </div>
+                    <AnimatePresence mode="wait">
+                        {authLoading ? (
+                            <motion.div 
+                                key="auth-loading"
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                style={{ textAlign: 'center', padding: '40px 0' }}
+                            >
+                                <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+                                <p style={{ color: '#999', fontWeight: 600, fontSize: 14 }}>جاري التحقق من الهوية...</p>
+                            </motion.div>
+                        ) : !authUser ? (
+                            <motion.div 
+                                key="auth-form"
+                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+                            >
+                                <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                                    <div style={{
+                                        width: 56, height: 56, borderRadius: 18,
+                                        background: '#5AA56410', color: '#5AA564',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        margin: '0 auto 16px',
+                                    }}>
+                                        <LogIn size={28} />
+                                    </div>
+                                    <h3 style={{ fontSize: 20, fontWeight: 900, color: '#0F172A', marginBottom: 8 }}>تسجيل الدخول للمتابعة</h3>
+                                    <p style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>يجب تسجيل الدخول لربط الاشتراك بحسابك في التطبيق</p>
+                                </div>
 
-                    {status === 'loading' && (
-                        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                            <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-                            <p style={{ color: '#999', fontWeight: 600, fontSize: 14 }}>جاري تحميل نموذج الدفع...</p>
-                            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                        </div>
-                    )}
+                                <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                    {authError && (
+                                        <div style={{
+                                            padding: '12px 16px', background: '#FEF2F2', border: '1px solid #FEE2E2',
+                                            borderRadius: 12, color: '#DC2626', fontSize: 12, fontWeight: 700,
+                                            display: 'flex', alignItems: 'center', gap: 8
+                                        }}>
+                                            <AlertTriangle size={16} />
+                                            {authError}
+                                        </div>
+                                    )}
 
-                    {status === 'error' && (
-                        <div style={{
-                            textAlign: 'center', padding: '40px 20px',
-                            background: '#FFF5F5', borderRadius: 16,
-                        }}>
-                            <AlertTriangle size={40} style={{ color: '#E53E3E', margin: '0 auto 16px' }} />
-                            <p style={{ color: '#E53E3E', fontWeight: 700, fontSize: 15, marginBottom: 8 }}>خطأ</p>
-                            <p style={{ color: '#666', fontSize: 13, fontWeight: 500 }}>{errorMsg}</p>
-                        </div>
-                    )}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <label style={{ fontSize: 11, fontWeight: 900, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em', paddingRight: 4 }}>البريد الإلكتروني</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <Mail size={18} style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                                            <input 
+                                                type="email" required value={authEmail} onChange={(e) => setAuthEmail(e.target.value)}
+                                                placeholder="example@mail.com"
+                                                style={{
+                                                    width: '100%', height: 52, borderRadius: 14, border: '1px solid #E2E8F0',
+                                                    padding: '0 48px 0 16px', fontSize: 14, fontWeight: 600, outline: 'none',
+                                                    background: '#F8FAFC', transition: 'all 0.2s'
+                                                }}
+                                                onFocus={(e) => e.target.style.borderColor = '#5AA564'}
+                                                onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                                            />
+                                        </div>
+                                    </div>
 
-                    {/* Moyasar Container - Stable version */}
-                    <div 
-                        ref={formRef}
-                        className="mysr-form" 
-                        dir="rtl" 
-                        style={{ minHeight: 200 }}
-                    ></div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                        <label style={{ fontSize: 11, fontWeight: 900, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em', paddingRight: 4 }}>كلمة المرور</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <Lock size={18} style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                                            <input 
+                                                type="password" required value={authPassword} onChange={(e) => setAuthPassword(e.target.value)}
+                                                placeholder="••••••••"
+                                                style={{
+                                                    width: '100%', height: 52, borderRadius: 14, border: '1px solid #E2E8F0',
+                                                    padding: '0 48px 0 16px', fontSize: 14, fontWeight: 600, outline: 'none',
+                                                    background: '#F8FAFC', transition: 'all 0.2s'
+                                                }}
+                                                onFocus={(e) => e.target.style.borderColor = '#5AA564'}
+                                                onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        type="submit" disabled={isAuthProcessing}
+                                        style={{
+                                            width: '100%', height: 56, borderRadius: 16,
+                                            background: 'linear-gradient(135deg, #5AA564 0%, #4A8F53 100%)',
+                                            color: '#fff', fontWeight: 900, fontSize: 16, border: 'none',
+                                            cursor: 'pointer', boxShadow: '0 10px 25px rgba(90,165,100,0.2)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                                            marginTop: 8, transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        {isAuthProcessing ? <Loader2 className="animate-spin" size={20} /> : (
+                                            <>
+                                                <span>{authMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}</span>
+                                                <ArrowLeft size={20} />
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <div style={{ textAlign: 'center', marginTop: 8 }}>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
+                                            style={{ background: 'none', border: 'none', color: '#5AA564', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                                        >
+                                            {authMode === 'login' ? 'ليس لديك حساب؟ سجل الآن' : 'لديك حساب بالفعل؟ سجل دخولك'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </motion.div>
+                        ) : (
+                            <motion.div 
+                                key="payment-form"
+                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                                    <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        <CreditCard size={20} style={{ color: '#5AA564' }} />
+                                        تفاصيل الدفع
+                                    </h3>
+                                    <div style={{ display: 'flex', gap: 4 }}>
+                                        {['visa', 'mastercard', 'mada'].map(brand => (
+                                            <div key={brand} style={{ height: 20, width: 32, background: '#f8fafc', borderRadius: 4, border: '1px solid #eee' }} />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {status === 'loading' && (
+                                    <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                                        <Loader2 size={32} style={{ color: '#5AA564', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+                                        <p style={{ color: '#999', fontWeight: 600, fontSize: 14 }}>جاري تحميل نموذج الدفع...</p>
+                                    </div>
+                                )}
+
+                                {status === 'error' && (
+                                    <div style={{
+                                        textAlign: 'center', padding: '40px 20px',
+                                        background: '#FFF5F5', borderRadius: 16,
+                                    }}>
+                                        <AlertTriangle size={40} style={{ color: '#E53E3E', margin: '0 auto 16px' }} />
+                                        <p style={{ color: '#E53E3E', fontWeight: 700, fontSize: 15, marginBottom: 8 }}>خطأ</p>
+                                        <p style={{ color: '#666', fontSize: 13, fontWeight: 500 }}>{errorMsg}</p>
+                                    </div>
+                                )}
+
+                                {/* Moyasar Container */}
+                                <div 
+                                    ref={formRef}
+                                    className="mysr-form" 
+                                    dir="rtl" 
+                                    style={{ minHeight: 200 }}
+                                ></div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* SDK Loader */}
                     <Script 

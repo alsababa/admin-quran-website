@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 /* eslint-disable react-refresh/only-export-components */
@@ -32,6 +32,10 @@ export const AuthProvider = ({ children }) => {
         return signInWithEmailAndPassword(auth, email, password);
     };
 
+    const signUp = (email, password) => {
+        return createUserWithEmailAndPassword(auth, email, password);
+    };
+
     const logout = () => {
         return signOut(auth);
     };
@@ -39,6 +43,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         login,
+        signUp,
         logout,
         loading
     };
